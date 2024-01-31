@@ -70,6 +70,7 @@
             // 
             // DownloadButton
             // 
+            DownloadButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             DownloadButton.Location = new Point(614, 164);
             DownloadButton.Margin = new Padding(3, 4, 3, 4);
             DownloadButton.Name = "DownloadButton";
@@ -81,6 +82,7 @@
             // 
             // UploadButton
             // 
+            UploadButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             UploadButton.Location = new Point(614, 215);
             UploadButton.Margin = new Padding(3, 4, 3, 4);
             UploadButton.Name = "UploadButton";
@@ -92,6 +94,7 @@
             // 
             // RepoPathTextBox
             // 
+            RepoPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             RepoPathTextBox.Location = new Point(15, 64);
             RepoPathTextBox.Margin = new Padding(3, 4, 3, 4);
             RepoPathTextBox.Name = "RepoPathTextBox";
@@ -100,6 +103,7 @@
             // 
             // BrowseGitHubButton
             // 
+            BrowseGitHubButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             BrowseGitHubButton.Location = new Point(15, 25);
             BrowseGitHubButton.Margin = new Padding(3, 4, 3, 4);
             BrowseGitHubButton.Name = "BrowseGitHubButton";
@@ -111,6 +115,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             groupBox1.Controls.Add(BrowseGitHubButton);
             groupBox1.Controls.Add(RepoPathTextBox);
             groupBox1.Location = new Point(599, 20);
@@ -124,7 +129,7 @@
             // 
             // SelectAllButton
             // 
-            SelectAllButton.Location = new Point(397, 36);
+            SelectAllButton.Location = new Point(413, 36);
             SelectAllButton.Margin = new Padding(3, 4, 3, 4);
             SelectAllButton.Name = "SelectAllButton";
             SelectAllButton.Size = new Size(86, 31);
@@ -135,7 +140,7 @@
             // 
             // ClearAllButton
             // 
-            ClearAllButton.Location = new Point(489, 36);
+            ClearAllButton.Location = new Point(505, 36);
             ClearAllButton.Margin = new Padding(3, 4, 3, 4);
             ClearAllButton.Name = "ClearAllButton";
             ClearAllButton.Size = new Size(86, 31);
@@ -149,7 +154,7 @@
             GetTestCasesButton.Location = new Point(280, 36);
             GetTestCasesButton.Margin = new Padding(3, 4, 3, 4);
             GetTestCasesButton.Name = "GetTestCasesButton";
-            GetTestCasesButton.Size = new Size(110, 31);
+            GetTestCasesButton.Size = new Size(127, 31);
             GetTestCasesButton.TabIndex = 12;
             GetTestCasesButton.Text = "Get For Project";
             GetTestCasesButton.UseVisualStyleBackColor = true;
@@ -157,6 +162,7 @@
             // 
             // ExitButton
             // 
+            ExitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             ExitButton.Location = new Point(712, 448);
             ExitButton.Margin = new Padding(3, 4, 3, 4);
             ExitButton.Name = "ExitButton";
@@ -177,6 +183,7 @@
             // 
             // ProgressBar
             // 
+            ProgressBar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             ProgressBar.Location = new Point(614, 269);
             ProgressBar.Margin = new Padding(3, 4, 3, 4);
             ProgressBar.Name = "ProgressBar";
@@ -187,6 +194,7 @@
             // 
             // TestCaseListBox
             // 
+            TestCaseListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             TestCaseListBox.FormattingEnabled = true;
             TestCaseListBox.Location = new Point(279, 79);
             TestCaseListBox.Margin = new Padding(3, 4, 3, 4);
@@ -196,6 +204,7 @@
             // 
             // StatusTextBox
             // 
+            StatusTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             StatusTextBox.Location = new Point(11, 429);
             StatusTextBox.MaxLength = 1000000;
             StatusTextBox.Multiline = true;

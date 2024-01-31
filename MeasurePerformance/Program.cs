@@ -162,14 +162,11 @@ namespace MeasurePerformance
             {
                 Console.Write($"\r{i}");
                 long start = DateTime.Now.Ticks;
-                //string url = BaseDokimionApiUrl() +  "/" + project + "/testcase?from_lastModifiedTime=1697500000000";
                 url = BaseDokimionApiUrl() + "/" + project + $"/testcase?limit=1&skip={i}";
                 json = m_Client.GetStringAsync(url).Result;
-                TestCase[] testCase = JsonConvert.DeserializeObject<TestCase[]>(json);
-                if (testCase.Count() == 1)
+                TestCase[]? testCase = JsonConvert.DeserializeObject<TestCase[]>(json);
+                if (testCase != null && testCase.Length == 1)
                 {
-                    // None of the "From" time conversions work
-                    //string createdOn = (new DateTime(testCase[0].createdTime)).ToString("u");
                     cases.Add(testCase[0]);
                     File.WriteAllText($"{project}_TestCase_{testCase[0].id}.json", json);
                 }

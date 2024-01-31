@@ -41,6 +41,7 @@
             // 
             // UserNameTextBox
             // 
+            UserNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             UserNameTextBox.Location = new Point(14, 44);
             UserNameTextBox.Margin = new Padding(3, 4, 3, 4);
             UserNameTextBox.Name = "UserNameTextBox";
@@ -67,6 +68,7 @@
             // 
             // PasswordTextBox
             // 
+            PasswordTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PasswordTextBox.Location = new Point(14, 121);
             PasswordTextBox.Margin = new Padding(3, 4, 3, 4);
             PasswordTextBox.Name = "PasswordTextBox";
@@ -76,15 +78,17 @@
             // 
             // label3
             // 
+            label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label3.AutoSize = true;
             label3.Location = new Point(14, 177);
             label3.Name = "label3";
-            label3.Size = new Size(163, 20);
+            label3.Size = new Size(208, 20);
             label3.TabIndex = 5;
-            label3.Text = "Url for Dokimion server";
+            label3.Text = "IP Address of Dokimion server";
             // 
             // UrlTextBox
             // 
+            UrlTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             UrlTextBox.Location = new Point(14, 207);
             UrlTextBox.Margin = new Padding(3, 4, 3, 4);
             UrlTextBox.Name = "UrlTextBox";
@@ -104,6 +108,7 @@
             // 
             // CancelButton
             // 
+            CancelButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             CancelButton.DialogResult = DialogResult.Cancel;
             CancelButton.Location = new Point(318, 264);
             CancelButton.Margin = new Padding(3, 4, 3, 4);

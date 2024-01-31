@@ -166,7 +166,7 @@ namespace Updater
             {
                 RepoPathTextBox.Text = dlg.SelectedPath;
                 Settings? settings = GetSettings();
-                if (settings != null) 
+                if (settings != null)
                 {
                     settings.repo = dlg.SelectedPath;
                     SaveSettings(settings);
