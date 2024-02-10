@@ -54,6 +54,7 @@ namespace Updater
             }
             else
             {
+                StatusTextBox.Text = "";
                 ProjectsListBox.Items.Clear();
                 List<Project>? projects = m_Dokimion.GetProjects();
                 if (projects == null)
@@ -194,6 +195,7 @@ namespace Updater
             }
 
             StatusTextBox.Text = "";
+            m_Dokimion.Error = "";
             ProgressBar.Minimum = 0;
             ProgressBar.Value = 0;
             ProgressBar.Step = 1;
@@ -210,7 +212,9 @@ namespace Updater
             }
 
             ProgressBar.Value = 0;
-            StatusTextBox.Text = $"{TestCaseListBox.CheckedItems.Count} test cases saved";
+            StatusTextBox.Text = (m_Dokimion.Error == "") ? 
+                $"{TestCaseListBox.CheckedItems.Count} test cases saved" :
+                m_Dokimion.Error;
         }
 
         private void UploadButton_Click(object sender, EventArgs e)

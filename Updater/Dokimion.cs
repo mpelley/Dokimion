@@ -46,11 +46,14 @@ namespace Updater
         public bool automated;
         public bool broken;
         public bool deleted;
+        public bool launchBroken;
+        public bool locked;
         public Int64 createdTime;
         public Int64 lastModifiedTime;
         public string lastModifiedBy = "";
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>() ;
     }
+
     public class TestCaseForUpload
     {
         public string id = "";
@@ -61,6 +64,8 @@ namespace Updater
         public bool automated;
         public bool broken;
         public bool deleted;
+        public bool launchBroken;
+        public bool locked;
         public Int64 lastModifiedTime;
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
     }
@@ -72,6 +77,8 @@ namespace Updater
         public bool automated;
         public bool broken;
         public bool deleted;
+        public bool launchBroken;
+        public bool locked;
         public Int64 createdTime;
         public Int64 lastModifiedTime;
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
@@ -106,6 +113,7 @@ namespace Updater
         private string m_Url = "";
         private string m_UserId = "";
         public string Error = "";
+        private const string SPACE_REPLACER = "_";
 
         private string BaseDokimionApiUrl()
         {
@@ -132,10 +140,10 @@ namespace Updater
             }
             catch (Exception e)
             {
-                Error = "Cannot log in because:\n" + e.Message;
+                Error = "Cannot log in because:\r\n" + e.Message;
                 if (resp != null)
                 {
-                    Error += "\n" + resp.ReasonPhrase;
+                    Error += "\r\n" + resp.ReasonPhrase;
                 }
                 return false;
             }
@@ -162,7 +170,7 @@ namespace Updater
             }
             else
             {
-                Error = "Server returned error: " + resp.ReasonPhrase + "\n" + json;
+                Error = "Server returned error to login request: " + resp.ReasonPhrase + ":\r\n" + json;
             }
             return results;
         }
@@ -180,12 +188,12 @@ namespace Updater
                 projectList = JsonConvert.DeserializeObject<List<Project>>(json);
                 if (projectList == null)
                 {
-                    Error = "Cannot decode: \n" + json;
+                    Error = "Cannot decode: \r\n" + json;
                 }
             }
             else
             {
-                Error = "Server returned error: " + resp.ReasonPhrase + "\n" + json;
+                Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
             }
 
             if (projectList != null)
@@ -212,13 +220,13 @@ namespace Updater
                 testcaseTreeResponse = JsonConvert.DeserializeObject<TestCaseTreeResponse>(json);
                 if (testcaseTreeResponse == null)
                 {
-                    Error = "Cannot decode: \n" + json;
+                    Error = "Cannot decode: \r\n" + json;
                     return null;
                 }
             }
             else
             {
-                Error = "Server returned error: " + resp.ReasonPhrase + "\n" + json;
+                Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
                 return null;
             }
             return testcaseTreeResponse.testCases;
@@ -238,20 +246,21 @@ namespace Updater
                 attrList = JsonConvert.DeserializeObject<List<Attribute>>(json);
                 if (attrList == null)
                 {
-                    Error = "Cannot decode: \n" + json;
+                    Error = "Cannot decode: \r\n" + json;
                     return new Dictionary<string, string>();
                 }
             }
             else
             {
-                Error = "Server returned error: " + resp.ReasonPhrase + "\n" + json;
+                Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
                 return new Dictionary<string, string>();
             }
 
             Dictionary<string, string> attrDict = new Dictionary<string, string>();
             foreach (var attr in attrList)
             {
-                attrDict.Add(attr.id, attr.name);
+                string name = attr.name.Replace(" ", SPACE_REPLACER);
+                attrDict.Add(attr.id, name);
             }
 
             return attrDict;
@@ -264,7 +273,7 @@ namespace Updater
             string json = resp.Content.ReadAsStringAsync().Result;
             if (false == resp.IsSuccessStatusCode)
             {
-                Error = "Cannot get test case from Dokimion because:\n" + json;
+                Error = $"Cannot get test case from Dokimion because: {resp.StatusCode} {resp.ReasonPhrase} {json}";
                 return null;
             }
 
@@ -272,8 +281,16 @@ namespace Updater
             TestCase? testcase = JsonConvert.DeserializeObject<TestCase>(json);
             if (testcase == null)
             {
-                Error = "Cannot decode: \n" + json;
+                Error = "Cannot decode: \r\n" + json;
                 return null;
+            }
+            // Trim whitespace from start and end of attribute values since Dokimion gives some.
+            foreach (var attr in testcase.attributes)
+            {
+                for (int val=0; val < attr.Value.Count(); val++)
+                {
+                    attr.Value[val] = attr.Value[val].Trim();
+                }
             }
             return testcase;
         }
@@ -319,7 +336,7 @@ namespace Updater
                     Error = $"Error creating folder {folderPath} because {e.Message}";
                     if (e.InnerException != null)
                     {
-                        Error += "\n" + e.InnerException.ToString();
+                        Error += "\r\n" + e.InnerException.ToString();
                     }
                     return false;
                 }
@@ -336,7 +353,7 @@ namespace Updater
                 Error = $"Error writing file {path} because {e.Message}";
                 if (e.InnerException != null)
                 {
-                    Error += "\n" + e.InnerException.ToString();
+                    Error += "\r\n" + e.InnerException.ToString();
                 }
                 return false;
             }
@@ -360,7 +377,7 @@ namespace Updater
             testcase.AppendChild(name);
 
             XmlElement description = xmlDoc.CreateElement("description");
-            description.InnerText = tc.description.Replace("<br>", "<br>\n");
+            description.InnerText = tc.description.Replace("<br>", "<br>\r\n");
             testcase.AppendChild(description);
 
             XmlElement preconditions = xmlDoc.CreateElement("preconditions");
@@ -370,7 +387,7 @@ namespace Updater
             }
             else
             {
-                preconditions.InnerText = tc.preconditions.Replace("<br>", "<br>\n");
+                preconditions.InnerText = tc.preconditions.Replace("<br>", "<br>\r\n");
             }
             testcase.AppendChild(preconditions);
 
@@ -385,6 +402,14 @@ namespace Updater
             XmlElement deleted = xmlDoc.CreateElement("deleted");
             deleted.InnerText = tc.deleted.ToString();
             testcase.AppendChild(deleted);
+
+            XmlElement locked = xmlDoc.CreateElement("locked");
+            locked.InnerText = tc.locked.ToString();
+            testcase.AppendChild(locked);
+
+            XmlElement launchBroken = xmlDoc.CreateElement("launchBroken");
+            launchBroken.InnerText = tc.launchBroken.ToString();
+            testcase.AppendChild(launchBroken);
 
             XmlElement createdTime = xmlDoc.CreateElement("createdTime");
             createdTime.InnerText = tc.createdTime.ToString();
@@ -413,20 +438,12 @@ namespace Updater
                 steps.AppendChild(stepNode);
                 XmlElement actionNode = xmlDoc.CreateElement("action");
                 string action = step.action;
-                if (action.Contains('\n'))
-                {
-                    ;
-                }
-                action = action.Replace("<br>", "<br>\n");
+                action = action.Replace("<br>", "<br>\r\n");
                 actionNode.InnerText = action;
                 stepNode.AppendChild(actionNode);
                 XmlElement expectation = xmlDoc.CreateElement("expectation");
                 string exp = step.expectation;
-                if (exp.Contains('\n'))
-                {
-                    ;
-                }
-                exp = exp.Replace("<br>", "<br>\n");
+                exp = exp.Replace("<br>", "<br>\r\n");
                 expectation.InnerText = exp;
                 stepNode.AppendChild(expectation);
             }
@@ -455,17 +472,30 @@ namespace Updater
             testcase.AppendChild(attributes);
             foreach (var attr in tc.attributes)
             {
-                string attrName = project.attributes[attr.Key];
-                XmlElement attNode = xmlDoc.CreateElement(attrName);
-                string s = "";
-                bool first = true;
-                foreach (string value in attr.Value)
+                string? attrName = null;
+                try
                 {
-                    s += first ? $"\"{value}\"": $", \"{value}\"";
-                    first = false;
+                    attrName = project.attributes[attr.Key];
                 }
-                attNode.InnerText = s;
-                attributes.AppendChild(attNode);
+                catch
+                {
+                    Error += $"Test case {tc.id} has a garbage attribute.\r\n";
+                }
+                if (false == string.IsNullOrEmpty(attrName))
+                {
+                    attrName = attrName.Replace(" ", SPACE_REPLACER);
+                    XmlElement attNode = xmlDoc.CreateElement(attrName);
+                    string s = "";
+                    bool first = true;
+                    foreach (string value in attr.Value)
+                    {
+                        string trimmedValue = value.Trim();
+                        s += first ? $"\"{trimmedValue}\"" : $", \"{trimmedValue}\"";
+                        first = false;
+                    }
+                    attNode.InnerText = s;
+                    attributes.AppendChild(attNode);
+                }
             }
 
             // Generate a string to return from the Xml Document
@@ -577,18 +607,18 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                Error = "Could not upload the test case because:\n";
+                Error = "Could not upload the test case because:\r\n";
                 Error += ex.Message;
                 if (ex.InnerException != null)
                 {
-                    Error += "\n" + ex.InnerException.Message;
+                    Error += "\r\n" + ex.InnerException.Message;
                 }
                 if (resp != null)
                 {
-                    Error += "\n" + resp.ReasonPhrase;
+                    Error += "\r\n" + resp.ReasonPhrase;
                     if (resp.Content != null)
                     {
-                        Error += "\n" + resp.Content.ReadAsStringAsync().Result;
+                        Error += "\r\n" + resp.Content.ReadAsStringAsync().Result;
                     }
                 }
                 return DialogResult.Cancel;
@@ -598,17 +628,17 @@ namespace Updater
                 string error = resp.Content.ReadAsStringAsync().Result;
                 if (error.Contains("Entity has been changed previously"))
                 {
-                    var answer = MessageBox.Show("The testcase on the server has changed since the file in the repo was created.\n" +
-                        "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\n" + 
-                        "Or skip uploading this file and continue with other files? (Continue)\n" +
+                    var answer = MessageBox.Show("The testcase on the server has changed since the file in the repo was created.\r\n" +
+                        "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\r\n" + 
+                        "Or skip uploading this file and continue with other files? (Continue)\r\n" +
                         "Or quit uploading files? (Cancel)", 
                         "Conflict Detected", MessageBoxButtons.CancelTryContinue);
                     return answer;
                 }
-                Error = "Server returned error when uploading test case:\n" + resp.ReasonPhrase;
+                Error = "Server returned error when uploading test case:\r\n" + resp.ReasonPhrase;
                 if (resp.Content != null)
                 {
-                    Error += "\n" + error;
+                    Error += "\r\n" + error;
                 }
                 return DialogResult.Cancel;
             }
@@ -683,6 +713,20 @@ namespace Updater
             }
             tc.deleted = deletedNode.InnerText.ToLower() == "true";
 
+            XmlNode? lockedNode = FindNodeNamed(overall, "locked");
+            if (lockedNode == null)
+            {
+                return null;
+            }
+            tc.locked = lockedNode.InnerText.ToLower() == "true";
+
+            XmlNode? launchBrokenNode = FindNodeNamed(overall, "launchBroken");
+            if (launchBrokenNode == null)
+            {
+                return null;
+            }
+            tc.launchBroken = launchBrokenNode.InnerText.ToLower() == "true";
+
             XmlNode? modifiedNode = FindNodeNamed(overall, "lastModifiedTime");
             if (modifiedNode == null)
             {
@@ -732,7 +776,9 @@ namespace Updater
                 string[] values = attrNode.InnerText.Split(new char[] { ',' });
                 for (int i = 0; i < values.Length; i++)
                 {
-                    values[i] = values[i].Replace("\"", "");
+                    string value = values[i].Replace("\"", "");
+                    value = value.Trim();
+                    values[i] = value;
                 }
                 tc.attributes.Add(key, values);
             }
@@ -760,6 +806,8 @@ namespace Updater
             if (testcaseFromDokimion.automated != extracted.automated) return true;
             if (testcaseFromDokimion.broken != extracted.broken) return true;
             if (testcaseFromDokimion.deleted != extracted.deleted) return true;
+            if (testcaseFromDokimion.locked != extracted.locked) return true;
+            if (testcaseFromDokimion.launchBroken != extracted.launchBroken) return true;
             if (testcaseFromDokimion.steps.Count != extracted.steps.Count) return true;
             // Since there are no differences yet, the steps for both have the same size.
             for (int i = 0; i < extracted.steps.Count; i++)
@@ -775,7 +823,9 @@ namespace Updater
                 // We know the values have the same number of strings in them.
                 for (int i = 0; i < extracted.attributes[key].Length; i++)
                 {
-                    if (testcaseFromDokimion.attributes[key][i] != extracted.attributes[key][i]) return true;
+                    string attrvalue = testcaseFromDokimion.attributes[key][i];
+                    attrvalue = attrvalue.Trim();
+                    if (attrvalue != extracted.attributes[key][i]) return true;
                 }
             }
             return false;
