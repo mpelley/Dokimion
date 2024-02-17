@@ -256,47 +256,80 @@ namespace Cloner
             Project sourceProject = ProjectMap[(string)ProjectsListBox.SelectedItem];
             Project destProject = new(sourceProject);
 
-            string projectName = sourceProject.name;
+            // Reject the clone if the desired project already exists in the destination server; we won't modify existing projects
+            string projectName = NewProjectNameTextBox.Text;
             if (IsProjectInDest(projectName))
             {
                 StatusTextBox.Text = $"Cannot clone; project {projectName} already exists in destination";
                 return;
             }
 
+            // Create the new project in the destination
             if (false == CreateProject(destProject))
             {
                 return;
             }
 
+            // Copy the project's attributes from the source to destination
             if (false == CopyAttributes(sourceProject, destProject))
             {
                 return;
             }
 
+            // Get the destination attributes; they will have different ID's than the source
             destProject.attributes = DestDokimion.GetAttributesForProject(destProject.id);
 
+            // Generate a mapping of the source attribute IDs to the destination attribute IDs
             Dictionary<string, string> attrMap = GenerateAttributeMap(sourceProject.attributes, destProject.attributes);
             if (attrMap == null)
             {
                 return;
             }
 
-            ProgressBar.Minimum = 0;
-            ProgressBar.Maximum = TestcaseDataGridView.Rows.Count;
-            ProgressBar.Step = 1;
-            ProgressBar.Value = 0;
+            // Get the test suites from the source
+            TestSuite[]? testSuites = SourceDokimion.GetTestSuites(sourceProject);
+            if (testSuites == null)
+            {
+                StatusTextBox.Text = SourceDokimion.Error;
+                return;
+            }
 
-            // Create dummy test cases for each ID up to the maximum, so we can overwrite them later
+            // Copy the test suites to the destination server
+            foreach (TestSuite testSuite in testSuites)
+            {
+                foreach (var attr in testSuite.filter.filters)
+                {
+                    attr.id = attrMap[attr.id];
+                }
+
+                if (false == DestDokimion.CreateTestSuite(destProject, testSuite))
+                {
+                    StatusTextBox.Text = SourceDokimion.Error;
+                    return;
+                }
+            }
+
+            // Determine the maximum test ID that we need to use
             int maxId = 0;
             foreach (DataGridViewRow row in TestcaseDataGridView.Rows)
             {
-                if (false == int.TryParse((string)row.Cells[1].Value, out int id))
+                if ((bool)row.Cells[0].Value)
                 {
-                    StatusTextBox.Text = $"Cannot parse {(string)row.Cells[1].Value} as an integer.";
-                    return;
+                    if (false == int.TryParse((string)row.Cells[1].Value, out int id))
+                    {
+                        StatusTextBox.Text = $"Cannot parse {(string)row.Cells[1].Value} as an integer.";
+                        return;
+                    }
+                    maxId = Math.Max(maxId, id);
                 }
-                maxId = Math.Max(maxId, id);
             }
+
+            // Create dummy test cases for each ID up to the maximum, so we can overwrite them later
+            ProgressBar.Minimum = 0;
+            ProgressBar.Maximum = maxId;
+            ProgressBar.Step = 1;
+            ProgressBar.Value = 0;
+            StatusTextBox.Text = $"Creating {maxId} empty test cases";
 
             TestCaseForUpload emptyTc = new();
             emptyTc.name = "dummy";
@@ -309,7 +342,24 @@ namespace Cloner
                     StatusTextBox.Text = DestDokimion.Error;
                     return;
                 }
+                ProgressBar.PerformStep();
+                Thread.Sleep(TimeSpan.FromMilliseconds(10));
             }
+
+            // Determine the number of test cases that we will actually update
+            int testCaseCount = 0;
+            foreach (DataGridViewRow row in TestcaseDataGridView.Rows)
+            {
+                if ((bool)row.Cells[0].Value)
+                {
+                    testCaseCount++;
+                }
+            }
+
+            // Update the test cases we will be using
+            ProgressBar.Maximum = testCaseCount;
+            ProgressBar.Value = 0;
+            StatusTextBox.Text = $"Filling in {testCaseCount} test cases";
 
             foreach (DataGridViewRow row in TestcaseDataGridView.Rows)
             {

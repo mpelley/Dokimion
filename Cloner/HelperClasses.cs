@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -115,5 +116,24 @@ namespace Cloner
     {
         public BriefTestCase[] testCases;
     }
+
+    public class TestSuiteAttribute
+    {
+        public string name = "";
+        public string id = "";
+        public List<AttrValue> attrValues = new List<AttrValue>();
+    }
+
+    public class TestSuiteFilter
+    {
+        public List<TestSuiteAttribute> filters = new List<TestSuiteAttribute>();
+    }
+
+    public class TestSuite
+    {
+        public string name;
+        public TestSuiteFilter filter;
+    }
+
 
 }

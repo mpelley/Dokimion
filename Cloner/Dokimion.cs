@@ -265,7 +265,33 @@ namespace Cloner
         public string? GetTestCaseForId(Project project, string id)
         {
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + id;
-            string content = null;
+            return GetContent(url, "Testcase", id);
+        }
+
+        public TestSuite[]? GetTestSuites(Project project)
+        {
+            TestSuite[]? suites = null;
+            string url = BaseDokimionApiUrl() + $"/{project.id}/testsuite";
+            string? content = GetContent(url, "Test Suite", "");
+            if (content != null)
+            {
+                try
+                {
+                    suites = JsonConvert.DeserializeObject<TestSuite[]>(content);
+                }
+                catch
+                {
+                    Error = "Cannot decode: \r\n" + content;
+                    suites = null;
+                }
+            }
+
+            return suites;
+        }
+
+        private string? GetContent(string url, string elementType, string elementName)
+        {
+            string? content = null;
 
             try
             {
@@ -273,14 +299,14 @@ namespace Cloner
                 content = resp.Content.ReadAsStringAsync().Result;
                 if (false == resp.IsSuccessStatusCode)
                 {
-                    Error = $"Server returned {resp.ReasonPhrase} when getting Test Case {id}\r\n";
+                    Error = $"Server returned {resp.ReasonPhrase} when getting {elementType} {elementName}.\r\n";
                     Error += content;
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                Error = $"Exception thrown while getting Test Case {id}\r\n" + ex.Message;
+                Error = $"Exception thrown while getting {elementType} {elementName}\r\n" + ex.Message;
                 if (ex.InnerException != null)
                 {
                     Error += ex.InnerException.Message;
@@ -317,6 +343,13 @@ namespace Cloner
             string url = BaseDokimionApiUrl() + $"/{project.id}/testcase";
             string json = JsonConvert.SerializeObject(tc);
             return PostContent(url, json, "Test case", tc.id);
+        }
+
+        public bool CreateTestSuite(Project project, TestSuite suite)
+        {
+            string url = BaseDokimionApiUrl() + $"/{project.id}/testsuite";
+            string json = JsonConvert.SerializeObject(suite);
+            return PostContent(url, json, "Test Suite", suite.name);
         }
 
         private bool PostContent(string url, string json, string elementType, string elementName)
