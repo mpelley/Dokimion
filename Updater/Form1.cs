@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Serilog;
 
 namespace Updater
 {
@@ -10,7 +11,7 @@ namespace Updater
         {
             InitializeComponent();
             TestCaseListBox.CheckOnClick = true;
-            TestCaseListBox.DisplayMember = "Name";
+            TestCaseListBox.DisplayMember = "Display";
             ProjectsListBox.DisplayMember = "Name";
             m_Dokimion = new Dokimion("");
 
@@ -212,50 +213,76 @@ namespace Updater
             }
 
             ProgressBar.Value = 0;
-            StatusTextBox.Text = (m_Dokimion.Error == "") ? 
+            StatusTextBox.Text = (m_Dokimion.Error == "") ?
                 $"{TestCaseListBox.CheckedItems.Count} test cases saved" :
                 m_Dokimion.Error;
         }
 
         private void UploadButton_Click(object sender, EventArgs e)
         {
-            Project? project = (Project?)ProjectsListBox.SelectedItem;
-            if (project == null)
+            if (TestCaseListBox.CheckedItems.Count == 0)
             {
-                StatusTextBox.Text = "Please select one of the projects to upload to.";
+                StatusTextBox.Text = "Please select one or more test cases to upload.";
                 return;
             }
-
             if (string.IsNullOrEmpty(RepoPathTextBox.Text))
             {
                 StatusTextBox.Text = "Please enter a path to the local repo clone.";
                 return;
             }
+            Project? project = (Project?)ProjectsListBox.SelectedItem;
+            if (project == null)
+            {
+                StatusTextBox.Text = "Please select one of the projects to get the test cases for";
+                return;
+            }
 
-            string folderPath = Path.Combine(RepoPathTextBox.Text, project.Name);
-            IEnumerable<string> fileList = Directory.EnumerateFiles(folderPath, "*.xml");
-
+            StatusTextBox.Text = "";
+            m_Dokimion.Error = "";
             ProgressBar.Minimum = 0;
             ProgressBar.Value = 0;
             ProgressBar.Step = 1;
-            ProgressBar.Maximum = fileList.Count();
+            ProgressBar.Maximum = TestCaseListBox.CheckedItems.Count;
             int testcasesChanged = 0;
 
-            StatusTextBox.Text = $"Evaluating {fileList.Count()} test cases";
+            StatusTextBox.Text = $"Evaluating {TestCaseListBox.CheckedItems.Count} test cases";
 
-            foreach (string file in fileList)
+            string folderPath = Path.Combine(RepoPathTextBox.Text, project.Name);
+
+            foreach (TestCaseShort item in TestCaseListBox.CheckedItems)
             {
-                if (false == m_Dokimion.UploadFileToProject(file, project, out bool changed))
+                bool abort = false;
+                switch  (m_Dokimion.UploadFileToProject(folderPath, item.id, project, out bool changed))
                 {
-                    StatusTextBox.Text = m_Dokimion.Error;
-                    return;
+                    case UploadStatus.Updated:
+                        Log.Information($"Test case {item.id}, \"{item.name}\" written to Project \"{project.name}\".");
+                        testcasesChanged++;
+                        break;
+                    case UploadStatus.Error:
+                        StatusTextBox.Text = m_Dokimion.Error;
+                        Log.Error($"Error uploading Test case {item.id}, \"{item.name}\" to Project \"{project.name}\": {m_Dokimion.Error}.");
+                        break;
+                    case UploadStatus.NotChanged:
+                        Log.Information($"Test case {item.id}, \"{item.name}\" in Project \"{project.name}\" was newer on server and not updated.");
+                        break;
+                    case UploadStatus.NoChange:
+                        Log.Information($"Test case {item.id}, \"{item.name}\" in Project \"{project.name}\" did not need to be updated.");
+                        break;
+                    case UploadStatus.Aborted:
+                        Log.Information("Upload of test cases aborted by user.");
+                        abort = true; 
+                        break;
                 }
-                if (changed)
-                {
-                    testcasesChanged++;
-                }
+
                 ProgressBar.PerformStep();
+
+                if (abort)
+                {
+                    break;
+                }
             }
+
+            ProgressBar.Value = 0;
             switch (testcasesChanged)
             {
                 case 0:
@@ -268,6 +295,12 @@ namespace Updater
                     StatusTextBox.Text = $"{testcasesChanged} test cases were updated.";
                     break;
             }
+
+        }
+
+        private void ProjectsListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TestCaseListBox.Items.Clear();
         }
     }
 }

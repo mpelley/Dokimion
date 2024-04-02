@@ -4,6 +4,15 @@ using System.Xml;
 
 namespace Updater
 {
+    public enum UploadStatus
+    {
+        Updated,
+        NoChange,
+        NotChanged,
+        Error,
+        Aborted
+    }
+
     public class Project
     {
         public string description = "";
@@ -83,9 +92,9 @@ namespace Updater
         public Int64 lastModifiedTime;
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
 
-        public string Name
+        public string Display
         {
-            get { return name; }
+            get { return $"ID: {id}, {name}"; }
         }
 
     }
@@ -507,7 +516,16 @@ namespace Updater
             return encoding.GetString(bytes, 0, bytes.Length);
         }
 
-        public bool UploadFileToProject(string filename, Project project, out bool changed)
+        public UploadStatus UploadFileToProject(string folderPath, string testcaseId, Project project, out bool changed)
+        {
+            string filename = Path.Combine(folderPath, testcaseId + ".xml");
+            UploadStatus resp = UploadFileToProject(filename, project, out bool localChanged);
+            changed = localChanged;
+            return resp;
+        }
+
+
+        public UploadStatus UploadFileToProject(string filename, Project project, out bool changed)
         {
             changed = false;
 
@@ -520,7 +538,7 @@ namespace Updater
             catch (Exception ex)
             {
                 Error = ex.Message;
-                return false;
+                return UploadStatus.Error;
             }
 
             // Create XmlDocument.
@@ -532,14 +550,14 @@ namespace Updater
             catch (Exception ex)
             {
                 Error = ex.Message;
-                return false;
+                return UploadStatus.Error;
             }
 
             // Extract info from XmlDocument to an instance of TestCase.
             TestCaseForUpload? extracted = XmlToObject(xmlDoc, filename, project);
             if (extracted == null)
             {
-                return false;
+                return UploadStatus.Error;
             }
 
             // Download the TestCase from Dokimion
@@ -547,7 +565,7 @@ namespace Updater
             TestCase? testcaseFromDokimion = GetTestCaseAsObject(url);
             if (testcaseFromDokimion == null)
             {
-                return false;
+                return UploadStatus.Error;
             }
 
             // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
@@ -562,18 +580,15 @@ namespace Updater
                     case DialogResult.TryAgain:
                         extracted.lastModifiedTime = testcaseFromDokimion.lastModifiedTime;
                         answer = UploadTestCase(extracted, project);
-                        if (answer != DialogResult.OK)
-                        {
-                            return false;
-                        }
                         break;
                     case DialogResult.Cancel:
-                        return false;
+                        Error = "Uploads aborted by user.";
+                        return UploadStatus.Aborted;
                     case DialogResult.OK:
                         break;
                     case DialogResult.Continue:
                         changed = false;
-                        break;
+                        return UploadStatus.NotChanged;
                 }
                 // If we successfully uploaded the test case ...
                 if (answer == DialogResult.OK)
@@ -584,15 +599,29 @@ namespace Updater
                     if (folderPath == null)
                     {
                         Error = "Cannot get folder name from " + filename;
-                        return false;
+                        return UploadStatus.Error;
                     }
                     if (false == DownloadTestcase(extracted.id, project, folderPath))
                     {
-                        return false;
+                        // DownloadTestcase sets Error
+                        return UploadStatus.Error;
                     }
                 }
+                switch (answer)
+                {
+                    case DialogResult.TryAgain:
+                        return UploadStatus.Error;
+                    case DialogResult.Cancel:
+                        Error = "Uploads aborted by user.";
+                        return UploadStatus.Aborted;
+                    case DialogResult.OK:
+                        return UploadStatus.Updated;
+                    case DialogResult.Continue:
+                        changed = false;
+                        return UploadStatus.NotChanged;
+                }
             }
-            return true;
+            return UploadStatus.NoChange;
         }
 
         private DialogResult UploadTestCase(TestCaseForUpload tc, Project project)
@@ -628,7 +657,8 @@ namespace Updater
                 string error = resp.Content.ReadAsStringAsync().Result;
                 if (error.Contains("Entity has been changed previously"))
                 {
-                    var answer = MessageBox.Show("The testcase on the server has changed since the file in the repo was created.\r\n" +
+                    Error = $"Testcase {tc.id} on server is newer than our testcase.";
+                    var answer = MessageBox.Show($"Testcase {tc.id} on the server has changed since the file in the repo was created.\r\n" +
                         "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\r\n" + 
                         "Or skip uploading this file and continue with other files? (Continue)\r\n" +
                         "Or quit uploading files? (Cancel)", 

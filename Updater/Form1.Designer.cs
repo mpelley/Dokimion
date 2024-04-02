@@ -67,6 +67,7 @@
             ProjectsListBox.Name = "ProjectsListBox";
             ProjectsListBox.Size = new Size(233, 344);
             ProjectsListBox.TabIndex = 2;
+            ProjectsListBox.SelectedIndexChanged += ProjectsListBox_SelectedIndexChanged;
             // 
             // DownloadButton
             // 
