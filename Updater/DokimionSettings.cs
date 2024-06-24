@@ -25,6 +25,12 @@
             set { UrlTextBox.Text = value; }
         }
 
+        public bool UseHttps
+        {
+            get => UseHttpsCheckBox.Checked;
+            set => UseHttpsCheckBox.Checked = value;
+        }
+
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             PasswordTextBox.PasswordChar = checkBox1.Checked ? '\0' : '*';

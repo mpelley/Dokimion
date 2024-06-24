@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MimeMapping;
+using Newtonsoft.Json;
 using System.Text;
 using System.Xml;
 
@@ -39,6 +40,7 @@ namespace Updater
     {
         public string id = "";
         public string title = "";
+        public string createdBy = "";
         public Int64 createdTime;
         public Int64 dataSize;
     }
@@ -77,6 +79,7 @@ namespace Updater
         public bool locked;
         public Int64 lastModifiedTime;
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
+        public List<Attachment> attachments = new List<Attachment>();
     }
 
     public class TestCaseShort
@@ -91,6 +94,7 @@ namespace Updater
         public Int64 createdTime;
         public Int64 lastModifiedTime;
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
+        public List<Attachment> attachments = new List<Attachment>();
 
         public string Display
         {
@@ -121,12 +125,14 @@ namespace Updater
         private HttpClient m_Client = new HttpClient();
         private string m_Url = "";
         private string m_UserId = "";
+        private bool m_UseHttps = false;
         public string Error = "";
         private const string SPACE_REPLACER = "_";
 
         private string BaseDokimionApiUrl()
         {
-            return $"http://{m_Url}/api";
+            string protocol = m_UseHttps ? "https" : "http";
+            return $"{protocol}://{m_Url}/api";
         }
 
         private Dokimion()
@@ -134,9 +140,10 @@ namespace Updater
             m_Client = new HttpClient();
         }
 
-        public Dokimion(string server) : this()
+        public Dokimion(string server, bool useHttps) : this()
         {
             m_Url = server;
+            m_UseHttps = useHttps;
         }
 
         public bool Login(string username, string password)
@@ -306,29 +313,83 @@ namespace Updater
 
         public bool DownloadTestcase(string testcaseId, Project project, string folderPath)
         {
-            string? xml = GetTestCaseAsXml(testcaseId, project);
-            if (string.IsNullOrEmpty(xml))
-            {
-                return false;
-            }
-
-            return SaveTestCase(testcaseId, folderPath, xml);
-        }
-
-        private string? GetTestCaseAsXml(string testcaseId, Project project)
-        {
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testcaseId;
 
             // Get the test case from Dokimion
             TestCase? testcase = GetTestCaseAsObject(url);
             if (testcase == null)
             {
-                return null;
+                return false;
             }
 
             // Generate the XML format for this testcaseFromDokimion
             string xml = GenerateXml(testcase, project);
-            return xml;
+            if (string.IsNullOrEmpty(xml))
+            {
+                return false;
+            }
+
+            // Save the xml of the test case:
+            if (false == SaveTestCase(testcaseId, folderPath, xml))
+            {
+                return false;
+            }
+
+            // Save any attachments:
+            foreach( var attachment in testcase.attachments)
+            {
+                byte[]? fileContent = GetAttachment(project.id, testcase.id, attachment.id);
+                if (fileContent == null)
+                {
+                    return false;
+                }
+
+                string filename = $"{testcaseId}_{attachment.title}";
+                if (false == SaveAttachment(filename, folderPath, fileContent))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private byte[]? GetAttachment(string projectId, string testcaseId, string attachmentId)
+        {
+            string url = BaseDokimionApiUrl() + "/" + projectId + "/testcase/" + testcaseId + "/attachment/" + attachmentId;
+            var resp = m_Client.GetAsync(url).Result;
+            if (false == resp.IsSuccessStatusCode)
+            {
+                Error = $"Cannot read attachment for test case {testcaseId} because {resp.ReasonPhrase}";
+                if (resp.Content != null)
+                {
+                    Error += "\r\n" + resp.Content.ReadAsStringAsync().Result;
+                }
+                return null;
+            }
+
+            return resp.Content.ReadAsByteArrayAsync().Result;
+        }
+
+        private bool SaveAttachment(string title, string folderPath, byte[] fileContent)
+        {
+            // Assume folder exists from saving the XML file.
+            // Save the file in the repo folder
+            string path = Path.Combine(folderPath, title);
+            try
+            {
+                File.WriteAllBytes(path, fileContent);
+            }
+            catch (Exception e)
+            {
+                Error = $"Error writing file {path} because {e.Message}";
+                if (e.InnerException != null)
+                {
+                    Error += "\r\n" + e.InnerException.ToString();
+                }
+                return false;
+            }
+            return true;
         }
 
         private bool SaveTestCase(string testcaseId, string folderPath, string xml)
@@ -472,6 +533,9 @@ namespace Updater
                 XmlElement created = xmlDoc.CreateElement("createdTime");
                 created.InnerText = att.createdTime.ToString();
                 attNode.AppendChild(created);
+                XmlElement createdBy = xmlDoc.CreateElement("createdBy");
+                createdBy.InnerText = att.createdBy;
+                attNode.AppendChild(createdBy);
                 XmlElement dataSize = xmlDoc.CreateElement("dataSize");
                 dataSize.InnerText = att.dataSize.ToString();
                 attNode.AppendChild(dataSize);
@@ -516,19 +580,40 @@ namespace Updater
             return encoding.GetString(bytes, 0, bytes.Length);
         }
 
-        public UploadStatus UploadFileToProject(string folderPath, string testcaseId, Project project, out bool changed)
+        public UploadStatus UploadTestCaseToProject(string folderPath, TestCaseShort testcase, Project project)
         {
-            string filename = Path.Combine(folderPath, testcaseId + ".xml");
-            UploadStatus resp = UploadFileToProject(filename, project, out bool localChanged);
-            changed = localChanged;
-            return resp;
+            string filename = Path.Combine(folderPath, testcase.id + ".xml");
+            UploadStatus resp = UploadXmlFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);
+            if (uploaded == null)
+            {
+                return UploadStatus.Error;
+            }
+
+            UploadStatus attResp = UploadAttachments(folderPath, uploaded, project);
+            switch (attResp)
+            {
+                case UploadStatus.Error:
+                    return UploadStatus.Error;
+                case UploadStatus.NoChange:
+                    attResp = resp;
+                    break;
+                case UploadStatus.Updated:
+                    if (false == DownloadTestcase(testcase.id, project, folderPath))
+                    {
+                        // DownloadTestcase sets Error
+                        return UploadStatus.Error;
+                    }
+                    break;
+                default:
+                    return UploadStatus.Error;
+            }
+            return attResp;
         }
 
 
-        public UploadStatus UploadFileToProject(string filename, Project project, out bool changed)
+        public UploadStatus UploadXmlFileToProjectIfDifferent(string filename, Project project, out TestCaseForUpload? uploaded)
         {
-            changed = false;
-
+            uploaded = null;
             // Read text from XML file.
             string xmlText = "";
             try
@@ -559,6 +644,7 @@ namespace Updater
             {
                 return UploadStatus.Error;
             }
+            uploaded = extracted;
 
             // Download the TestCase from Dokimion
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + extracted.id;
@@ -569,31 +655,46 @@ namespace Updater
             }
 
             // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
-            changed = IsTestCaseChanged(testcaseFromDokimion, extracted);
+            bool changed = IsTestCaseChanged(testcaseFromDokimion, extracted);
 
             // If different, write tc TestCase to server.
             if (changed)
             {
-                DialogResult answer = UploadTestCase(extracted, project);
-                switch (answer)
-                {
-                    case DialogResult.TryAgain:
-                        extracted.lastModifiedTime = testcaseFromDokimion.lastModifiedTime;
-                        answer = UploadTestCase(extracted, project);
-                        break;
-                    case DialogResult.Cancel:
-                        Error = "Uploads aborted by user.";
-                        return UploadStatus.Aborted;
-                    case DialogResult.OK:
-                        break;
-                    case DialogResult.Continue:
-                        changed = false;
-                        return UploadStatus.NotChanged;
-                }
-                // If we successfully uploaded the test case ...
-                if (answer == DialogResult.OK)
-                {
-                    // ... download the test case again so that we get the latest timestamp
+                return UploadTestCaseToProjectWithRetries(filename, project, extracted, testcaseFromDokimion);
+            }
+            return UploadStatus.NoChange;
+        }
+
+        private UploadStatus UploadTestCaseToProjectWithRetries(string filename, Project project, TestCaseForUpload extracted, TestCase testcaseFromDokimion)
+        {
+            DialogResult answer = UploadTestCaseObject(extracted, project);
+            switch (answer)
+            {
+                case DialogResult.OK:
+                    // "OK" is processed further down in this function
+                    // to eliminate duplicate code
+                    break;
+
+                case DialogResult.TryAgain:
+                    // Use the time from what is currently in Dokimion so it will be accepted:
+                    extracted.lastModifiedTime = testcaseFromDokimion.lastModifiedTime;
+                    answer = UploadTestCaseObject(extracted, project);
+                    // Processed retry response further down in this function
+                    break;
+
+                case DialogResult.Cancel:
+                    Error = "Uploads aborted by user.";
+                    return UploadStatus.Aborted;
+
+                case DialogResult.Continue:
+                    return UploadStatus.NotChanged;
+            }
+
+            // Process OK or response of retry.
+            switch (answer)
+            {
+                case DialogResult.OK:
+                    // Download the test case again so that we get the latest timestamp
                     FileInfo? fi = new FileInfo(filename);
                     string? folderPath = fi.DirectoryName;
                     if (folderPath == null)
@@ -601,30 +702,21 @@ namespace Updater
                         Error = "Cannot get folder name from " + filename;
                         return UploadStatus.Error;
                     }
-                    if (false == DownloadTestcase(extracted.id, project, folderPath))
-                    {
-                        // DownloadTestcase sets Error
-                        return UploadStatus.Error;
-                    }
-                }
-                switch (answer)
-                {
-                    case DialogResult.TryAgain:
-                        return UploadStatus.Error;
-                    case DialogResult.Cancel:
-                        Error = "Uploads aborted by user.";
-                        return UploadStatus.Aborted;
-                    case DialogResult.OK:
-                        return UploadStatus.Updated;
-                    case DialogResult.Continue:
-                        changed = false;
-                        return UploadStatus.NotChanged;
-                }
+                    return UploadStatus.Updated;
+                case DialogResult.TryAgain:
+                    // The retry didn't work, so return an error
+                    return UploadStatus.Error;
+                case DialogResult.Cancel:
+                    Error = "Uploads aborted by user.";
+                    return UploadStatus.Aborted;
+                case DialogResult.Continue:
+                    return UploadStatus.NotChanged;
             }
-            return UploadStatus.NoChange;
+
+            return UploadStatus.NotChanged;
         }
 
-        private DialogResult UploadTestCase(TestCaseForUpload tc, Project project)
+        private DialogResult UploadTestCaseObject(TestCaseForUpload tc, Project project)
         {
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase";
             string json = JsonConvert.SerializeObject(tc);
@@ -659,10 +751,11 @@ namespace Updater
                 {
                     Error = $"Testcase {tc.id} on server is newer than our testcase.";
                     var answer = MessageBox.Show($"Testcase {tc.id} on the server has changed since the file in the repo was created.\r\n" +
-                        "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\r\n" + 
-                        "Or skip uploading this file and continue with other files? (Continue)\r\n" +
-                        "Or quit uploading files? (Cancel)", 
-                        "Conflict Detected", MessageBoxButtons.CancelTryContinue);
+                            "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\r\n" + 
+                            "Or skip uploading this file and continue with other files? (Continue)\r\n" +
+                            "Or quit uploading files? (Cancel)", 
+                        "Conflict Detected", 
+                        MessageBoxButtons.CancelTryContinue);
                     return answer;
                 }
                 Error = "Server returned error when uploading test case:\r\n" + resp.ReasonPhrase;
@@ -674,6 +767,114 @@ namespace Updater
             }
 
             return DialogResult.OK;
+        }
+
+        UploadStatus UploadAttachments(string folderPath, TestCaseForUpload testcase, Project project)
+        {
+            bool didUpload = false;
+            foreach(var attachment in testcase.attachments)
+            {
+                // Get the content from our disk:
+                string filename = $"{testcase.id}_{attachment.title}";
+                string filePath = Path.Combine(folderPath, filename);
+                Byte[] diskContent;
+                try
+                {
+                    diskContent = File.ReadAllBytes(filePath);
+                }
+                catch (Exception ex)
+                {
+                    Error = $"Cannot read file {filePath} because: " + ex.Message;
+                    return UploadStatus.Error;
+                }
+
+                // See if an attachment with that ID is already on the server
+                bool needToUpload = true;
+                bool needToRemove = false;
+                byte[]? serverContent = GetAttachment(project.id, testcase.id, attachment.id);
+                if (serverContent != null)
+                {
+                    // If the file is on the server, check if it has the same content
+                    if (diskContent.Length == serverContent.Length)
+                    {
+                        if (diskContent.SequenceEqual(serverContent))
+                        {
+                            needToUpload = false;
+                        }
+                        else
+                        {
+                            needToRemove = true;
+                        }
+                    }
+
+                }
+
+                if (needToRemove)
+                {
+                    string url = $"{BaseDokimionApiUrl()}/{project.id}/testcase/{testcase.id}/attachment/{attachment.id}";
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, url);
+                    HttpResponseMessage? response = null;
+                    try
+                    {
+                        response = m_Client.SendAsync(request).Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        Error = "Cannot delete existing attachment because: " + ex.Message;
+                        return UploadStatus.Error;
+                    }
+                    if (false == response.IsSuccessStatusCode)
+                    {
+                        Error = "Deletion of attachment failed because: " + response.StatusCode;
+                        return UploadStatus.Error;
+                    }
+                }
+
+                if (needToUpload)
+                {
+                    string url = $"{BaseDokimionApiUrl()}/{project.id}/testcase/{testcase.id}/attachment";
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+                    MultipartFormDataContent formData = new MultipartFormDataContent();
+
+                    ByteArrayContent fileContent = new ByteArrayContent(diskContent);
+                    string mimeType = MimeMapping.MimeUtility.GetMimeMapping(filename);
+                    fileContent.Headers.Add("ContentType", mimeType);
+                    formData.Add(fileContent, "file");
+
+                    StringContent fileIdContent = new StringContent(filename);
+                    formData.Add(fileIdContent, "fileId");
+
+                    StringContent initialPreview = new StringContent("[]");
+                    formData.Add(fileIdContent, "initialPreview");
+
+                    StringContent initialPreviewConfig = new StringContent("[]");
+                    formData.Add(fileIdContent, "initialPreviewConfig");
+
+                    StringContent initialPreviewThumbTags = new StringContent("[]");
+                    formData.Add(fileIdContent, "initialPreviewThumbTags");
+
+                    request.Content = formData;
+                    HttpResponseMessage? response = null;
+                    try
+                    {
+                        response = m_Client.SendAsync(request).Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        Error = "Cannot upload attachment because: " + ex.Message;
+                        return UploadStatus.Error;
+                    }
+                    if (false == response.IsSuccessStatusCode)
+                    {
+                        Error = "Upload of attachment failed because: " + response.StatusCode;
+                        return UploadStatus.Error;
+                    }
+                    didUpload = true;
+                }
+
+            }
+
+            return didUpload ? UploadStatus.Updated : UploadStatus.NoChange;
         }
 
         private TestCaseForUpload? XmlToObject(XmlDocument xmlDoc, string filename, Project project)
@@ -812,6 +1013,49 @@ namespace Updater
                 }
                 tc.attributes.Add(key, values);
             }
+
+            XmlNode? attachmentsNode = FindNodeNamed(overall, "attachments");
+            if (attachmentsNode == null)
+            {
+                return null;
+            }
+            tc.attachments = new List<Attachment>();
+            foreach (XmlNode attachNode in attachmentsNode.ChildNodes)
+            {
+                Attachment attach = new Attachment();
+                XmlNode? attachIdNode = FindNodeNamed(attachNode, "id");
+                if (attachIdNode == null)
+                {
+                    return null;
+                }
+                attach.id = attachIdNode.InnerText;
+                XmlNode? attachTitleNode = FindNodeNamed(attachNode, "title");
+                if (attachTitleNode == null)
+                {
+                    return null;
+                }
+                attach.title = attachTitleNode.InnerText;
+                XmlNode? attachCtimeNode = FindNodeNamed(attachNode, "createdTime");
+                if (attachCtimeNode == null)
+                {
+                    return null;
+                }
+                attach.createdTime = Int64.Parse(attachCtimeNode.InnerText);
+                XmlNode? attachCbyNode = FindNodeNamed(attachNode, "createdBy");
+                if (attachCbyNode == null)
+                {
+                    return null;
+                }
+                attach.createdBy = attachCbyNode.InnerText;
+                XmlNode? attachSizeNode = FindNodeNamed(attachNode, "dataSize");
+                if (attachSizeNode == null)
+                {
+                    return null;
+                }
+                attach.dataSize = Int64.Parse(attachSizeNode.InnerText);
+                tc.attachments.Add(attach);
+            }
+
             return tc;
         }
 
@@ -857,6 +1101,18 @@ namespace Updater
                     attrvalue = attrvalue.Trim();
                     if (attrvalue != extracted.attributes[key][i]) return true;
                 }
+            }
+
+            if (testcaseFromDokimion.attachments.Count != extracted.attachments.Count) return true;
+            // We know they have the same number of items
+            // TODO: Handle the case where they are not in the same order
+            for (int i=0; i < testcaseFromDokimion.attachments.Count; i++)
+            {
+                if (testcaseFromDokimion.attachments[i].id != extracted.attachments[i].id) return true;
+                if (testcaseFromDokimion.attachments[i].title != extracted.attachments[i].title) return true;
+                if (testcaseFromDokimion.attachments[i].createdBy != extracted.attachments[i].createdBy) return true;
+                if (testcaseFromDokimion.attachments[i].createdTime != extracted.attachments[i].createdTime) return true;
+                if (testcaseFromDokimion.attachments[i].dataSize != extracted.attachments[i].dataSize) return true;
             }
             return false;
         }

@@ -37,6 +37,7 @@
             LoginButton = new Button();
             CancelButton = new Button();
             checkBox1 = new CheckBox();
+            UseHttpsCheckBox = new CheckBox();
             SuspendLayout();
             // 
             // UserNameTextBox
@@ -80,7 +81,7 @@
             // 
             label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label3.AutoSize = true;
-            label3.Location = new Point(14, 177);
+            label3.Location = new Point(14, 183);
             label3.Name = "label3";
             label3.Size = new Size(208, 20);
             label3.TabIndex = 5;
@@ -98,7 +99,7 @@
             // LoginButton
             // 
             LoginButton.DialogResult = DialogResult.OK;
-            LoginButton.Location = new Point(14, 264);
+            LoginButton.Location = new Point(14, 318);
             LoginButton.Margin = new Padding(3, 4, 3, 4);
             LoginButton.Name = "LoginButton";
             LoginButton.Size = new Size(122, 31);
@@ -110,7 +111,7 @@
             // 
             CancelButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             CancelButton.DialogResult = DialogResult.Cancel;
-            CancelButton.Location = new Point(318, 264);
+            CancelButton.Location = new Point(317, 318);
             CancelButton.Margin = new Padding(3, 4, 3, 4);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(86, 31);
@@ -130,12 +131,23 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
+            // UseHttpsCheckBox
+            // 
+            UseHttpsCheckBox.AutoSize = true;
+            UseHttpsCheckBox.Location = new Point(20, 255);
+            UseHttpsCheckBox.Name = "UseHttpsCheckBox";
+            UseHttpsCheckBox.Size = new Size(92, 24);
+            UseHttpsCheckBox.TabIndex = 9;
+            UseHttpsCheckBox.Text = "Use https";
+            UseHttpsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // DokimionSettings
             // 
             AcceptButton = LoginButton;
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(437, 309);
+            ClientSize = new Size(437, 362);
+            Controls.Add(UseHttpsCheckBox);
             Controls.Add(checkBox1);
             Controls.Add(CancelButton);
             Controls.Add(LoginButton);
@@ -163,5 +175,6 @@
         private Button LoginButton;
         private new Button CancelButton;
         private CheckBox checkBox1;
+        private CheckBox UseHttpsCheckBox;
     }
 }

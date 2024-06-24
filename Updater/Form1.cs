@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Serilog;
+using System.Text.RegularExpressions;
 
 namespace Updater
 {
@@ -13,7 +14,7 @@ namespace Updater
             TestCaseListBox.CheckOnClick = true;
             TestCaseListBox.DisplayMember = "Display";
             ProjectsListBox.DisplayMember = "Name";
-            m_Dokimion = new Dokimion("");
+            m_Dokimion = new Dokimion("", false);
 
         }
 
@@ -30,6 +31,7 @@ namespace Updater
             {
                 dlg.Username = settings.username;
                 dlg.ServerUrl = settings.server;
+                dlg.UseHttps = settings.useHttps;
                 RepoPathTextBox.Text = settings.repo;
             }
 
@@ -39,6 +41,7 @@ namespace Updater
 
             settings.username = dlg.Username;
             settings.server = dlg.ServerUrl;
+            settings.useHttps = dlg.UseHttps;
             try
             {
                 File.WriteAllText("Updater.json", JsonConvert.SerializeObject(settings));
@@ -48,7 +51,7 @@ namespace Updater
                 ; // Ignore errors
             }
 
-            m_Dokimion = new Dokimion(dlg.ServerUrl);
+            m_Dokimion = new Dokimion(dlg.ServerUrl, dlg.UseHttps);
             if (false == m_Dokimion.Login(dlg.Username, dlg.Password))
             {
                 StatusTextBox.Text = m_Dokimion.Error;
@@ -249,28 +252,28 @@ namespace Updater
 
             string folderPath = Path.Combine(RepoPathTextBox.Text, project.Name);
 
-            foreach (TestCaseShort item in TestCaseListBox.CheckedItems)
+            foreach (TestCaseShort testcase in TestCaseListBox.CheckedItems)
             {
                 bool abort = false;
-                switch  (m_Dokimion.UploadFileToProject(folderPath, item.id, project, out bool changed))
+                switch (m_Dokimion.UploadTestCaseToProject(folderPath, testcase, project))
                 {
                     case UploadStatus.Updated:
-                        Log.Information($"Test case {item.id}, \"{item.name}\" written to Project \"{project.name}\".");
+                        Log.Information($"Test case {testcase.id}, \"{testcase.name}\" written to Project \"{project.name}\".");
                         testcasesChanged++;
                         break;
                     case UploadStatus.Error:
                         StatusTextBox.Text = m_Dokimion.Error;
-                        Log.Error($"Error uploading Test case {item.id}, \"{item.name}\" to Project \"{project.name}\": {m_Dokimion.Error}.");
+                        Log.Error($"Error uploading Test case {testcase.id}, \"{testcase.name}\" to Project \"{project.name}\": {m_Dokimion.Error}.");
                         break;
                     case UploadStatus.NotChanged:
-                        Log.Information($"Test case {item.id}, \"{item.name}\" in Project \"{project.name}\" was newer on server and not updated.");
+                        Log.Information($"Test case {testcase.id}, \"{testcase.name}\" in Project \"{project.name}\" was newer on server and not updated.");
                         break;
                     case UploadStatus.NoChange:
-                        Log.Information($"Test case {item.id}, \"{item.name}\" in Project \"{project.name}\" did not need to be updated.");
+                        Log.Information($"Test case {testcase.id}, \"{testcase.name}\" in Project \"{project.name}\" did not need to be updated.");
                         break;
                     case UploadStatus.Aborted:
                         Log.Information("Upload of test cases aborted by user.");
-                        abort = true; 
+                        abort = true;
                         break;
                 }
 
@@ -286,16 +289,53 @@ namespace Updater
             switch (testcasesChanged)
             {
                 case 0:
-                    StatusTextBox.Text = $"No test cases were updated.";
+                    StatusTextBox.Text += $"\nNo test cases were updated.";
                     break;
                 case 1:
-                    StatusTextBox.Text = $"One test case was updated.";
+                    StatusTextBox.Text += $"\nOne test case was updated.";
                     break;
                 default:
-                    StatusTextBox.Text = $"{testcasesChanged} test cases were updated.";
+                    StatusTextBox.Text += $"\n{testcasesChanged} test cases were updated.";
                     break;
             }
 
+            CheckForNewTestCases(project);
+
+        }
+
+        private void CheckForNewTestCases(Project project)
+        {
+            List<FileInfo> newFiles = new List<FileInfo>();
+            string folderPath = Path.Combine(RepoPathTextBox.Text, project.Name);
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            IEnumerable<FileInfo> fileList = di.EnumerateFiles();
+
+            foreach (FileInfo file in fileList)
+            {
+                const string pattern = @"\d+\.xml";
+                if (Regex.IsMatch(pattern, file.Name))
+                {
+                    bool found = false;
+                    foreach (TestCaseShort testcase in TestCaseListBox.Items)
+                    {
+                        if (testcase.id + ".xml" == file.Name)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        newFiles.Add(file);
+                    }
+                }
+            }
+
+            if (newFiles.Count > 0)
+            {
+                UploadTests dlg = new UploadTests();
+
+            }
         }
 
         private void ProjectsListBox_SelectedIndexChanged(object sender, EventArgs e)
