@@ -58,6 +58,7 @@
             // UploadCheckedTestCasesButton
             // 
             UploadCheckedTestCasesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            UploadCheckedTestCasesButton.DialogResult = DialogResult.OK;
             UploadCheckedTestCasesButton.Location = new Point(310, 78);
             UploadCheckedTestCasesButton.Name = "UploadCheckedTestCasesButton";
             UploadCheckedTestCasesButton.Size = new Size(185, 23);
@@ -68,6 +69,7 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            QuitButton.DialogResult = DialogResult.Cancel;
             QuitButton.Location = new Point(310, 126);
             QuitButton.Name = "QuitButton";
             QuitButton.Size = new Size(185, 23);

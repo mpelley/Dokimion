@@ -82,11 +82,11 @@
             // 
             // SourceLoginStatusTextBox
             // 
-            SourceLoginStatusTextBox.Location = new Point(136, 109);
+            SourceLoginStatusTextBox.Location = new Point(136, 92);
             SourceLoginStatusTextBox.Multiline = true;
             SourceLoginStatusTextBox.Name = "SourceLoginStatusTextBox";
             SourceLoginStatusTextBox.ReadOnly = true;
-            SourceLoginStatusTextBox.Size = new Size(546, 27);
+            SourceLoginStatusTextBox.Size = new Size(546, 60);
             SourceLoginStatusTextBox.TabIndex = 3;
             SourceLoginStatusTextBox.TabStop = false;
             // 
@@ -240,11 +240,11 @@
             // 
             // DestLoginStatusTextBox
             // 
-            DestLoginStatusTextBox.Location = new Point(136, 103);
+            DestLoginStatusTextBox.Location = new Point(136, 88);
             DestLoginStatusTextBox.Multiline = true;
             DestLoginStatusTextBox.Name = "DestLoginStatusTextBox";
             DestLoginStatusTextBox.ReadOnly = true;
-            DestLoginStatusTextBox.Size = new Size(525, 27);
+            DestLoginStatusTextBox.Size = new Size(525, 57);
             DestLoginStatusTextBox.TabIndex = 3;
             // 
             // DestLoginButton

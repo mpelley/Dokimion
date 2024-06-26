@@ -44,5 +44,21 @@ namespace Updater
             }
             SetAllTestCases(true);
         }
+
+        public List<string> GetCheckedFiles()
+        {
+            List<string> list = new();
+
+            for (int i = 0; i < NewTestCaseListBox.Items.Count; i++)
+            {
+                if (NewTestCaseListBox.GetItemChecked(i))
+                {
+                    var item = NewTestCaseListBox.Items[i];
+                    list.Add((string)item);
+                }
+            }
+
+            return list;
+        }
     }
 }

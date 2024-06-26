@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Text;
 using System.Xml;
+using Serilog;
 
 namespace Updater
 {
@@ -580,9 +581,9 @@ namespace Updater
             return encoding.GetString(bytes, 0, bytes.Length);
         }
 
-        public UploadStatus UploadTestCaseToProject(string folderPath, TestCaseShort testcase, Project project)
+        public UploadStatus UploadTestCaseToProject(string folderPath, string testcaseId, Project project)
         {
-            string filename = Path.Combine(folderPath, testcase.id + ".xml");
+            string filename = Path.Combine(folderPath, testcaseId + ".xml");
             UploadStatus resp = UploadXmlFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);
             if (uploaded == null)
             {
@@ -598,7 +599,7 @@ namespace Updater
                     attResp = resp;
                     break;
                 case UploadStatus.Updated:
-                    if (false == DownloadTestcase(testcase.id, project, folderPath))
+                    if (false == DownloadTestcase(testcaseId, project, folderPath))
                     {
                         // DownloadTestcase sets Error
                         return UploadStatus.Error;
@@ -642,6 +643,7 @@ namespace Updater
             TestCaseForUpload? extracted = XmlToObject(xmlDoc, filename, project);
             if (extracted == null)
             {
+                Error = "Cannot convert XML file to a test case object";
                 return UploadStatus.Error;
             }
             uploaded = extracted;
@@ -649,25 +651,72 @@ namespace Updater
             // Download the TestCase from Dokimion
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + extracted.id;
             TestCase? testcaseFromDokimion = GetTestCaseAsObject(url);
+            bool changed = true;
+            bool overwrite = false;
+            long lastModifiedTimeFromDokimion = 0;
+            int extractedId = int.Parse(extracted.id);
+            int testCaseId = 0;
             if (testcaseFromDokimion == null)
             {
-                return UploadStatus.Error;
+                // We are uploading a missing test case, so create test cases up to that number so we can then replace it
+                TestCaseForUpload tc = new TestCaseForUpload();
+                tc.name = "<<empty>>";
+                string json = JsonConvert.SerializeObject(tc);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                url = BaseDokimionApiUrl() + "/" + project.id + "/testcase";
+                TestCase? testcase;
+                do
+                {
+                    try
+                    {
+                        var resp = m_Client.PostAsync(url, content).Result;
+                        if (false == resp.IsSuccessStatusCode)
+                        {
+                            Error = $"Error {resp.ReasonPhrase} when trying to create an empty test case.";
+                            return UploadStatus.Error;
+                        }
+                        string responseContent = resp.Content.ReadAsStringAsync().Result;
+                        // Deserialize response into our TestCase object
+                        testcase = JsonConvert.DeserializeObject<TestCase>(responseContent);
+                        if (testcase == null)
+                        {
+                            Error = "Cannot decode: \r\n" + responseContent;
+                            return UploadStatus.Error;
+                        }
+                        testCaseId = int.Parse(testcase.id);
+                        lastModifiedTimeFromDokimion = testcase.lastModifiedTime;
+                        extracted.lastModifiedTime = lastModifiedTimeFromDokimion;
+                    }
+                    catch (Exception ex)
+                    {
+                        Error = $"Exception thrown when trying to create an empty test case:\n{ex.Message}";
+                        return UploadStatus.Error;
+                    }
+                } while (testCaseId < extractedId);
             }
-
-            // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
-            bool changed = IsTestCaseChanged(testcaseFromDokimion, extracted);
+            else
+            {
+                lastModifiedTimeFromDokimion = testcaseFromDokimion.lastModifiedTime;
+                // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
+                changed = IsTestCaseChanged(testcaseFromDokimion, extracted);
+                // Automatically overwrite our dummy test cases and deleted test cases:
+                if ((testcaseFromDokimion.name == "<<empty>>") || (testcaseFromDokimion.deleted == true))
+                {
+                    overwrite = true;
+                }
+            }
 
             // If different, write tc TestCase to server.
             if (changed)
             {
-                return UploadTestCaseToProjectWithRetries(filename, project, extracted, testcaseFromDokimion);
+                return UploadTestCaseToProjectWithRetries(filename, project, extracted, lastModifiedTimeFromDokimion, overwrite);
             }
             return UploadStatus.NoChange;
         }
 
-        private UploadStatus UploadTestCaseToProjectWithRetries(string filename, Project project, TestCaseForUpload extracted, TestCase testcaseFromDokimion)
+        private UploadStatus UploadTestCaseToProjectWithRetries(string filename, Project project, TestCaseForUpload extracted, long lastModifiedTimeFromDokimion, bool overwrite)
         {
-            DialogResult answer = UploadTestCaseObject(extracted, project);
+            DialogResult answer = UploadTestCaseObject(extracted, project, overwrite);
             switch (answer)
             {
                 case DialogResult.OK:
@@ -677,8 +726,8 @@ namespace Updater
 
                 case DialogResult.TryAgain:
                     // Use the time from what is currently in Dokimion so it will be accepted:
-                    extracted.lastModifiedTime = testcaseFromDokimion.lastModifiedTime;
-                    answer = UploadTestCaseObject(extracted, project);
+                    extracted.lastModifiedTime = lastModifiedTimeFromDokimion;
+                    answer = UploadTestCaseObject(extracted, project, false);
                     // Processed retry response further down in this function
                     break;
 
@@ -716,7 +765,7 @@ namespace Updater
             return UploadStatus.NotChanged;
         }
 
-        private DialogResult UploadTestCaseObject(TestCaseForUpload tc, Project project)
+        private DialogResult UploadTestCaseObject(TestCaseForUpload tc, Project project, bool overwrite)
         {
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase";
             string json = JsonConvert.SerializeObject(tc);
@@ -749,6 +798,10 @@ namespace Updater
                 string error = resp.Content.ReadAsStringAsync().Result;
                 if (error.Contains("Entity has been changed previously"))
                 {
+                    if (overwrite)
+                    {
+                        return DialogResult.TryAgain;
+                    }
                     Error = $"Testcase {tc.id} on server is newer than our testcase.";
                     var answer = MessageBox.Show($"Testcase {tc.id} on the server has changed since the file in the repo was created.\r\n" +
                             "Do you wish to upload anyway, overwriting changes on the server? (Try Again)\r\n" + 
@@ -1004,14 +1057,22 @@ namespace Updater
             foreach (XmlNode attrNode in attributesNode.ChildNodes)
             {
                 string key = AttributeKeyForName(project, attrNode.Name);
-                string[] values = attrNode.InnerText.Split(new char[] { ',' });
-                for (int i = 0; i < values.Length; i++)
+                // keys might be missing if the project isn't correctly set up
+                if (string.IsNullOrEmpty(key))
                 {
-                    string value = values[i].Replace("\"", "");
-                    value = value.Trim();
-                    values[i] = value;
+                    Log.Error($"Missing Attribute {attrNode.Name} in project");
                 }
-                tc.attributes.Add(key, values);
+                else
+                {
+                    string[] values = attrNode.InnerText.Split(new char[] { ',' });
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        string value = values[i].Replace("\"", "");
+                        value = value.Trim();
+                        values[i] = value;
+                    }
+                    tc.attributes.Add(key, values);
+                }
             }
 
             XmlNode? attachmentsNode = FindNodeNamed(overall, "attachments");

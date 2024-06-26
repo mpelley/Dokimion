@@ -201,7 +201,7 @@
             Controls.Add(LoginButton);
             Controls.Add(ProjectsListBox);
             Name = "Form1";
-            Text = "Form1";
+            Text = "Cloner";
             ((System.ComponentModel.ISupportInitialize)TestcaseDataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
