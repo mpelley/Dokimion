@@ -1,0 +1,13 @@
+Don would like to be able to transfer a whole project from/to:
+* Server to server
+* Server to local file system
+* Local file system to server
+
+Cloner could do the above by:
+* Adding "local file system" as a source or target (not both).  [Define an interface used by Form with two implementing classes behind the interface, one for server, one for file system.]
+* Adding project data to what is stored on the local file system.
+
+Don would like test case authors to work in GitHub and then upload the new test case to Dokimion.
+
+Don would like to be able to restore a corrupted or deleted test case from the local file system (GitHub cloned repo).
+

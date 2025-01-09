@@ -1,0 +1,48 @@
+To upload an attachment, use a POST with file as the contents to:
+/api/sandbox/testcase/2/attachment
+
+This works:
+curl --location "dokimion4.psonet/api/sandbox/testcase/18/attachment" -H "Whoru-Api-Token: abc" -F "file=@ParaNextDocumentLinks.txt" -F "fileId=ParaNextDocumentLinks.txt" -F "initialPreview=[]" -F "initialPreviewConfig=[]" -F "initialPreviewThumbTags=[]"
+
+To see attachment in test case do a GET to the testcase:
+/api/sandbox/testcase/2
+The response is:
+{
+	"attachments": [
+		{
+			"id": "33a43c7f-9211-4498-af03-3b069ef6db66",
+			"title": "Wycliffe-The-Finish-Line-2024-April.pdf",
+			"createdBy": "admin",
+			"createdTime": 1713206615735,
+			"dataSize": -1
+		}
+	],
+	"automated": false,
+	"locked": false,
+	"broken": false,
+	"launchBroken": false,
+	"id": "2",
+	"deleted": false,
+	"createdTime": 0,
+	"lastModifiedTime": 1713206615745,
+	"lastModifiedBy": "admin",
+	"attributes": {},
+	"metaData": {}
+}
+
+To remove attachment, do a DELETE with no parameters to:
+/api/sandbox/testcase/2/attachment/33a43c7f-9211-4498-af03-3b069ef6db66
+Response is the current value of the test case.
+
+To download attachment, do a GET using the attachment's ID:
+api/sandbox/testcase/18/attachment/d7a0286f-bede-4609-a301-3caa7eba128e
+
+
+Thoughts:
+On downloading a test case, download the attachments, which will overwrite existing ones, which is OK if they are the same.  We want to see newer ones.
+
+On uploading, look at the ID's in the test case on disk.  
+If the attachment for the ID exists on the server, download it and compare to what is on disk. 
+  If different, upload attachment.
+If we can't download that ID, upload the file.  
+Redownload the test case after all attachments are handled if we uploaded any to get the new IDs for the newly uploaded attachments.
