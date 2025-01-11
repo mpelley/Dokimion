@@ -30,6 +30,7 @@
         {
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            textBox6 = new TextBox();
             label7 = new Label();
             button10 = new Button();
             button9 = new Button();
@@ -47,6 +48,7 @@
             label1 = new Label();
             button1 = new Button();
             tabPage2 = new TabPage();
+            textBox7 = new TextBox();
             label8 = new Label();
             button12 = new Button();
             textBox4 = new TextBox();
@@ -64,6 +66,8 @@
             button11 = new Button();
             button3 = new Button();
             tabPage3 = new TabPage();
+            textBox9 = new TextBox();
+            textBox8 = new TextBox();
             label10 = new Label();
             label9 = new Label();
             button17 = new Button();
@@ -79,10 +83,6 @@
             label6 = new Label();
             button5 = new Button();
             button6 = new Button();
-            textBox6 = new TextBox();
-            textBox7 = new TextBox();
-            textBox8 = new TextBox();
-            textBox9 = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -127,6 +127,14 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Server to File System";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // textBox6
+            // 
+            textBox6.Location = new Point(9, 47);
+            textBox6.Name = "textBox6";
+            textBox6.ReadOnly = true;
+            textBox6.Size = new Size(236, 27);
+            textBox6.TabIndex = 16;
             // 
             // label7
             // 
@@ -297,10 +305,18 @@
             tabPage2.Location = new Point(4, 29);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(848, 456);
+            tabPage2.Size = new Size(638, 455);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "File System to Server";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // textBox7
+            // 
+            textBox7.Location = new Point(394, 49);
+            textBox7.Name = "textBox7";
+            textBox7.ReadOnly = true;
+            textBox7.Size = new Size(219, 27);
+            textBox7.TabIndex = 25;
             // 
             // label8
             // 
@@ -467,10 +483,26 @@
             tabPage3.Location = new Point(4, 29);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(848, 456);
+            tabPage3.Size = new Size(638, 455);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Server to Server";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // textBox9
+            // 
+            textBox9.Location = new Point(260, 49);
+            textBox9.Name = "textBox9";
+            textBox9.ReadOnly = true;
+            textBox9.Size = new Size(236, 27);
+            textBox9.TabIndex = 27;
+            // 
+            // textBox8
+            // 
+            textBox8.Location = new Point(6, 49);
+            textBox8.Name = "textBox8";
+            textBox8.ReadOnly = true;
+            textBox8.Size = new Size(236, 27);
+            textBox8.TabIndex = 26;
             // 
             // label10
             // 
@@ -608,38 +640,6 @@
             button6.Text = "Log into Source Server";
             button6.UseVisualStyleBackColor = true;
             // 
-            // textBox6
-            // 
-            textBox6.Location = new Point(9, 47);
-            textBox6.Name = "textBox6";
-            textBox6.ReadOnly = true;
-            textBox6.Size = new Size(236, 27);
-            textBox6.TabIndex = 16;
-            // 
-            // textBox7
-            // 
-            textBox7.Location = new Point(394, 49);
-            textBox7.Name = "textBox7";
-            textBox7.ReadOnly = true;
-            textBox7.Size = new Size(219, 27);
-            textBox7.TabIndex = 25;
-            // 
-            // textBox8
-            // 
-            textBox8.Location = new Point(6, 49);
-            textBox8.Name = "textBox8";
-            textBox8.ReadOnly = true;
-            textBox8.Size = new Size(236, 27);
-            textBox8.TabIndex = 26;
-            // 
-            // textBox9
-            // 
-            textBox9.Location = new Point(260, 49);
-            textBox9.Name = "textBox9";
-            textBox9.ReadOnly = true;
-            textBox9.Size = new Size(236, 27);
-            textBox9.TabIndex = 27;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -647,7 +647,7 @@
             ClientSize = new Size(673, 515);
             Controls.Add(tabControl1);
             Name = "Form1";
-            Text = "Updater";
+            Text = "Updater3";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();

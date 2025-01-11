@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Updater4": {
+      "commandName": "Project",
+      "workingDirectory": "."
+    }
+  }
+}
