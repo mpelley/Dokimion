@@ -5,6 +5,8 @@ namespace Updater4
     {
         Dokimion.Dokimion m_Dokimion;
 
+        Dictionary<int, DocumentPair> m_TestCases;
+
         public const int DOKIMION_TITLE_COLUMN = 0;
         public const int ID_COLUMN = 1;
         public const int STATUS_COLUMN = 2;
@@ -28,8 +30,12 @@ namespace Updater4
             TestCaseDataGridView.Rows.Clear();
 
             FilterListBox.Items.Clear();
-            FilterListBox.Items.AddRange(new string[] { "None", "Dokimion Newer", "File System Newer", "Dokimion missing", "File System missing", "Unknown" });
+            FilterListBox.Items.AddRange(new string[] { "No Filtering", "Not Equal", "Dokimion Newer", "File System Newer", "Dokimion missing", "File System missing", "Unknown" });
             FilterListBox.SelectedIndex = 0;
+
+            ProgressBar.Visible = false;
+
+            m_TestCases = new Dictionary<int, DocumentPair>();
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -102,7 +108,7 @@ namespace Updater4
                 }
                 catch
                 {
-                    StatusTextBox.Text = "Cannot decode Updater.json which contains: \n" + settingsJson;
+                    StatusTextBox.Text = "Cannot decode Updater.json which contains: \r\n" + settingsJson;
                 }
             }
             return settings;
@@ -148,6 +154,8 @@ namespace Updater4
         private void CompareButton_Click(object sender, EventArgs e)
         {
             TestCaseDataGridView.Rows.Clear();
+            m_TestCases = new Dictionary<int, DocumentPair>();
+
             FilterListBox.SelectedIndex = 0;
             StatusTextBox.Text = "Busy loading test cases from Dokimion.";
             Thread.Sleep(TimeSpan.FromMilliseconds(100));
@@ -155,14 +163,15 @@ namespace Updater4
             Project? project = (Project?)ProjectsListBox.SelectedItem;
             if (project == null)
             {
-                StatusTextBox.Text = "Please select one of the projects to get the test cases for";
+                StatusTextBox.Text = "Please select one of the projects to get the test cases for.";
                 return;
             }
 
+            StatusTextBox.Text = "";
             GetDokimionTestCases(project);
             GetFileSystemTestCases(project);
             CompareTestCases(project);
-            StatusTextBox.Text = "Done";
+
         }
 
 
@@ -212,38 +221,66 @@ namespace Updater4
             if (project != null)
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(FolderTextBox.Text);
+
+                StatusTextBox.Text += "Getting  test cases from file system.";
+                ProgressBar.Minimum = 0;
+                ProgressBar.Maximum = dirInfo.EnumerateFiles().Count();
+                ProgressBar.Step = 1;
+                ProgressBar.Value = 0;
+                ProgressBar.Visible = true;
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
                 foreach (var file in dirInfo.EnumerateFiles())
                 {
                     string path = file.FullName;
-                    TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(path, project);
-                    if (testcaseFromFile == null)
-                    {
-                        StatusTextBox.Text = m_Dokimion.Error;
-                    }
-                    else
-                    {
-                        int testCaseId = int.Parse(testcaseFromFile.id);
-                        int index = IndexForId(testCaseId);
-                        if (index < 0)
-                        {
-                            index = TestCaseDataGridView.Rows.Add();
-                            TestCaseDataGridView.Rows[index].Visible = true;
-                            TestCaseDataGridView.Rows[index].Cells[ID_COLUMN].Value = testCaseId;
-                        }
-                        TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
-                        TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
-                        TestCaseDataGridView.Rows[index].Cells[SELECT_COLUMN].Value = false;
-                    }
+                    GetFileSystemTestCase(project, path);
+                    ProgressBar.PerformStep();
                 }
+                ProgressBar.Visible = false;
+                StatusTextBox.Text += "\r\nDone";
+            }
+        }
+
+        private void GetFileSystemTestCase(Project project, string path)
+        {
+            TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(path, project);
+            if (testcaseFromFile == null)
+            {
+                StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
+            }
+            else
+            {
+                int testCaseId = int.Parse(testcaseFromFile.id);
+                int index = IndexForId(testCaseId);
+                if (index < 0)
+                {
+                    index = TestCaseDataGridView.Rows.Add();
+                    TestCaseDataGridView.Rows[index].Visible = true;
+                    TestCaseDataGridView.Rows[index].Cells[ID_COLUMN].Value = testCaseId;
+                }
+                TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
+                TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
+                TestCaseDataGridView.Rows[index].Cells[SELECT_COLUMN].Value = false;
             }
         }
 
         private void CompareTestCases(Project project)
         {
+            StatusTextBox.Text += "\r\nComparing Test Cases";
+            ProgressBar.Minimum = 0;
+            ProgressBar.Maximum = TestCaseDataGridView.Rows.Count;
+            ProgressBar.Step = 1;
+            ProgressBar.Value = 0;
+            ProgressBar.Visible = true;
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
             foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
             {
                 CompareTestCase(project, row);
+                ProgressBar.PerformStep();
             }
+            ProgressBar.Visible = false;
+            StatusTextBox.Text += "\r\nDone";
         }
 
         private void CompareTestCase(Project project, DataGridViewRow row)
@@ -251,10 +288,12 @@ namespace Updater4
             if (string.IsNullOrEmpty((string)row.Cells[DOKIMION_TITLE_COLUMN].Value))
             {
                 row.Cells[STATUS_COLUMN].Value = "«";
+                return;
             }
-            else if (string.IsNullOrEmpty((string)row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value))
+            if (string.IsNullOrEmpty((string)row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value))
             {
                 row.Cells[STATUS_COLUMN].Value = "»";
+                return;
             }
 
             int id = (int)row.Cells[ID_COLUMN].Value;
@@ -276,7 +315,11 @@ namespace Updater4
             {
                 row.Cells[DOKIMION_TITLE_COLUMN].Value = fullTestCase.name;
                 row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
-                if (fullTestCase.lastModifiedTime == testcaseFromFile.lastModifiedTime)
+                if (fullTestCase.lastModifiedTime == 0 || testcaseFromFile.lastModifiedTime == 0)
+                {
+                    row.Cells[STATUS_COLUMN].Value = "<>";
+                }
+                else if (fullTestCase.lastModifiedTime == testcaseFromFile.lastModifiedTime)
                 {
                     if (m_Dokimion.IsTestCaseChanged(fullTestCase, testcaseFromFile))
                     {
@@ -295,7 +338,18 @@ namespace Updater4
                 {
                     row.Cells[STATUS_COLUMN].Value = "<";
                 }
+                string serverXml = m_Dokimion.GenerateXml(fullTestCase, project);
+                string fileSystemXml = File.ReadAllText(filePath);
+                DocumentPair dp = new DocumentPair
+                {
+                    TestCase = $"{id}: {fullTestCase.name}",
+                    ServerDocument = serverXml,
+                    FileSystemDocument = fileSystemXml
+                };
+                m_TestCases[id] = dp;
             }
+
+
         }
 
         private void SelectAllButton_Click(object sender, EventArgs e)
@@ -340,8 +394,23 @@ namespace Updater4
             }
             else
             {
-                StatusTextBox.Text = "Downloading test cases to file system.";
+                int casesToDownload = 0;
+                foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
+                {
+                    if (row.Visible && (bool)row.Cells[SELECT_COLUMN].Value == true)
+                    {
+                        casesToDownload++;
+                    }
+                }
+
+                StatusTextBox.Text = "Downloading test cases to file system... ";
+                ProgressBar.Minimum = 0;
+                ProgressBar.Maximum = casesToDownload;
+                ProgressBar.Step = 1;
+                ProgressBar.Value = 0;
+                ProgressBar.Visible = true;
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
 
                 foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
                 {
@@ -352,15 +421,20 @@ namespace Updater4
                         {
                             if (false == m_Dokimion.DownloadTestcase(id, project, FolderTextBox.Text))
                             {
-                                StatusTextBox.Text = m_Dokimion.Error;
+                                StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
                                 return;
                             }
+
+                            string filePath = Path.Combine(FolderTextBox.Text, id + ".xml");
+                            GetFileSystemTestCase(project, filePath);
                             CompareTestCase(project, row);
                             row.Cells[SELECT_COLUMN].Value = false;
                         }
+                        ProgressBar.PerformStep();
                     }
                 }
-                StatusTextBox.Text = "Done.";
+                ProgressBar.Visible = false;
+                StatusTextBox.Text += "\r\nDone.";
             }
         }
 
@@ -428,7 +502,7 @@ namespace Updater4
             string? filter = (string?)FilterListBox.SelectedItem;
             for (int i = 0; i < TestCaseDataGridView.Rows.Count; i++)
             {
-                if (filter == "None")
+                if (filter == "No Filtering")
                 {
                     TestCaseDataGridView.Rows[i].Visible = true;
                 }
@@ -437,22 +511,22 @@ namespace Updater4
                     switch (TestCaseDataGridView.Rows[i].Cells[STATUS_COLUMN].Value)
                     {
                         case "»":
-                            TestCaseDataGridView.Rows[i].Visible = (filter == "File System missing");
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "File System missing") || (filter == "Not Equal"));
                             break;
                         case "«":
-                            TestCaseDataGridView.Rows[i].Visible = (filter == "Dokimion missing");
-                            break;
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "Dokimion missing") || (filter == "Not Equal"));
+                             break;
                         case "=":
                             TestCaseDataGridView.Rows[i].Visible = false;
                             break;
                         case ">":
-                            TestCaseDataGridView.Rows[i].Visible = (filter == "Dokimion Newer");
-                            break;
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "Dokimion Newer") || (filter == "Not Equal"));
+                             break;
                         case "<":
-                            TestCaseDataGridView.Rows[i].Visible = (filter == "File System Newer");
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "File System Newer") || (filter == "Not Equal"));
                             break;
                         case "<>":
-                            TestCaseDataGridView.Rows[i].Visible = (filter == "Unknown");
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "Unknown") || (filter == "Not Equal"));
                             break;
                         default:
                             TestCaseDataGridView.Rows[i].Visible = true;
@@ -462,5 +536,27 @@ namespace Updater4
             }
         }
 
+        private void ShowDiffsButton_Click(object sender, EventArgs e)
+        {
+            StatusTextBox.Text = "";
+            ShowDiffs dlg = new();
+
+            foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
+            {
+                if (row.Visible && (bool)row.Cells[SELECT_COLUMN].Value == true)
+                {
+                    int id = (int)row.Cells[ID_COLUMN].Value;
+                    dlg.DocumentPairs.Add(m_TestCases[id]);
+                }
+            }
+            if (dlg.DocumentPairs.Count > 0)
+            {
+                dlg.ShowDialog();
+            }
+            else
+            {
+                StatusTextBox.Text = "Please select some test cases to show the differences.";
+            }
+        }
     }
 }

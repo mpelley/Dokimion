@@ -91,43 +91,20 @@ namespace Dokimion
         public List<TestCaseShort> testCases = new List<TestCaseShort>();
     }
 
-    public class TestCaseForUpload
+    public class TestCaseForUpload : TestCaseShort
     {
-        public string id = "";
-        public string name = "";
         public string description = "";
         public string preconditions = "";
         public List<Step> steps = new List<Step>();
-        public bool automated;
-        public bool broken;
-        public bool deleted;
-        public bool launchBroken;
-        public bool locked;
         public Int64 lastModifiedTime;
-        public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
-        public List<Attachment> attachments = new List<Attachment>();
     }
 
-    public class TestCase
+    public class TestCase : TestCaseForUpload
     {
-        public string id = "";
-        public string name = "";
-        public string description = "";
-        public string preconditions = "";
-        public List<Step> steps = new List<Step>();
-        public List<Attachment> attachments = new List<Attachment>();
         public string createdBy = "";
-        public bool automated;
-        public bool broken;
-        public bool deleted;
-        public bool launchBroken;
-        public bool locked;
         public Int64 createdTime;
-        public Int64 lastModifiedTime;
         public string lastModifiedBy = "";
-        public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
     }
-
 
 
     /// <summary>
@@ -347,11 +324,11 @@ namespace Dokimion
                 return null;
             }
 
-            // Extract info from XmlDocument to an instance of TestCase.
+            // Extract info from XmlDocument to an instance of TestCaseForUpload.
             uploaded = XmlToObject(xmlDoc, path, project);
             if (uploaded == null)
             {
-                Error = "Cannot convert XML file to a test case object";
+                Error = $"Cannot convert XML file {path} to a test case object";
                 return null;
             }
 
@@ -648,7 +625,7 @@ namespace Dokimion
             return true;
         }
 
-        private string GenerateXml(TestCase tc, Project project)
+        public string GenerateXml(TestCase tc, Project project)
         {
             // Create our top-level node
             XmlDocument xmlDoc = new XmlDocument();
@@ -874,7 +851,7 @@ namespace Dokimion
             return true;
         }
 
-        public bool IsTestCaseChanged(TestCase testcaseFromDokimion, TestCaseForUpload extracted)
+        public bool IsTestCaseChanged(TestCaseForUpload testcaseFromDokimion, TestCaseForUpload extracted)
         {
             if (testcaseFromDokimion.id != extracted.id) return true;
             if (testcaseFromDokimion.name != extracted.name) return true;
@@ -955,14 +932,14 @@ namespace Dokimion
             return attResp;
         }
 
-        public UploadStatus UploadXmlFileToProjectIfDifferent(string filename, Project project, out TestCaseForUpload? uploaded)
+        public UploadStatus UploadXmlFileToProjectIfDifferent(string path, Project project, out TestCaseForUpload? uploaded)
         {
             uploaded = null;
             // Read text from XML file.
             string xmlText = "";
             try
             {
-                xmlText = File.ReadAllText(filename);
+                xmlText = File.ReadAllText(path);
             }
             catch (Exception ex)
             {
@@ -983,10 +960,10 @@ namespace Dokimion
             }
 
             // Extract info from XmlDocument to an instance of TestCase.
-            TestCaseForUpload? extracted = XmlToObject(xmlDoc, filename, project);
+            TestCaseForUpload? extracted = XmlToObject(xmlDoc, path, project);
             if (extracted == null)
             {
-                Error = "Cannot convert XML file to a test case object";
+                Error = $"Cannot convert XML file {path} to a test case object";
                 return UploadStatus.Error;
             }
             uploaded = extracted;
@@ -1052,7 +1029,7 @@ namespace Dokimion
             // If different, write tc TestCase to server.
             if (changed)
             {
-                return UploadTestCaseToProjectWithRetries(filename, project, extracted, lastModifiedTimeFromDokimion, overwrite);
+                return UploadTestCaseToProjectWithRetries(path, project, extracted, lastModifiedTimeFromDokimion, overwrite);
             }
             return UploadStatus.NoChange;
         }

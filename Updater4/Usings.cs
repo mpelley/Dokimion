@@ -7,3 +7,5 @@ global using System.Threading.Tasks;
 global using Newtonsoft.Json;
 global using Dokimion;
 
+global using DiffPlex;
+global using DiffPlex.WindowsForms.Controls;
