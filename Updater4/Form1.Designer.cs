@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             LoginButton = new Button();
             TestCaseDataGridView = new DataGridView();
             TitleInDokimion = new DataGridViewTextBoxColumn();
@@ -47,20 +47,27 @@
             QuitButton = new Button();
             StatusTextBox = new TextBox();
             ProjectsListBox = new ListBox();
-            CompareButton = new Button();
+            GetTestCasesButton = new Button();
             FilterListBox = new ListBox();
             ProgressBar = new ProgressBar();
+            label1 = new Label();
+            label2 = new Label();
+            ServerTextBox = new TextBox();
+            groupBox2 = new GroupBox();
+            SaveProjectButton = new Button();
+            RestoreProjectButton = new Button();
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // LoginButton
             // 
-            LoginButton.Location = new Point(25, 12);
+            LoginButton.Location = new Point(13, 20);
             LoginButton.Name = "LoginButton";
-            LoginButton.Size = new Size(218, 37);
+            LoginButton.Size = new Size(218, 29);
             LoginButton.TabIndex = 17;
-            LoginButton.Text = "Log into Dokimion Server";
+            LoginButton.Text = "Log into Dokimion Server...";
             LoginButton.UseVisualStyleBackColor = true;
             LoginButton.Click += LoginButton_Click;
             // 
@@ -69,21 +76,21 @@
             TestCaseDataGridView.AllowUserToAddRows = false;
             TestCaseDataGridView.AllowUserToDeleteRows = false;
             TestCaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem });
-            TestCaseDataGridView.Location = new Point(25, 223);
+            TestCaseDataGridView.Location = new Point(25, 293);
             TestCaseDataGridView.Name = "TestCaseDataGridView";
             TestCaseDataGridView.RowHeadersVisible = false;
             TestCaseDataGridView.RowHeadersWidth = 51;
-            TestCaseDataGridView.Size = new Size(875, 221);
+            TestCaseDataGridView.Size = new Size(869, 107);
             TestCaseDataGridView.TabIndex = 20;
             // 
             // TitleInDokimion
@@ -128,7 +135,7 @@
             // DokimionToFsButton
             // 
             DokimionToFsButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DokimionToFsButton.Location = new Point(34, 531);
+            DokimionToFsButton.Location = new Point(34, 535);
             DokimionToFsButton.Name = "DokimionToFsButton";
             DokimionToFsButton.Size = new Size(152, 53);
             DokimionToFsButton.TabIndex = 21;
@@ -141,9 +148,9 @@
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(FolderTextBox);
             groupBox1.Controls.Add(BrowseFileSystemButton);
-            groupBox1.Location = new Point(263, 12);
+            groupBox1.Location = new Point(481, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(637, 85);
+            groupBox1.Size = new Size(354, 95);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "GitHub Repo";
@@ -151,25 +158,26 @@
             // FolderTextBox
             // 
             FolderTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            FolderTextBox.Location = new Point(14, 53);
+            FolderTextBox.Location = new Point(18, 58);
             FolderTextBox.Name = "FolderTextBox";
-            FolderTextBox.Size = new Size(617, 27);
+            FolderTextBox.ReadOnly = true;
+            FolderTextBox.Size = new Size(330, 27);
             FolderTextBox.TabIndex = 1;
             // 
             // BrowseFileSystemButton
             // 
-            BrowseFileSystemButton.Location = new Point(10, 19);
+            BrowseFileSystemButton.Location = new Point(18, 23);
             BrowseFileSystemButton.Name = "BrowseFileSystemButton";
             BrowseFileSystemButton.Size = new Size(94, 29);
             BrowseFileSystemButton.TabIndex = 0;
-            BrowseFileSystemButton.Text = "Browse";
+            BrowseFileSystemButton.Text = "Browse...";
             BrowseFileSystemButton.UseVisualStyleBackColor = true;
             BrowseFileSystemButton.Click += BrowseFileSystemButton_Click;
             // 
             // FsToDokimionButton
             // 
             FsToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            FsToDokimionButton.Location = new Point(382, 531);
+            FsToDokimionButton.Location = new Point(382, 535);
             FsToDokimionButton.Name = "FsToDokimionButton";
             FsToDokimionButton.Size = new Size(152, 53);
             FsToDokimionButton.TabIndex = 26;
@@ -179,9 +187,9 @@
             // 
             // SelectAllButton
             // 
-            SelectAllButton.Location = new Point(410, 103);
+            SelectAllButton.Location = new Point(25, 249);
             SelectAllButton.Name = "SelectAllButton";
-            SelectAllButton.Size = new Size(89, 40);
+            SelectAllButton.Size = new Size(89, 38);
             SelectAllButton.TabIndex = 27;
             SelectAllButton.Text = "Select All";
             SelectAllButton.UseVisualStyleBackColor = true;
@@ -189,9 +197,9 @@
             // 
             // ClearAllButton
             // 
-            ClearAllButton.Location = new Point(505, 103);
+            ClearAllButton.Location = new Point(120, 249);
             ClearAllButton.Name = "ClearAllButton";
-            ClearAllButton.Size = new Size(89, 40);
+            ClearAllButton.Size = new Size(89, 38);
             ClearAllButton.TabIndex = 28;
             ClearAllButton.Text = "Clear All";
             ClearAllButton.UseVisualStyleBackColor = true;
@@ -200,7 +208,7 @@
             // ShowDiffsButton
             // 
             ShowDiffsButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            ShowDiffsButton.Location = new Point(210, 531);
+            ShowDiffsButton.Location = new Point(210, 535);
             ShowDiffsButton.Name = "ShowDiffsButton";
             ShowDiffsButton.Size = new Size(152, 53);
             ShowDiffsButton.TabIndex = 29;
@@ -211,7 +219,7 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            QuitButton.Location = new Point(747, 531);
+            QuitButton.Location = new Point(742, 535);
             QuitButton.Name = "QuitButton";
             QuitButton.Size = new Size(152, 53);
             QuitButton.TabIndex = 30;
@@ -222,61 +230,124 @@
             // StatusTextBox
             // 
             StatusTextBox.AcceptsReturn = true;
-            StatusTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            StatusTextBox.Location = new Point(25, 451);
+            StatusTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            StatusTextBox.Location = new Point(25, 455);
             StatusTextBox.Multiline = true;
             StatusTextBox.Name = "StatusTextBox";
             StatusTextBox.ReadOnly = true;
             StatusTextBox.ScrollBars = ScrollBars.Both;
-            StatusTextBox.Size = new Size(875, 64);
+            StatusTextBox.Size = new Size(869, 64);
             StatusTextBox.TabIndex = 2;
             // 
             // ProjectsListBox
             // 
             ProjectsListBox.FormattingEnabled = true;
-            ProjectsListBox.Location = new Point(25, 103);
+            ProjectsListBox.Location = new Point(25, 139);
             ProjectsListBox.Name = "ProjectsListBox";
-            ProjectsListBox.Size = new Size(271, 104);
+            ProjectsListBox.Size = new Size(348, 104);
             ProjectsListBox.TabIndex = 31;
             // 
-            // CompareButton
+            // GetTestCasesButton
             // 
-            CompareButton.Location = new Point(316, 103);
-            CompareButton.Name = "CompareButton";
-            CompareButton.Size = new Size(89, 40);
-            CompareButton.TabIndex = 32;
-            CompareButton.Text = "Compare";
-            CompareButton.UseVisualStyleBackColor = true;
-            CompareButton.Click += CompareButton_Click;
+            GetTestCasesButton.Location = new Point(399, 139);
+            GetTestCasesButton.Name = "GetTestCasesButton";
+            GetTestCasesButton.Size = new Size(194, 45);
+            GetTestCasesButton.TabIndex = 32;
+            GetTestCasesButton.Text = "Compare Project";
+            GetTestCasesButton.UseVisualStyleBackColor = true;
+            GetTestCasesButton.Click += CompareButton_Click;
             // 
             // FilterListBox
             // 
+            FilterListBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             FilterListBox.FormattingEnabled = true;
-            FilterListBox.Location = new Point(627, 103);
+            FilterListBox.Location = new Point(627, 139);
             FilterListBox.Name = "FilterListBox";
-            FilterListBox.Size = new Size(237, 104);
+            FilterListBox.Size = new Size(267, 104);
             FilterListBox.TabIndex = 33;
             FilterListBox.SelectedIndexChanged += FilterListBox_SelectedIndexChanged;
             // 
             // ProgressBar
             // 
-            ProgressBar.Location = new Point(316, 162);
+            ProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ProgressBar.Location = new Point(25, 406);
             ProgressBar.Name = "ProgressBar";
-            ProgressBar.Size = new Size(278, 45);
+            ProgressBar.Size = new Size(869, 45);
             ProgressBar.Step = 1;
             ProgressBar.Style = ProgressBarStyle.Continuous;
             ProgressBar.TabIndex = 34;
             ProgressBar.Visible = false;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(27, 110);
+            label1.Name = "label1";
+            label1.Size = new Size(154, 20);
+            label1.TabIndex = 35;
+            label1.Text = "Projects on Dokimion:";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(627, 114);
+            label2.Name = "label2";
+            label2.Size = new Size(51, 20);
+            label2.TabIndex = 36;
+            label2.Text = "Filters:";
+            // 
+            // ServerTextBox
+            // 
+            ServerTextBox.Location = new Point(13, 55);
+            ServerTextBox.Name = "ServerTextBox";
+            ServerTextBox.ReadOnly = true;
+            ServerTextBox.Size = new Size(401, 27);
+            ServerTextBox.TabIndex = 37;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(ServerTextBox);
+            groupBox2.Controls.Add(LoginButton);
+            groupBox2.Location = new Point(21, 15);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(433, 92);
+            groupBox2.TabIndex = 38;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Dokimion Server";
+            // 
+            // SaveProjectButton
+            // 
+            SaveProjectButton.Location = new Point(379, 190);
+            SaveProjectButton.Name = "SaveProjectButton";
+            SaveProjectButton.Size = new Size(96, 53);
+            SaveProjectButton.TabIndex = 39;
+            SaveProjectButton.Text = "Save Project Info";
+            SaveProjectButton.UseVisualStyleBackColor = true;
+            SaveProjectButton.Click += SaveProjectButton_Click;
+            // 
+            // RestoreProjectButton
+            // 
+            RestoreProjectButton.Location = new Point(492, 190);
+            RestoreProjectButton.Name = "RestoreProjectButton";
+            RestoreProjectButton.Size = new Size(129, 53);
+            RestoreProjectButton.TabIndex = 40;
+            RestoreProjectButton.Text = "Create Project From Info";
+            RestoreProjectButton.UseVisualStyleBackColor = true;
+            RestoreProjectButton.Click += RestoreProjectButton_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
-            ClientSize = new Size(912, 607);
+            ClientSize = new Size(912, 611);
+            Controls.Add(RestoreProjectButton);
+            Controls.Add(SaveProjectButton);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(ProgressBar);
             Controls.Add(FilterListBox);
-            Controls.Add(CompareButton);
+            Controls.Add(GetTestCasesButton);
             Controls.Add(ProjectsListBox);
             Controls.Add(StatusTextBox);
             Controls.Add(QuitButton);
@@ -287,12 +358,14 @@
             Controls.Add(groupBox1);
             Controls.Add(DokimionToFsButton);
             Controls.Add(TestCaseDataGridView);
-            Controls.Add(LoginButton);
+            Controls.Add(groupBox2);
             Name = "Form1";
             Text = "Updater4";
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -311,7 +384,7 @@
         private Button QuitButton;
         private TextBox StatusTextBox;
         private ListBox ProjectsListBox;
-        private Button CompareButton;
+        private Button GetTestCasesButton;
         private ListBox FilterListBox;
         private DataGridViewTextBoxColumn TitleInDokimion;
         private DataGridViewTextBoxColumn ID;
@@ -319,5 +392,11 @@
         private DataGridViewCheckBoxColumn Selected;
         private DataGridViewTextBoxColumn TitleInFileSystem;
         private ProgressBar ProgressBar;
+        private Label label1;
+        private Label label2;
+        private TextBox ServerTextBox;
+        private GroupBox groupBox2;
+        private Button SaveProjectButton;
+        private Button RestoreProjectButton;
     }
 }

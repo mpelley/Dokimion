@@ -26,6 +26,26 @@ namespace Dokimion
         Aborted
     }
 
+    public class AttributeValue
+    {
+        public string? value = null;
+    }
+
+    public class AttributeForUpload
+    {
+        public string? id = null;
+        public string? name = null;
+        public string? type = null;
+        public AttributeValue[]? attrValues;
+    }
+
+    public class ProjectForUpload
+    {
+        public string description = "";
+        public string[] readWriteUsers = { "" };
+        public string id = "";
+        public string name = "";
+    }
 
     public class Project
     {
@@ -295,6 +315,120 @@ namespace Dokimion
             return testcaseTreeResponse.testCases;
         }
 
+        public string? GetProject(string projectId)
+        {
+            string url = BaseDokimionApiUrl() + "/project/" + projectId;
+            Error = "";
+
+            var resp = m_Client.GetAsync(url).Result;
+            string json = resp.Content.ReadAsStringAsync().Result;
+            if (false == resp.IsSuccessStatusCode)
+            {
+                Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
+                return null;
+            }
+            return json;
+        }
+
+        public string? GetProjectAttributes(string projectId)
+        {
+            string url = BaseDokimionApiUrl() + "/" + projectId + "/attribute";
+            Error = "";
+
+            var resp = m_Client.GetAsync(url).Result;
+            string json = resp.Content.ReadAsStringAsync().Result;
+            if (false == resp.IsSuccessStatusCode)
+            {
+                Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
+                return null;
+            }
+            return json;
+        }
+
+        public ProjectForUpload? GetProjectFromJson(string path)
+        {
+            string projectJson;
+            ProjectForUpload? project;
+            try
+            {
+                projectJson = File.ReadAllText(path);
+                project = JsonConvert.DeserializeObject<ProjectForUpload>(projectJson);
+            }
+            catch (Exception ex)
+            {
+                Error = $"Cannot read project file {path} because:\r\n{ex.Message}";
+                return null;
+            }
+            if (project == null)
+            {
+                Error = $"Cannot deserialize JSON file {path}";
+                return null;
+            }
+
+            return project;
+        }
+
+        public bool CreateProjectFromFiles(string projectFilePath, string attributesFilePath, bool doUpdate)
+        {
+
+            ProjectForUpload? project = GetProjectFromJson(projectFilePath);
+            if (project == null)
+            {
+                return false;
+            }
+
+            string attributesJson;
+            AttributeForUpload[]? attributes;
+            try
+            {
+                attributesJson = File.ReadAllText(attributesFilePath);
+                attributes = JsonConvert.DeserializeObject<AttributeForUpload[]>(attributesJson);
+            }
+            catch (Exception ex)
+            {
+                Error = $"Cannot read attributes file {attributesFilePath} because:\r\n{ex.Message}";
+                return false;
+            }
+            if (attributes == null)
+            {
+                Error = $"Cannot deserialize JSON file {attributesFilePath}";
+                return false;
+            }
+
+            if (false == doUpdate)
+            {
+                string json = JsonConvert.SerializeObject(project);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                string url = BaseDokimionApiUrl() + "/project";
+                HttpResponseMessage resp = m_Client.PostAsync(url, content).Result;
+                if (false == resp.IsSuccessStatusCode)
+                {
+                    string respContent = resp.Content.ReadAsStringAsync().Result;
+                    Error = $"Error {resp.ReasonPhrase} when trying to create project.\r\n{respContent}";
+                    return false;
+                }
+            }
+
+            foreach(var attr in attributes)
+            {
+                attr.id = null;
+                attr.type = "TESTCASE";
+                string json = JsonConvert.SerializeObject(attr);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                string url = BaseDokimionApiUrl() + "/" + project.id + "/attribute";
+                HttpResponseMessage resp = m_Client.PostAsync(url, content).Result;
+                if (false == resp.IsSuccessStatusCode)
+                {
+                    string respContent = resp.Content.ReadAsStringAsync().Result;
+                    Error = $"Error {resp.ReasonPhrase} when trying to create project.\r\n{respContent}";
+                    return false;
+                }
+            }
+
+
+            return true;
+        }
+
         public TestCaseForUpload? GetTestCaseFromFileSystem(string path, Project project)
         {
             TestCaseForUpload? uploaded;
@@ -328,7 +462,7 @@ namespace Dokimion
             uploaded = XmlToObject(xmlDoc, path, project);
             if (uploaded == null)
             {
-                Error = $"Cannot convert XML file {path} to a test case object";
+                Error += $"\r\nCannot convert XML file {path} to a test case object";
                 return null;
             }
 
@@ -353,6 +487,7 @@ namespace Dokimion
             XmlNode? idNode = FindNodeNamed(overall, "id");
             if (idNode == null)
             {
+                Error = $"id node in {filename} is missing.";
                 return null;
             }
             tc.id = idNode.InnerText;
@@ -360,6 +495,7 @@ namespace Dokimion
             XmlNode? nameNode = FindNodeNamed(overall, "name");
             if (nameNode == null)
             {
+                Error = $"name node in {filename} is missing.";
                 return null;
             }
             tc.name = nameNode.InnerText;
@@ -367,6 +503,7 @@ namespace Dokimion
             XmlNode? descNode = FindNodeNamed(overall, "description");
             if (descNode == null)
             {
+                Error = $"description node in {filename} is missing.";
                 return null;
             }
             tc.description = CleanText(descNode.InnerText);
@@ -384,6 +521,7 @@ namespace Dokimion
             XmlNode? autoNode = FindNodeNamed(overall, "automated");
             if (autoNode == null)
             {
+                Error = $"automated node in {filename} is missing.";
                 return null;
             }
             tc.automated = autoNode.InnerText.ToLower() == "true";
@@ -398,6 +536,7 @@ namespace Dokimion
             XmlNode? deletedNode = FindNodeNamed(overall, "deleted");
             if (deletedNode == null)
             {
+                Error = $"broken node in {filename} is missing.";
                 return null;
             }
             tc.deleted = deletedNode.InnerText.ToLower() == "true";
@@ -405,6 +544,7 @@ namespace Dokimion
             XmlNode? lockedNode = FindNodeNamed(overall, "locked");
             if (lockedNode == null)
             {
+                Error = $"locked node in {filename} is missing.";
                 return null;
             }
             tc.locked = lockedNode.InnerText.ToLower() == "true";
@@ -412,6 +552,7 @@ namespace Dokimion
             XmlNode? launchBrokenNode = FindNodeNamed(overall, "launchBroken");
             if (launchBrokenNode == null)
             {
+                Error = $"launchbroken node in {filename} is missing.";
                 return null;
             }
             tc.launchBroken = launchBrokenNode.InnerText.ToLower() == "true";
@@ -419,6 +560,7 @@ namespace Dokimion
             XmlNode? modifiedNode = FindNodeNamed(overall, "lastModifiedTime");
             if (modifiedNode == null)
             {
+                Error = $"lastModifiedTime node in {filename} is missing.";
                 return null;
             }
             Int64 time = Int64.Parse(modifiedNode.InnerText);
@@ -427,6 +569,7 @@ namespace Dokimion
             XmlNode? stepsNode = FindNodeNamed(overall, "steps");
             if (stepsNode == null)
             {
+                Error = $"steps node in {filename} is missing.";
                 return null;
             }
             tc.steps = new List<Step>();
@@ -456,6 +599,7 @@ namespace Dokimion
             XmlNode? attributesNode = FindNodeNamed(overall, "attributes");
             if (attributesNode == null)
             {
+                Error = $"attributes node in {filename} is missing.";
                 return null;
             }
             tc.attributes = new Dictionary<string, string[]>();
@@ -466,6 +610,10 @@ namespace Dokimion
                 if (string.IsNullOrEmpty(key))
                 {
                     Log.Error($"Missing Attribute {attrNode.Name} in project");
+                }
+                else if (tc.attributes.ContainsKey(key))
+                {
+                    Log.Error($"Duplicate Attribute {key} in test case {tc.name}.");
                 }
                 else
                 {
@@ -483,6 +631,7 @@ namespace Dokimion
             XmlNode? attachmentsNode = FindNodeNamed(overall, "attachments");
             if (attachmentsNode == null)
             {
+                Error = $"attachments node in {filename} is missing.";
                 return null;
             }
             tc.attachments = new List<Attachment>();
@@ -492,30 +641,35 @@ namespace Dokimion
                 XmlNode? attachIdNode = FindNodeNamed(attachNode, "id");
                 if (attachIdNode == null)
                 {
+                    Error = $"attachment id node in {filename} is missing.";
                     return null;
                 }
                 attach.id = attachIdNode.InnerText;
                 XmlNode? attachTitleNode = FindNodeNamed(attachNode, "title");
                 if (attachTitleNode == null)
                 {
+                    Error = $"attachment title node in {filename} is missing.";
                     return null;
                 }
                 attach.title = attachTitleNode.InnerText;
                 XmlNode? attachCtimeNode = FindNodeNamed(attachNode, "createdTime");
                 if (attachCtimeNode == null)
                 {
+                    Error = $"attachment createdTime node in {filename} is missing.";
                     return null;
                 }
                 attach.createdTime = Int64.Parse(attachCtimeNode.InnerText);
                 XmlNode? attachCbyNode = FindNodeNamed(attachNode, "createdBy");
                 if (attachCbyNode == null)
                 {
+                    Error = $"attachment createdBy node in {filename} is missing.";
                     return null;
                 }
                 attach.createdBy = attachCbyNode.InnerText;
                 XmlNode? attachSizeNode = FindNodeNamed(attachNode, "dataSize");
                 if (attachSizeNode == null)
                 {
+                    Error = $"attachment dataSize node in {filename} is missing.";
                     return null;
                 }
                 attach.dataSize = Int64.Parse(attachSizeNode.InnerText);
