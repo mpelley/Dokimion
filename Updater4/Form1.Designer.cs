@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             LoginButton = new Button();
             TestCaseDataGridView = new DataGridView();
             TitleInDokimion = new DataGridViewTextBoxColumn();
@@ -57,6 +57,7 @@
             SaveProjectButton = new Button();
             RestoreProjectButton = new Button();
             button1 = new Button();
+            DeleteEmptyButton = new Button();
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -77,14 +78,14 @@
             TestCaseDataGridView.AllowUserToAddRows = false;
             TestCaseDataGridView.AllowUserToDeleteRows = false;
             TestCaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem });
             TestCaseDataGridView.Location = new Point(25, 293);
@@ -247,6 +248,7 @@
             ProjectsListBox.Name = "ProjectsListBox";
             ProjectsListBox.Size = new Size(348, 104);
             ProjectsListBox.TabIndex = 31;
+            ProjectsListBox.SelectedIndexChanged += ProjectsListBox_SelectedIndexChanged;
             // 
             // GetTestCasesButton
             // 
@@ -293,9 +295,9 @@
             label2.AutoSize = true;
             label2.Location = new Point(627, 114);
             label2.Name = "label2";
-            label2.Size = new Size(51, 20);
+            label2.Size = new Size(110, 20);
             label2.TabIndex = 36;
-            label2.Text = "Filters:";
+            label2.Text = "Test Case Filter:";
             // 
             // ServerTextBox
             // 
@@ -340,11 +342,22 @@
             // 
             button1.Location = new Point(198, 105);
             button1.Name = "button1";
-            button1.Size = new Size(134, 30);
+            button1.Size = new Size(175, 30);
             button1.TabIndex = 41;
-            button1.Text = "Refresh Projects";
+            button1.Text = "Refresh Project List";
             button1.UseVisualStyleBackColor = true;
             button1.Click += RefreshButton_Click;
+            // 
+            // DeleteEmptyButton
+            // 
+            DeleteEmptyButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            DeleteEmptyButton.Location = new Point(554, 535);
+            DeleteEmptyButton.Name = "DeleteEmptyButton";
+            DeleteEmptyButton.Size = new Size(110, 53);
+            DeleteEmptyButton.TabIndex = 42;
+            DeleteEmptyButton.Text = "Delete Empty Test Cases";
+            DeleteEmptyButton.UseVisualStyleBackColor = true;
+            DeleteEmptyButton.Click += DeleteEmptyButton_Click;
             // 
             // Form1
             // 
@@ -352,6 +365,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
             ClientSize = new Size(912, 611);
+            Controls.Add(DeleteEmptyButton);
             Controls.Add(button1);
             Controls.Add(RestoreProjectButton);
             Controls.Add(SaveProjectButton);
@@ -372,7 +386,7 @@
             Controls.Add(TestCaseDataGridView);
             Controls.Add(groupBox2);
             Name = "Form1";
-            Text = "Updater4";
+            Text = "Dokimion Test Case Mainenance";
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
@@ -411,5 +425,6 @@
         private Button SaveProjectButton;
         private Button RestoreProjectButton;
         private Button button1;
+        private Button DeleteEmptyButton;
     }
 }

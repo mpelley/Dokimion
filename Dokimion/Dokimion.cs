@@ -1434,7 +1434,30 @@ namespace Dokimion
             return testcase;
         }
 
+        public bool DeleteTestCase(string projectId, string testcaseId)
+        {
+            string url = BaseDokimionApiUrl() + "/" + projectId + "/testcase/" + testcaseId;
+            HttpResponseMessage? resp = null;
+            try
+            {
+                resp = m_Client.DeleteAsync(url).Result;
+            }
+            catch (Exception ex)
+            {
+                Error = ex.Message;
+                return false;
+            }
+            if (false == resp.IsSuccessStatusCode)
+            {
+                string error = resp.Content.ReadAsStringAsync().Result;
+                Error = error;
+                return false;
+            }
 
-    }
+            return true;
+        }
+
+
+        }
 
 }

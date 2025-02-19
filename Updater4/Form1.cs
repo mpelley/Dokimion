@@ -163,8 +163,8 @@ namespace Updater4
                     settings.repo = dlg.SelectedPath;
                     SaveSettings(settings);
                 }
+                TestCaseDataGridView.Rows.Clear();
             }
-
         }
 
         private void QuitButton_Click(object sender, EventArgs e)
@@ -757,5 +757,58 @@ namespace Updater4
             }
         }
 
+        private void DeleteEmptyButton_Click(object sender, EventArgs e)
+        {
+            StatusTextBox.Text = "Deleting empty test cases.";
+            Project? project = (Project?)ProjectsListBox.SelectedItem;
+            if (project == null)
+            {
+                StatusTextBox.Text += "\r\nWe need a project to be selected.";
+                return;
+            }
+
+            string projectId = project.id;
+            List<TestCaseShort>? testcases = m_Dokimion.GetTestCaseSummariesForProject(projectId);
+
+            if (testcases == null)
+            {
+                StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
+            }
+            else
+            {
+                ProgressBar.Maximum = testcases.Count();
+                ProgressBar.Step = 1;
+                ProgressBar.Value = 0;
+                ProgressBar.Visible = true;
+                ProgressBar.Refresh();
+                int deleted = 0;
+                foreach (TestCaseShort shortTestCase in testcases)
+                {
+                    if (shortTestCase.name == "<<empty>>")
+                    {
+                        if (false == m_Dokimion.DeleteTestCase(projectId, shortTestCase.id))
+                        {
+                            StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
+                        }
+                        deleted++;
+                    }
+                    ProgressBar.PerformStep();
+                }
+                if (deleted == 0)
+                {
+                    StatusTextBox.Text += "\r\nNo test cases deleted.";
+                }
+                else
+                {
+                    StatusTextBox.Text += $"\r\n{deleted} Empty test cases were deleted.";
+                }
+            }
+            ProgressBar.Visible = false;
+        }
+
+        private void ProjectsListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TestCaseDataGridView.Rows.Clear();
+        }
     }
 }
