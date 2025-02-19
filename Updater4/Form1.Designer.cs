@@ -56,6 +56,7 @@
             groupBox2 = new GroupBox();
             SaveProjectButton = new Button();
             RestoreProjectButton = new Button();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -335,12 +336,23 @@
             RestoreProjectButton.UseVisualStyleBackColor = true;
             RestoreProjectButton.Click += RestoreProjectButton_Click;
             // 
+            // button1
+            // 
+            button1.Location = new Point(198, 105);
+            button1.Name = "button1";
+            button1.Size = new Size(134, 30);
+            button1.TabIndex = 41;
+            button1.Text = "Refresh Projects";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += RefreshButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
             ClientSize = new Size(912, 611);
+            Controls.Add(button1);
             Controls.Add(RestoreProjectButton);
             Controls.Add(SaveProjectButton);
             Controls.Add(label2);
@@ -398,5 +410,6 @@
         private GroupBox groupBox2;
         private Button SaveProjectButton;
         private Button RestoreProjectButton;
+        private Button button1;
     }
 }

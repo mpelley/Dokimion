@@ -79,21 +79,34 @@ namespace Updater4
                 ServerTextBox.Text = m_Dokimion.ServerUrl;
                 StatusTextBox.Text += "\r\nGetting Projects from Dokimion.";
                 StatusTextBox.Refresh();
-                ProjectsListBox.Items.Clear();
-                List<Project>? projects = m_Dokimion.GetProjects();
-                if (projects == null)
-                {
-                    StatusTextBox.Text = m_Dokimion.Error;
-                }
-                else
-                {
-                    foreach (Project project in projects)
-                    {
-                        ProjectsListBox.Items.Add(project);
-                    }
-                }
+                GetProjectsFromDokimion();
                 StatusTextBox.Text += "\r\nDone.";
             }
+        }
+
+        private void GetProjectsFromDokimion()
+        {
+            ProjectsListBox.Items.Clear();
+            List<Project>? projects = m_Dokimion.GetProjects();
+            if (projects == null)
+            {
+                StatusTextBox.Text = m_Dokimion.Error;
+            }
+            else
+            {
+                foreach (Project project in projects)
+                {
+                    ProjectsListBox.Items.Add(project);
+                }
+            }
+        }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            StatusTextBox.Text = "Getting Projects from Dokimion.";
+            StatusTextBox.Refresh();
+            GetProjectsFromDokimion();
+            StatusTextBox.Text += "\r\nDone.";
         }
 
         private Settings? GetSettings()
@@ -166,7 +179,7 @@ namespace Updater4
 
             FilterListBox.SelectedIndex = 0;
             StatusTextBox.Text = "Busy loading test cases from Dokimion.";
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            StatusTextBox.Refresh();
 
             Project? project = (Project?)ProjectsListBox.SelectedItem;
             if (project == null)
@@ -252,7 +265,7 @@ namespace Updater4
                 ProgressBar.Step = 1;
                 ProgressBar.Value = 0;
                 ProgressBar.Visible = true;
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                ProgressBar.Refresh();
 
                 foreach (var file in files)
                 {
@@ -297,7 +310,7 @@ namespace Updater4
             ProgressBar.Step = 1;
             ProgressBar.Value = 0;
             ProgressBar.Visible = true;
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            ProgressBar.Refresh();
 
             foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
             {
@@ -443,7 +456,7 @@ namespace Updater4
                 ProgressBar.Step = 1;
                 ProgressBar.Value = 0;
                 ProgressBar.Visible = true;
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                ProgressBar.Refresh();
 
 
                 foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
@@ -489,8 +502,14 @@ namespace Updater4
             else
             {
                 StatusTextBox.Text = "Uploading test cases to Dokimion.";
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                StatusTextBox.Refresh();
                 int testcasesChanged = 0;
+
+                ProgressBar.Maximum = TestCaseDataGridView.Rows.Count;
+                ProgressBar.Step = 1;
+                ProgressBar.Value = 0;
+                ProgressBar.Visible = true;
+                ProgressBar.Refresh();
 
                 foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
                 {
@@ -522,12 +541,15 @@ namespace Updater4
                     }
                     if (abort)
                     {
-                        StatusTextBox.Text = "Aborted.";
+                        StatusTextBox.Text += "Aborted.";
                         return;
                     }
+                    ProgressBar.PerformStep();
                 }
 
-                StatusTextBox.Text = "Done.";
+                ProgressBar.Visible = false;
+                StatusTextBox.Text += $"\r\n{testcasesChanged} test cases were sent to Dokimion";
+                StatusTextBox.Text += "\r\nDone.";
             }
         }
 
@@ -637,7 +659,13 @@ namespace Updater4
             }
 
             var project = m_Dokimion.GetProjectFromJson(projectFile);
-            string dokimionProject = m_Dokimion.GetProject(project.id);
+            if (project == null)
+            {
+                StatusTextBox.Text += $"\r\nCannot decode file {projectFile}";
+                return;
+            }
+
+            string? dokimionProject = m_Dokimion.GetProject(project.id);
             bool doUpdate = false;
             if (false == string.IsNullOrEmpty(dokimionProject))
             {
@@ -656,6 +684,11 @@ namespace Updater4
                 StatusTextBox.Text += $"Cannot restore project from {projectFile} because\r\n{m_Dokimion.Error}";
                 return;
             }
+
+            StatusTextBox.Text += "\r\nRefreshing projects from Dokimion";
+            StatusTextBox.Refresh();
+            GetProjectsFromDokimion();
+
             StatusTextBox.Text += "\r\nDone.";
         }
 
