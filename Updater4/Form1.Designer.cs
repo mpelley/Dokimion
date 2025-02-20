@@ -88,11 +88,11 @@
             TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem });
-            TestCaseDataGridView.Location = new Point(25, 293);
+            TestCaseDataGridView.Location = new Point(25, 300);
             TestCaseDataGridView.Name = "TestCaseDataGridView";
             TestCaseDataGridView.RowHeadersVisible = false;
             TestCaseDataGridView.RowHeadersWidth = 51;
-            TestCaseDataGridView.Size = new Size(869, 107);
+            TestCaseDataGridView.Size = new Size(869, 149);
             TestCaseDataGridView.TabIndex = 20;
             // 
             // TitleInDokimion
@@ -214,7 +214,7 @@
             ShowDiffsButton.Name = "ShowDiffsButton";
             ShowDiffsButton.Size = new Size(152, 53);
             ShowDiffsButton.TabIndex = 29;
-            ShowDiffsButton.Text = "Show Differences";
+            ShowDiffsButton.Text = "Show Test Case Differences";
             ShowDiffsButton.UseVisualStyleBackColor = true;
             ShowDiffsButton.Click += ShowDiffsButton_Click;
             // 
@@ -252,11 +252,11 @@
             // 
             // GetTestCasesButton
             // 
-            GetTestCasesButton.Location = new Point(399, 139);
+            GetTestCasesButton.Location = new Point(399, 131);
             GetTestCasesButton.Name = "GetTestCasesButton";
-            GetTestCasesButton.Size = new Size(194, 45);
+            GetTestCasesButton.Size = new Size(201, 53);
             GetTestCasesButton.TabIndex = 32;
-            GetTestCasesButton.Text = "Compare Project";
+            GetTestCasesButton.Text = "Compare Test Cases in Project";
             GetTestCasesButton.UseVisualStyleBackColor = true;
             GetTestCasesButton.Click += CompareButton_Click;
             // 
@@ -273,9 +273,9 @@
             // ProgressBar
             // 
             ProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            ProgressBar.Location = new Point(25, 406);
+            ProgressBar.Location = new Point(215, 249);
             ProgressBar.Name = "ProgressBar";
-            ProgressBar.Size = new Size(869, 45);
+            ProgressBar.Size = new Size(679, 45);
             ProgressBar.Step = 1;
             ProgressBar.Style = ProgressBarStyle.Continuous;
             ProgressBar.TabIndex = 34;
@@ -386,7 +386,7 @@
             Controls.Add(TestCaseDataGridView);
             Controls.Add(groupBox2);
             Name = "Form1";
-            Text = "Dokimion Test Case Mainenance";
+            Text = "Dokimion Test Case Maintenance";
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
