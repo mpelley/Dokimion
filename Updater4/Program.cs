@@ -13,7 +13,7 @@ namespace Updater4
             ApplicationConfiguration.Initialize();
 
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File("UpdaterLog.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("Updater_.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             Application.Run(new Form1());
