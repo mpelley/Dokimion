@@ -11,7 +11,14 @@ namespace Updater4
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.File("UpdaterLog.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
             Application.Run(new Form1());
+
+            Log.CloseAndFlush();
         }
     }
 }

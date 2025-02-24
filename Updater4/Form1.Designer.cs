@@ -58,6 +58,7 @@
             RestoreProjectButton = new Button();
             button1 = new Button();
             DeleteEmptyButton = new Button();
+            FolderForAllProjectsCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -148,6 +149,7 @@
             // groupBox1
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(FolderForAllProjectsCheckBox);
             groupBox1.Controls.Add(FolderTextBox);
             groupBox1.Controls.Add(BrowseFileSystemButton);
             groupBox1.Location = new Point(481, 12);
@@ -359,6 +361,16 @@
             DeleteEmptyButton.UseVisualStyleBackColor = true;
             DeleteEmptyButton.Click += DeleteEmptyButton_Click;
             // 
+            // FolderForAllProjectsCheckBox
+            // 
+            FolderForAllProjectsCheckBox.AutoSize = true;
+            FolderForAllProjectsCheckBox.Location = new Point(118, 26);
+            FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
+            FolderForAllProjectsCheckBox.Size = new Size(205, 24);
+            FolderForAllProjectsCheckBox.TabIndex = 2;
+            FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
+            FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -426,5 +438,6 @@
         private Button RestoreProjectButton;
         private Button button1;
         private Button DeleteEmptyButton;
+        private CheckBox FolderForAllProjectsCheckBox;
     }
 }

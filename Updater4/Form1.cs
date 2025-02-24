@@ -242,14 +242,19 @@ namespace Updater4
         {
             if (project != null)
             {
-                DirectoryInfo? dirInfo = new DirectoryInfo(FolderTextBox.Text);
+                string folderPath = FolderTextBox.Text;
+                if (FolderForAllProjectsCheckBox.Checked)
+                {
+                    folderPath = Path.Combine(folderPath, project.Name);
+                }
+                DirectoryInfo? dirInfo = new DirectoryInfo(folderPath);
                 if (dirInfo == null)
                 {
-                    StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {FolderTextBox.Text}.";
+                    StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {folderPath}.";
                     return false;
                 }
 
-                StatusTextBox.Text += "Getting  test cases from file system.";
+                StatusTextBox.Text += "Getting test cases from file system.";
                 ProgressBar.Minimum = 0;
                 IEnumerable<FileInfo> files;
                 try
@@ -258,7 +263,7 @@ namespace Updater4
                 }
                 catch (Exception ex)
                 {
-                    StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {FolderTextBox.Text} because:\r\n" + ex.Message;
+                    StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {folderPath} because:\r\n" + ex.Message;
                     return false;
                 }
                 ProgressBar.Maximum = files.Count();
@@ -326,6 +331,10 @@ namespace Updater4
             string testcase = "";
             int id = (int)row.Cells[ID_COLUMN].Value;
             string folder = FolderTextBox.Text;
+            if (FolderForAllProjectsCheckBox.Checked)
+            {
+                folder = Path.Combine(folder, project.Name);
+            }
             TestCase? fullTestCase = m_Dokimion.GetTestCaseAsObject(id.ToString(), project);
             string filePath = Path.Combine(folder, id + ".xml");
             TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(filePath, project);
@@ -458,7 +467,25 @@ namespace Updater4
                 ProgressBar.Visible = true;
                 ProgressBar.Refresh();
 
+                string folderPath = FolderTextBox.Text;
+                if (FolderForAllProjectsCheckBox.Checked)
+                {
+                    folderPath = Path.Combine(folderPath, project.Name);
+                }
 
+                int testcases = TestCaseDataGridView.Rows.Count;
+                // Get count of selected test cases, in case we get an error while downloading
+                int selected = 0;
+                foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
+                {
+                    if (row.Visible && (bool)row.Cells[SELECT_COLUMN].Value == true)
+                    {
+                        selected++;
+                    }
+                }
+                StatusTextBox.Text += $"\r\nThere are {selected} test cases selected out of {testcases} test cases.";
+
+                int testcasesDownloaded = 0;
                 foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
                 {
                     if (row.Visible && (bool)row.Cells[SELECT_COLUMN].Value == true)
@@ -466,13 +493,16 @@ namespace Updater4
                         string? id = row.Cells[ID_COLUMN].Value.ToString();
                         if (id != null)
                         {
-                            if (false == m_Dokimion.DownloadTestcase(id, project, FolderTextBox.Text))
+                            Log.Information($"Downloading test case {id} for project \"{project.name}\" to {folderPath}");
+                            if (false == m_Dokimion.DownloadTestcase(id, project, folderPath))
                             {
+                                Log.Error($"Error: {m_Dokimion.Error}");
                                 StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
-                                return;
+                                break;
                             }
 
-                            string filePath = Path.Combine(FolderTextBox.Text, id + ".xml");
+                            testcasesDownloaded++;
+                            string filePath = Path.Combine(folderPath, id + ".xml");
                             GetFileSystemTestCase(project, filePath);
                             CompareTestCase(project, row);
                             row.Cells[SELECT_COLUMN].Value = false;
@@ -481,7 +511,7 @@ namespace Updater4
                     }
                 }
                 ProgressBar.Visible = false;
-                StatusTextBox.Text += "\r\nDone.";
+                StatusTextBox.Text += $"\r\n{testcasesDownloaded} test cases were downloaded from Dokimion";
             }
         }
 
@@ -511,6 +541,24 @@ namespace Updater4
                 ProgressBar.Visible = true;
                 ProgressBar.Refresh();
 
+                string folderPath = FolderTextBox.Text;
+                if (FolderForAllProjectsCheckBox.Checked)
+                {
+                    folderPath = Path.Combine(folderPath, project.Name);
+                }
+
+                int testcases = TestCaseDataGridView.Rows.Count;
+                // Get count of selected test cases, in case we get an error while downloading
+                int selected = 0;
+                foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
+                {
+                    if (row.Visible && (bool)row.Cells[SELECT_COLUMN].Value == true)
+                    {
+                        selected++;
+                    }
+                }
+                StatusTextBox.Text += $"\r\nThere are {selected} test cases selected out of {testcases} test cases.";
+
                 foreach (DataGridViewRow row in TestCaseDataGridView.Rows)
                 {
                     bool abort = false;
@@ -519,12 +567,14 @@ namespace Updater4
                         string? id = row.Cells[ID_COLUMN].Value.ToString();
                         if (id != null)
                         {
-                            switch (m_Dokimion.UploadTestCaseToProject(FolderTextBox.Text, id, project))
+                            Log.Information($"Sending test case {id} for project \"{project.name}\" to Dokimion");
+                            switch (m_Dokimion.UploadTestCaseToProject(folderPath, id, project))
                             {
                                 case UploadStatus.Updated:
                                     testcasesChanged++;
                                     break;
                                 case UploadStatus.Error:
+                                    Log.Error($"Error: {m_Dokimion.Error}");
                                     StatusTextBox.Text = m_Dokimion.Error;
                                     break;
                                 case UploadStatus.NotChanged:
@@ -541,28 +591,21 @@ namespace Updater4
                     }
                     if (abort)
                     {
+                        Log.Information($"Sending test cases for project {project.name} aborted.");
                         StatusTextBox.Text += "Aborted.";
-                        return;
+                        break;
                     }
                     ProgressBar.PerformStep();
                 }
 
                 ProgressBar.Visible = false;
                 StatusTextBox.Text += $"\r\n{testcasesChanged} test cases were sent to Dokimion";
-                StatusTextBox.Text += "\r\nDone.";
             }
         }
 
         private void SaveProjectButton_Click(object sender, EventArgs e)
         {
             StatusTextBox.Text = "";
-            string folder = FolderTextBox.Text;
-            if (string.IsNullOrEmpty(folder))
-            {
-                StatusTextBox.Text = "Select a folder for saving the project.";
-                return;
-            }
-
             Project? project = (Project?)ProjectsListBox.SelectedItem;
             if (project == null)
             {
@@ -570,7 +613,23 @@ namespace Updater4
                 return;
             }
 
+            string folder = FolderTextBox.Text;
+            if (string.IsNullOrEmpty(folder))
+            {
+                StatusTextBox.Text = "Select a folder for saving the project.";
+                return;
+            }
+            if (FolderForAllProjectsCheckBox.Checked)
+            {
+                folder = Path.Combine(folder, project.Name);
+            }
+            if (false == Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
             string filePath = Path.Combine(folder, $"{project.id}.json");
+
             string? json = m_Dokimion.GetProject(project.id);
             if (json == null)
             {
@@ -626,12 +685,12 @@ namespace Updater4
             }
             catch (Exception ex)
             {
-                StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {FolderTextBox.Text} because:\r\n" + ex.Message;
+                StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {folder} because:\r\n" + ex.Message;
                 return;
             }
             if (files.Count() != 2)
             {
-                StatusTextBox.Text += $"\r\nExpect two .JSON files in folder {FolderTextBox.Text}";
+                StatusTextBox.Text += $"\r\nExpect two .JSON files in folder {folder}";
                 return;
             }
             string projectFile = "";
@@ -654,7 +713,7 @@ namespace Updater4
             }
             if (projectFile == "" || attributesFile == "")
             {
-                StatusTextBox.Text += $"\r\nExpect a JSON file with _attributes in its name in folder {FolderTextBox.Text}";
+                StatusTextBox.Text += $"\r\nExpect a JSON file with _attributes in its name in folder {folder}";
                 return;
             }
 

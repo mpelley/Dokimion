@@ -9,3 +9,6 @@ global using Dokimion;
 
 global using DiffPlex;
 global using DiffPlex.WindowsForms.Controls;
+
+global using Serilog;
+global using Serilog.Configuration;
