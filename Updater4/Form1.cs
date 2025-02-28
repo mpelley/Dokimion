@@ -501,6 +501,12 @@ namespace Updater4
                                 break;
                             }
 
+                            // show non-fatal errors and continue:
+                            if (false == string.IsNullOrEmpty(m_Dokimion.Error))
+                            {
+                                StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
+                            }
+
                             testcasesDownloaded++;
                             string filePath = Path.Combine(folderPath, id + ".xml");
                             GetFileSystemTestCase(project, filePath);

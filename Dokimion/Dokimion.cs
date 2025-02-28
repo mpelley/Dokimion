@@ -973,12 +973,16 @@ namespace Dokimion
             var resp = m_Client.GetAsync(url).Result;
             if (false == resp.IsSuccessStatusCode)
             {
-                Error = $"Cannot read attachment for test case {testcaseId} because {resp.ReasonPhrase}";
+                Error = $"Cannot read attachment for project {projectId}, test case {testcaseId}, attachment {attachmentId} because {resp.ReasonPhrase}";
                 if (resp.Content != null)
                 {
                     Error += "\r\n" + resp.Content.ReadAsStringAsync().Result;
                 }
-                return null;
+                Log.Error($"For GET {url} got this error:");
+                Log.Error(Error);
+
+                // There is a bug in Dokimion where it has unfetchable attachments, so return an empty array instead of erroring.
+                return new byte[] { };
             }
 
             return resp.Content.ReadAsByteArrayAsync().Result;
