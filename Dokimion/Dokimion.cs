@@ -689,10 +689,10 @@ namespace Dokimion
             TestCaseForUpload tc = new TestCaseForUpload();
 
             int index = 0;
-            while (null != markdownDoc[index])
+            while (index < markdownDoc.Count)
             {
-                index++;
                 Block block = markdownDoc[index];
+                index++;
                 switch (block)
                 {
                     case Markdig.Syntax.HeadingBlock:
@@ -704,9 +704,19 @@ namespace Dokimion
                         switch (text.ToLower())
                         {
                             case "description":
+                                string? description = GetMarkdownText(markdownDoc, ref index);
+                                if (false == string.IsNullOrEmpty(description))
+                                {
+                                    tc.description = description;
+                                }
                                 processed = true;
                                 break;
                             case "preconditions":
+                                string? preconditions = GetMarkdownText(markdownDoc, ref index);
+                                if (false == string.IsNullOrEmpty(preconditions))
+                                {
+                                    tc.preconditions = preconditions;
+                                }
                                 processed = true;
                                 break;
                             case "steps":
@@ -739,10 +749,50 @@ namespace Dokimion
             return tc;
         }
 
-        private string GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
+        private string? GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
         {
-            index++;
-            return "";
+            string text = "";
+            bool firstParagraph = true;
+            while (index < markdownDoc.Count)
+            {
+                Block? block = markdownDoc[index];
+                switch (block)
+                {
+                    case Markdig.Syntax.HeadingBlock:
+                        return text;
+                    case Markdig.Syntax.ParagraphBlock:
+                        if (false == firstParagraph)
+                        {
+                            text += "\r\n";
+                        }
+                        ParagraphBlock paragraph = (ParagraphBlock)block;
+                        foreach (var inline in paragraph.Inline)
+                        {
+                            switch (inline)
+                            {
+                                case LiteralInline:
+                                    LiteralInline literal = (LiteralInline)inline;
+                                    StringSlice slice = literal.Content;
+                                    text += slice.Text.Substring(slice.Start, slice.Length);
+                                    break;
+                                case LineBreakInline:
+                                    LineBreakInline lineBreak = (LineBreakInline)inline;
+                                    text += "\r\n";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        firstParagraph = false;
+                        break;
+                    case Markdig.Syntax.ListBlock:
+                        break;
+                    default:
+                        break;
+                }
+                index++;
+            }
+            return text;
         }
 
         private string CleanText(string t)
