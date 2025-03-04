@@ -4,6 +4,11 @@ using System.Text;
 using System.Xml;
 using Newtonsoft.Json;
 using Serilog;
+using Markdig;
+using Markdig.Syntax;
+using Markdig.Parsers;
+using Markdig.Syntax.Inlines;
+using Markdig.Helpers;
 
 // See https://github.com/greatbit/quack/wiki for the API specifications
 
@@ -679,6 +684,66 @@ namespace Dokimion
             return tc;
         }
 
+        private TestCaseForUpload? MarkdownToObject(MarkdownDocument markdownDoc, string filename, Project project)
+        {
+            TestCaseForUpload tc = new TestCaseForUpload();
+
+            int index = 0;
+            while (null != markdownDoc[index])
+            {
+                index++;
+                Block block = markdownDoc[index];
+                switch (block)
+                {
+                    case Markdig.Syntax.HeadingBlock:
+                        var heading = (HeadingBlock)block;
+                        LiteralInline inline = (LiteralInline)heading.Inline.FirstChild;
+                        StringSlice content = inline.Content;
+                        string text = content.Text.Substring(content.Start, content.Length);
+                        bool processed = false;
+                        switch (text.ToLower())
+                        {
+                            case "description":
+                                processed = true;
+                                break;
+                            case "preconditions":
+                                processed = true;
+                                break;
+                            case "steps":
+                                processed = true;
+                                break;
+                            case "metadata":
+                                processed = true;
+                                break;
+                            case "attributes":
+                                processed = true;
+                                break;
+                            case "attachments":
+                                processed = true;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case Markdig.Syntax.ParagraphBlock:
+                        break;
+                    case Markdig.Syntax.ListBlock:
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+
+            return tc;
+        }
+
+        private string GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
+        {
+            index++;
+            return "";
+        }
 
         private string CleanText(string t)
         {
@@ -1057,8 +1122,8 @@ namespace Dokimion
 
         public UploadStatus UploadTestCaseToProject(string folderPath, string testcaseId, Project project)
         {
-            string filename = Path.Combine(folderPath, testcaseId + ".xml");
-            UploadStatus resp = UploadXmlFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);
+            string filename = Path.Combine(folderPath, testcaseId + ".md");
+            UploadStatus resp = UploadMarkdownFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);
             if (uploaded == null)
             {
                 return UploadStatus.Error;
@@ -1090,10 +1155,10 @@ namespace Dokimion
             return attResp;
         }
 
-        public UploadStatus UploadXmlFileToProjectIfDifferent(string path, Project project, out TestCaseForUpload? uploaded)
+        public UploadStatus UploadMarkdownFileToProjectIfDifferent(string path, Project project, out TestCaseForUpload? uploaded)
         {
             uploaded = null;
-            // Read text from XML file.
+            // Read text from Markdown file.
             string xmlText = "";
             try
             {
@@ -1105,11 +1170,11 @@ namespace Dokimion
                 return UploadStatus.Error;
             }
 
-            // Create XmlDocument.
-            XmlDocument? xmlDoc = new XmlDocument();
+            // Parse the file into MarkdownDocument
+            MarkdownDocument? markdownDocument = null;
             try
             {
-                xmlDoc.LoadXml(xmlText);
+                markdownDocument = Markdig.Markdown.Parse(xmlText);
             }
             catch (Exception ex)
             {
@@ -1118,10 +1183,10 @@ namespace Dokimion
             }
 
             // Extract info from XmlDocument to an instance of TestCase.
-            TestCaseForUpload? extracted = XmlToObject(xmlDoc, path, project);
+            TestCaseForUpload? extracted = MarkdownToObject(markdownDocument, path, project);
             if (extracted == null)
             {
-                Error = $"Cannot convert XML file {path} to a test case object";
+                Error = $"Cannot convert Markdown file {path} to a test case object";
                 return UploadStatus.Error;
             }
             uploaded = extracted;

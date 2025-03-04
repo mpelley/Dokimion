@@ -12,3 +12,7 @@ global using DiffPlex.WindowsForms.Controls;
 
 global using Serilog;
 global using Serilog.Configuration;
+
+global using Markdig;
+global using Markdig.Syntax;
+global using Markdig.Parsers;
