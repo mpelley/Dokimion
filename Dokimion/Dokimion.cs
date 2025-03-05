@@ -819,6 +819,7 @@ namespace Dokimion
             return text;
         }
 
+
         private bool GetMarkdownMetaData(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
         {
             Block? block = markdownDoc[index];
@@ -828,51 +829,36 @@ namespace Dokimion
                 return false;
             }
 
-            foreach (var item in (ListBlock)block)
+            Dictionary<string, string>? items = GetMarkdownDictionary(block);
+            if (items == null)
             {
-                foreach (var child in item.Descendants())
+                return false;
+            }
+
+            foreach (var item in items)
+            {
+                switch (item.Key.ToLower())
                 {
-                    if (child is LiteralInline)
-                    {
-                        LiteralInline literal = (LiteralInline)child;
-                        StringSlice slice = literal.Content;
-                        string text = slice.Text.Substring(slice.Start, slice.Length);
-                        string[] pieces = text.Split(":");
-                        if (pieces.Length == 2)
-                        {
-                            switch (pieces[0].ToLower())
-                            {
-                                case "locked":
-                                    tc.locked = pieces[1].ToLower().Contains("true");
-                                    break;
-                                case "broken":
-                                    tc.broken = pieces[1].ToLower().Contains("true");
-                                    break;
-                                case "automated":
-                                    tc.automated = pieces[1].ToLower().Contains("true");
-                                    break;
-                                case "deleted":
-                                    tc.deleted = pieces[1].ToLower().Contains("true");
-                                    break;
-                                case "launchbroken":
-                                    tc.launchBroken = pieces[1].ToLower().Contains("true");
-                                    break;
-                                case "lastmodifiedtime":
-                                    tc.lastModifiedTime = long.Parse(pieces[1]);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            ;
-                        }
-                    }
-                    else
-                    {
-                        ;
-                    }
+                    case "locked":
+                        tc.locked = item.Value.ToLower().Contains("true");
+                        break;
+                    case "broken":
+                        tc.broken = item.Value.ToLower().Contains("true");
+                        break;
+                    case "automated":
+                        tc.automated = item.Value.ToLower().Contains("true");
+                        break;
+                    case "deleted":
+                        tc.deleted = item.Value.ToLower().Contains("true");
+                        break;
+                    case "launchbroken":
+                        tc.launchBroken = item.Value.ToLower().Contains("true");
+                        break;
+                    case "lastmodifiedtime":
+                        tc.lastModifiedTime = long.Parse(item.Value);
+                        break;
+                    default:
+                        break;
                 }
             }
             return true;
