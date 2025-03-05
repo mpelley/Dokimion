@@ -695,54 +695,69 @@ namespace Dokimion
                 index++;
                 switch (block)
                 {
-                    case Markdig.Syntax.HeadingBlock:
+                    case HeadingBlock:
                         var heading = (HeadingBlock)block;
-                        LiteralInline inline = (LiteralInline)heading.Inline.FirstChild;
-                        StringSlice content = inline.Content;
-                        string text = content.Text.Substring(content.Start, content.Length);
-                        switch (text.ToLower())
+                        if (heading.Inline == null)
                         {
-                            case "description":
-                                string? description = GetMarkdownText(markdownDoc, ref index);
-                                if (false == string.IsNullOrEmpty(description))
+                            Error += $"Heading is missing text at line {block.Line}";
+                            return null;
+                        }
+                        foreach (LiteralInline? inline in heading.Inline)
+                        {
+                            if (inline != null)
+                            {
+                                StringSlice content = inline.Content;
+                                string text = content.Text.Substring(content.Start, content.Length);
+                                switch (text.ToLower())
                                 {
-                                    tc.description = description;
+                                    case "description":
+                                        string? description = GetMarkdownText(markdownDoc, ref index);
+                                        if (false == string.IsNullOrEmpty(description))
+                                        {
+                                            tc.description = description;
+                                        }
+                                        break;
+                                    case "preconditions":
+                                        string? preconditions = GetMarkdownText(markdownDoc, ref index);
+                                        if (false == string.IsNullOrEmpty(preconditions))
+                                        {
+                                            tc.preconditions = preconditions;
+                                        }
+                                        break;
+                                    case "steps":
+                                        break;
+                                    case "metadata":
+                                        if (index < markdownDoc.Count)
+                                        {
+                                            if (false == GetMarkdownMetaData(markdownDoc, ref index, tc))
+                                            {
+                                                return null;
+                                            }
+                                            index++;
+                                        }
+                                        break;
+                                    case "attributes":
+                                        if (index < markdownDoc.Count)
+                                        {
+                                            var attributes = GetMarkdownAttributes(markdownDoc[index]);
+                                            if (attributes != null)
+                                            {
+                                                tc.attributes = attributes;
+                                            }
+                                            else
+                                            {
+                                                return null;
+                                            }
+                                            index++;
+                                        }
+                                        break;
+                                    case "attachments":
+                                        break;
+                                    default:
+                                        // Handle ID and Name...
+                                        break;
                                 }
-                                break;
-                            case "preconditions":
-                                string? preconditions = GetMarkdownText(markdownDoc, ref index);
-                                if (false == string.IsNullOrEmpty(preconditions))
-                                {
-                                    tc.preconditions = preconditions;
-                                }
-                                break;
-                            case "steps":
-                                break;
-                            case "metadata":
-                                if (index < markdownDoc.Count)
-                                {
-                                    if (false == GetMarkdownMetaData(markdownDoc, ref index, tc))
-                                    {
-                                        return null;
-                                    }
-                                }
-                                break;
-                            case "attributes":
-                                if (index < markdownDoc.Count)
-                                {
-                                    tc.attributes = GetMarkdownAttributes(markdownDoc[index]);
-                                    if (tc.attributes == null)
-                                    {
-                                        return null;
-                                    }
-                                    index++;
-                                }
-                                break;
-                            case "attachments":
-                                break;
-                            default:
-                                // Handle ID and Name...
-                                break;
+                            }
                         }
                         break;
                     default:
@@ -772,21 +787,24 @@ namespace Dokimion
                             text += "\r\n\r\n";
                         }
                         ParagraphBlock paragraph = (ParagraphBlock)block;
-                        foreach (var inline in paragraph.Inline)
+                        if (paragraph.Inline != null)
                         {
-                            switch (inline)
+                            foreach (var inline in paragraph.Inline)
                             {
-                                case LiteralInline:
-                                    LiteralInline literal = (LiteralInline)inline;
-                                    StringSlice slice = literal.Content;
-                                    text += slice.Text.Substring(slice.Start, slice.Length);
-                                    break;
-                                case LineBreakInline:
-                                    LineBreakInline lineBreak = (LineBreakInline)inline;
-                                    text += "\r\n";
-                                    break;
-                                default:
-                                    break;
+                                switch (inline)
+                                {
+                                    case LiteralInline:
+                                        LiteralInline literal = (LiteralInline)inline;
+                                        StringSlice slice = literal.Content;
+                                        text += slice.Text.Substring(slice.Start, slice.Length);
+                                        break;
+                                    case LineBreakInline:
+                                        LineBreakInline lineBreak = (LineBreakInline)inline;
+                                        text += "\r\n";
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                         firstParagraph = false;
@@ -861,7 +879,7 @@ namespace Dokimion
         }
 
 
-        private Dictionary<string, string[]>? GetMarkdownAttributes(Block? block)
+        private Dictionary<string, string[]>? GetMarkdownAttributes(Block block)
         {
             if (block is not ListBlock)
             {
@@ -870,7 +888,7 @@ namespace Dokimion
             }
 
             Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
-            Dictionary<string, string> items = GetMarkdownDictionary(block);
+            Dictionary<string, string>? items = GetMarkdownDictionary(block);
             if (items == null)
             {
                 return null;
@@ -890,7 +908,7 @@ namespace Dokimion
         }
 
 
-        private Dictionary<string, string>? GetMarkdownDictionary(Block? block)
+        private Dictionary<string, string>? GetMarkdownDictionary(Block block)
         {
             if (block is not ListBlock)
             {
