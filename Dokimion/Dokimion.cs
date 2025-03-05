@@ -700,7 +700,6 @@ namespace Dokimion
                         LiteralInline inline = (LiteralInline)heading.Inline.FirstChild;
                         StringSlice content = inline.Content;
                         string text = content.Text.Substring(content.Start, content.Length);
-                        bool processed = false;
                         switch (text.ToLower())
                         {
                             case "description":
@@ -709,7 +708,6 @@ namespace Dokimion
                                 {
                                     tc.description = description;
                                 }
-                                processed = true;
                                 break;
                             case "preconditions":
                                 string? preconditions = GetMarkdownText(markdownDoc, ref index);
@@ -717,27 +715,35 @@ namespace Dokimion
                                 {
                                     tc.preconditions = preconditions;
                                 }
-                                processed = true;
                                 break;
                             case "steps":
-                                processed = true;
                                 break;
                             case "metadata":
-                                processed = true;
+                                if (index < markdownDoc.Count)
+                                {
+                                    if (false == GetMarkdownMetaData(markdownDoc, ref index, tc))
+                                    {
+                                        return null;
+                                    }
+                                }
                                 break;
                             case "attributes":
-                                processed = true;
+                                if (index < markdownDoc.Count)
+                                {
+                                    tc.attributes = GetMarkdownAttributes(markdownDoc[index]);
+                                    if (tc.attributes == null)
+                                    {
+                                        return null;
+                                    }
+                                    index++;
+                                }
                                 break;
                             case "attachments":
-                                processed = true;
                                 break;
                             default:
+                                // Handle ID and Name...
                                 break;
                         }
-                        break;
-                    case Markdig.Syntax.ParagraphBlock:
-                        break;
-                    case Markdig.Syntax.ListBlock:
                         break;
                     default:
                         break;
@@ -746,7 +752,7 @@ namespace Dokimion
 
 
 
-            return tc;
+            return null;
         }
 
         private string? GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
@@ -763,7 +769,7 @@ namespace Dokimion
                     case Markdig.Syntax.ParagraphBlock:
                         if (false == firstParagraph)
                         {
-                            text += "\r\n";
+                            text += "\r\n\r\n";
                         }
                         ParagraphBlock paragraph = (ParagraphBlock)block;
                         foreach (var inline in paragraph.Inline)
@@ -793,6 +799,132 @@ namespace Dokimion
                 index++;
             }
             return text;
+        }
+
+        private bool GetMarkdownMetaData(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            Block? block = markdownDoc[index];
+            if (block is not ListBlock)
+            {
+                Error += "Expect only a list in Metadata.";
+                return false;
+            }
+
+            foreach (var item in (ListBlock)block)
+            {
+                foreach (var child in item.Descendants())
+                {
+                    if (child is LiteralInline)
+                    {
+                        LiteralInline literal = (LiteralInline)child;
+                        StringSlice slice = literal.Content;
+                        string text = slice.Text.Substring(slice.Start, slice.Length);
+                        string[] pieces = text.Split(":");
+                        if (pieces.Length == 2)
+                        {
+                            switch (pieces[0].ToLower())
+                            {
+                                case "locked":
+                                    tc.locked = pieces[1].ToLower().Contains("true");
+                                    break;
+                                case "broken":
+                                    tc.broken = pieces[1].ToLower().Contains("true");
+                                    break;
+                                case "automated":
+                                    tc.automated = pieces[1].ToLower().Contains("true");
+                                    break;
+                                case "deleted":
+                                    tc.deleted = pieces[1].ToLower().Contains("true");
+                                    break;
+                                case "launchbroken":
+                                    tc.launchBroken = pieces[1].ToLower().Contains("true");
+                                    break;
+                                case "lastmodifiedtime":
+                                    tc.lastModifiedTime = long.Parse(pieces[1]);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            ;
+                        }
+                    }
+                    else
+                    {
+                        ;
+                    }
+                }
+            }
+            return true;
+        }
+
+
+        private Dictionary<string, string[]>? GetMarkdownAttributes(Block? block)
+        {
+            if (block is not ListBlock)
+            {
+                Error += $"Was expecting a list at {block.Line}";
+                return null;
+            }
+
+            Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
+            Dictionary<string, string> items = GetMarkdownDictionary(block);
+            if (items == null)
+            {
+                return null;
+            }
+
+            foreach(var item in items)
+            {
+                string[] values = item.Value.Split(",");
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values[i] = values[i].Trim();
+                }
+                attributes.Add(item.Key, values);
+            }
+
+            return attributes;
+        }
+
+
+        private Dictionary<string, string>? GetMarkdownDictionary(Block? block)
+        {
+            if (block is not ListBlock)
+            {
+                Error += $"Was expecting a list at {block.Line}";
+                return null;
+            }
+
+            Dictionary<string, string> items = new Dictionary<string, string>();
+
+            foreach (var item in (ListBlock)block)
+            {
+                foreach (var child in item.Descendants())
+                {
+                    if (child is LiteralInline)
+                    {
+                        LiteralInline literal = (LiteralInline)child;
+                        StringSlice slice = literal.Content;
+                        string text = slice.Text.Substring(slice.Start, slice.Length);
+                        string[] pieces = text.Split(":");
+                        if (pieces.Length == 2)
+                        {
+                            pieces[1] = pieces[1].Trim();
+                            items.Add(pieces[0], pieces[1]);
+                        }
+                        else
+                        {
+                            Error += $"Don't know what to do with {text}. Was expecting name: value";
+                            return null;
+                        }
+                    }
+                }
+            }
+
+            return items;
         }
 
         private string CleanText(string t)
@@ -1232,7 +1364,7 @@ namespace Dokimion
                 return UploadStatus.Error;
             }
 
-            // Extract info from XmlDocument to an instance of TestCase.
+            // Extract info from MarkdownDocument to an instance of TestCase.
             TestCaseForUpload? extracted = MarkdownToObject(markdownDocument, path, project);
             if (extracted == null)
             {
