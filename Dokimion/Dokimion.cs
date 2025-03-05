@@ -687,6 +687,7 @@ namespace Dokimion
         private TestCaseForUpload? MarkdownToObject(MarkdownDocument markdownDoc, string filename, Project project)
         {
             TestCaseForUpload tc = new TestCaseForUpload();
+            Error = "";
 
             int index = 0;
             while (index < markdownDoc.Count)
@@ -702,72 +703,97 @@ namespace Dokimion
                             Error += $"Heading is missing text at line {block.Line}";
                             return null;
                         }
-                        foreach (LiteralInline? inline in heading.Inline)
+                        string? text = GetInlineText(heading.Inline);
+                        if (string.IsNullOrEmpty(text))
                         {
-                            if (inline != null)
-                            {
-                                StringSlice content = inline.Content;
-                                string text = content.Text.Substring(content.Start, content.Length);
-                                switch (text.ToLower())
+                            Error += $"Heading is missing text at line {block.Line}";
+                            return null;
+                        }
+                        switch (text.ToLower())
+                        {
+                            case "description":
+                                string? description = GetMarkdownText(markdownDoc, ref index);
+                                if (false == string.IsNullOrEmpty(description))
                                 {
-                                    case "description":
-                                        string? description = GetMarkdownText(markdownDoc, ref index);
-                                        if (false == string.IsNullOrEmpty(description))
-                                        {
-                                            tc.description = description;
-                                        }
-                                        break;
-                                    case "preconditions":
-                                        string? preconditions = GetMarkdownText(markdownDoc, ref index);
-                                        if (false == string.IsNullOrEmpty(preconditions))
-                                        {
-                                            tc.preconditions = preconditions;
-                                        }
-                                        break;
-                                    case "steps":
-                                        break;
-                                    case "metadata":
-                                        if (index < markdownDoc.Count)
-                                        {
-                                            if (false == GetMarkdownMetaData(markdownDoc, ref index, tc))
-                                            {
-                                                return null;
-                                            }
-                                            index++;
-                                        }
-                                        break;
-                                    case "attributes":
-                                        if (index < markdownDoc.Count)
-                                        {
-                                            var attributes = GetMarkdownAttributes(markdownDoc[index]);
-                                            if (attributes != null)
-                                            {
-                                                tc.attributes = attributes;
-                                            }
-                                            else
-                                            {
-                                                return null;
-                                            }
-                                            index++;
-                                        }
-                                        break;
-                                    case "attachments":
-                                        break;
-                                    default:
-                                        // Handle ID and Name...
-                                        break;
+                                    tc.description = description;
                                 }
-                            }
+                                break;
+                            case "preconditions":
+                                string? preconditions = GetMarkdownText(markdownDoc, ref index);
+                                if (false == string.IsNullOrEmpty(preconditions))
+                                {
+                                    tc.preconditions = preconditions;
+                                }
+                                break;
+                            case "steps":
+                                if (false == GetMarkdownSteps(markdownDoc, ref index, tc))
+                                {
+                                    return null;
+                                }
+                                break;
+                            case "metadata":
+                                if (index < markdownDoc.Count)
+                                {
+                                    if (false == GetMarkdownMetaData(markdownDoc[index], tc))
+                                    {
+                                        return null;
+                                    }
+                                    index++;
+                                }
+                                break;
+                            case "attributes":
+                                if (index < markdownDoc.Count)
+                                {
+                                    var attributes = GetMarkdownAttributes(markdownDoc[index]);
+                                    if (attributes != null)
+                                    {
+                                        tc.attributes = attributes;
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                                    index++;
+                                }
+                                break;
+                            case "attachments":
+                                break;
+                            default:
+                                // Handle ID and Name...
+                                if (text.Substring(0,2).ToLower() == "id")
+                                {
+                                    tc.id = text.Substring(2).Trim();
+                                }
+                                else if (text.Substring(0,4).ToLower() == "name")
+                                {
+                                    tc.name = text.Substring(4).Trim();
+                                }
+                                else
+                                {
+                                    ;
+                                }
+                                break;
                         }
                         break;
                     default:
                         break;
                 }
             }
-
-
-
             return null;
+        }
+
+        string? GetInlineText(ContainerInline container)
+        {
+            string text = "";
+            foreach (LiteralInline? inline in container)
+            {
+                if (inline != null)
+                {
+                    StringSlice content = inline.Content;
+                    text += content.Text.Substring(content.Start, content.Length);
+                }
+            }
+            return text;
         }
 
         private string? GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
@@ -779,9 +805,9 @@ namespace Dokimion
                 Block? block = markdownDoc[index];
                 switch (block)
                 {
-                    case Markdig.Syntax.HeadingBlock:
+                    case HeadingBlock:
                         return text;
-                    case Markdig.Syntax.ParagraphBlock:
+                    case ParagraphBlock:
                         if (false == firstParagraph)
                         {
                             text += "\r\n\r\n";
@@ -809,7 +835,13 @@ namespace Dokimion
                         }
                         firstParagraph = false;
                         break;
-                    case Markdig.Syntax.ListBlock:
+                    case ListBlock:
+                        string? listText = GetMarkdownListBlockText(block);
+                        if (string.IsNullOrEmpty(listText))
+                        {
+                            return null;
+                        }
+                        text += listText;
                         break;
                     default:
                         break;
@@ -820,12 +852,11 @@ namespace Dokimion
         }
 
 
-        private bool GetMarkdownMetaData(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        private bool GetMarkdownMetaData(Block block, TestCaseForUpload tc)
         {
-            Block? block = markdownDoc[index];
             if (block is not ListBlock)
             {
-                Error += "Expect only a list in Metadata.";
+                Error += $"Expect only a list in Metadata at line {block.Line}.";
                 return false;
             }
 
@@ -904,32 +935,210 @@ namespace Dokimion
 
             Dictionary<string, string> items = new Dictionary<string, string>();
 
-            foreach (var item in (ListBlock)block)
+            foreach (ListItemBlock item in (ListBlock)block)
             {
                 foreach (var child in item.Descendants())
                 {
-                    if (child is LiteralInline)
+                    switch (child)
                     {
-                        LiteralInline literal = (LiteralInline)child;
-                        StringSlice slice = literal.Content;
-                        string text = slice.Text.Substring(slice.Start, slice.Length);
-                        string[] pieces = text.Split(":");
-                        if (pieces.Length == 2)
-                        {
-                            pieces[1] = pieces[1].Trim();
-                            items.Add(pieces[0], pieces[1]);
-                        }
-                        else
-                        {
-                            Error += $"Don't know what to do with {text}. Was expecting name: value";
+                        case LiteralInline:
+                            LiteralInline literal = (LiteralInline)child;
+                            StringSlice slice = literal.Content;
+                            string text = slice.Text.Substring(slice.Start, slice.Length);
+                            string[] pieces = text.Split(":");
+                            if (pieces.Length == 2)
+                            {
+                                pieces[1] = pieces[1].Trim();
+                                items.Add(pieces[0], pieces[1]);
+                            }
+                            else
+                            {
+                                Error += $"Don't know what to do with {text} at line {child.Line}. Was expecting name: value";
+                                return null;
+                            }
+                            break;
+                        case ParagraphBlock:
+                            // Ignore.  Its text will be in a descendent LiteralInline
+                            break;
+                        default:
+                            Error += $"Unexpected child type at line {child.Line}.";
                             return null;
-                        }
                     }
                 }
             }
 
             return items;
         }
+
+
+        private string? GetMarkdownListBlockText(Block block)
+        {
+            if (block is not ListBlock)
+            {
+                Error += $"Was expecting a list at {block.Line}";
+                return null;
+            }
+
+            int listItemNumber = 1;
+            string listText = "";
+            StringSlice slice;
+            foreach (ListItemBlock item in (ListBlock)block)
+            {
+                listText += "\r\n";
+                if (item.Order== 0)
+                {
+                    listText += $"* ";
+                }
+                else
+                {
+                    listText += $"{listItemNumber}. ";
+                    listItemNumber++;
+                }
+                foreach (var child in item.Descendants())
+                {
+                    switch(child)
+                    {
+                        case LiteralInline literal:
+                            slice = literal.Content;
+                            string text = slice.ToString();
+                            listText += text;
+                            break;
+                        case ParagraphBlock:
+                            // Ignore.  We will get its Inline as a descendent
+                            break;
+                        default:
+                            Error += $"Unexpected child type at line {child.Line}.";
+                            return null;
+                    }
+                }
+            }
+
+            return listText;
+        }
+
+
+        private bool GetMarkdownSteps(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            tc.steps = new List<Step>();
+            while (index < markdownDoc.Count)
+            {
+                Block block = markdownDoc[index];
+                if (block is not HeadingBlock)
+                {
+                    Error = $"Expect a Header at line {block.Line}";
+                    return false;
+                }
+
+                HeadingBlock heading = (HeadingBlock)block;
+                if (heading.Level == 1)
+                {
+                    return true;
+                }
+
+                if (heading.Level != 2)
+                {
+                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    return false;
+                }
+
+                if (heading.Inline == null)
+                {
+                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    return false;
+                }
+
+                string? text = GetInlineText(heading.Inline);
+                if ((string.IsNullOrEmpty(text)) || (text.ToLower() != "step"))
+                {
+                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    return false;
+                }
+
+                index++;
+                if (false == GetMarkdownStep(markdownDoc, ref index, tc))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        private bool GetMarkdownStep(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            string? action = GetMarkdownAction(markdownDoc, ref index, tc);
+            if (string.IsNullOrEmpty(action))
+            {
+                return false;
+            }
+
+            string? expectation = GetMarkdownExpectation(markdownDoc, ref index, tc);
+            if (string.IsNullOrEmpty(expectation))
+            {
+                return false;
+            }
+
+            Step step = new();
+            step.action = action;
+            step.expectation = expectation;
+            tc.steps.Add(step);
+
+            return true;
+        }
+
+
+        private string? GetMarkdownAction(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            return GetMarkdownStepDetails(markdownDoc, ref index, tc, "Action");
+        }
+
+
+        private string? GetMarkdownExpectation(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            return GetMarkdownStepDetails(markdownDoc, ref index, tc, "Expectation");
+        }
+
+
+        private string? GetMarkdownStepDetails(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc, string detail)
+        {
+            if (index >= markdownDoc.Count)
+            {
+                Error += $"Reached end of document before getting {detail} for Step.";
+                return null;
+            }
+            Block block = markdownDoc[index];
+            index++;
+            if (block is not HeadingBlock)
+            {
+                Error += $"Expected Header 3 for {detail} at line {block.Line}";
+                return null;
+            }
+            HeadingBlock heading = (HeadingBlock)block;
+
+            if (heading.Level != 3)
+            {
+                Error = $"Expect a Header 3 for {detail} under Step at line {block.Line}";
+                return null;
+            }
+
+            if (heading.Inline == null)
+            {
+                Error = $"Expect a Header 3 for {detail} under Step at line {block.Line}";
+                return null;
+            }
+
+            string? headerName = GetInlineText(heading.Inline);
+            if ((string.IsNullOrEmpty(headerName)) || (headerName.ToLower() != detail.ToLower()))
+            {
+                Error = $"Expect a Header 2 for {detail} under Step at line {block.Line}";
+                return null;
+            }
+
+            string? text = GetMarkdownText(markdownDoc, ref index);
+
+            return text;
+        }
+
 
         private string CleanText(string t)
         {
@@ -1372,7 +1581,7 @@ namespace Dokimion
             TestCaseForUpload? extracted = MarkdownToObject(markdownDocument, path, project);
             if (extracted == null)
             {
-                Error = $"Cannot convert Markdown file {path} to a test case object";
+                Error += $"Cannot convert Markdown file {path} to a test case object";
                 return UploadStatus.Error;
             }
             uploaded = extracted;
