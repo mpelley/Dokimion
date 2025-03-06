@@ -430,7 +430,6 @@ namespace Dokimion
                 }
             }
 
-
             return true;
         }
 
@@ -760,17 +759,18 @@ namespace Dokimion
                                 break;
                             default:
                                 // Handle ID and Name...
-                                if (text.Substring(0,2).ToLower() == "id")
+                                if (text.Substring(0, 2).ToLower() == "id")
                                 {
                                     tc.id = text.Substring(2).Trim();
                                 }
-                                else if (text.Substring(0,4).ToLower() == "name")
+                                else if (text.Substring(0, 4).ToLower() == "name")
                                 {
                                     tc.name = text.Substring(4).Trim();
                                 }
                                 else
                                 {
-                                    ;
+                                    Error += $"Don't know what to do with Header {text} at line {heading.Line}.";
+                                    return null;
                                 }
                                 break;
                         }
@@ -799,7 +799,7 @@ namespace Dokimion
         private string? GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
         {
             string text = "";
-            bool firstParagraph = true;
+            bool firstBlock = true;
             while (index < markdownDoc.Count)
             {
                 Block? block = markdownDoc[index];
@@ -807,8 +807,21 @@ namespace Dokimion
                 {
                     case HeadingBlock:
                         return text;
+                    case HtmlBlock:
+                        if (false == firstBlock)
+                        {
+                            text += "\r\n\r\n";
+                        }
+                        HtmlBlock html = (HtmlBlock)block;
+                        foreach (StringLine line in html.Lines)
+                        {
+                            text += line.Slice.ToString();
+                            text += "\r\n";
+                        }
+                        firstBlock = false;
+                        break;
                     case ParagraphBlock:
-                        if (false == firstParagraph)
+                        if (false == firstBlock)
                         {
                             text += "\r\n\r\n";
                         }
@@ -822,7 +835,7 @@ namespace Dokimion
                                     case LiteralInline:
                                         LiteralInline literal = (LiteralInline)inline;
                                         StringSlice slice = literal.Content;
-                                        text += slice.Text.Substring(slice.Start, slice.Length);
+                                        text += slice.ToString();
                                         break;
                                     case LineBreakInline:
                                         LineBreakInline lineBreak = (LineBreakInline)inline;
@@ -833,10 +846,10 @@ namespace Dokimion
                                 }
                             }
                         }
-                        firstParagraph = false;
+                        firstBlock = false;
                         break;
                     case ListBlock:
-                        string? listText = GetMarkdownListBlockText(block);
+                        string? listText = GetMarkdownListBlockAsText(block);
                         if (string.IsNullOrEmpty(listText))
                         {
                             return null;
@@ -900,7 +913,7 @@ namespace Dokimion
         {
             if (block is not ListBlock)
             {
-                Error += $"Was expecting a list at {block.Line}";
+                Error += $"Was expecting a list at line {block.Line}";
                 return null;
             }
 
@@ -929,7 +942,7 @@ namespace Dokimion
         {
             if (block is not ListBlock)
             {
-                Error += $"Was expecting a list at {block.Line}";
+                Error += $"Was expecting a list at line {block.Line}";
                 return null;
             }
 
@@ -937,33 +950,21 @@ namespace Dokimion
 
             foreach (ListItemBlock item in (ListBlock)block)
             {
-                foreach (var child in item.Descendants())
+                string? text = GetListItemText(item);
+                if (text == null)
                 {
-                    switch (child)
-                    {
-                        case LiteralInline:
-                            LiteralInline literal = (LiteralInline)child;
-                            StringSlice slice = literal.Content;
-                            string text = slice.Text.Substring(slice.Start, slice.Length);
-                            string[] pieces = text.Split(":");
-                            if (pieces.Length == 2)
-                            {
-                                pieces[1] = pieces[1].Trim();
-                                items.Add(pieces[0], pieces[1]);
-                            }
-                            else
-                            {
-                                Error += $"Don't know what to do with {text} at line {child.Line}. Was expecting name: value";
-                                return null;
-                            }
-                            break;
-                        case ParagraphBlock:
-                            // Ignore.  Its text will be in a descendent LiteralInline
-                            break;
-                        default:
-                            Error += $"Unexpected child type at line {child.Line}.";
-                            return null;
-                    }
+                    return null;
+                }
+                string[] pieces = text.Split(":");
+                if (pieces.Length == 2)
+                {
+                    pieces[1] = pieces[1].Trim();
+                    items.Add(pieces[0], pieces[1]);
+                }
+                else
+                {
+                    Error += $"Don't know what to do with {text} at line {item.Line}. Was expecting name: value";
+                    return null;
                 }
             }
 
@@ -971,7 +972,34 @@ namespace Dokimion
         }
 
 
-        private string? GetMarkdownListBlockText(Block block)
+        private string? GetListItemText(ListItemBlock item)
+        {
+            string itemText = "";
+            foreach (var child in item.Descendants())
+            {
+                switch (child)
+                {
+                    case LiteralInline:
+                        LiteralInline literal = (LiteralInline)child;
+                        StringSlice slice = literal.Content;
+                        string text = slice.ToString();
+                        itemText += text;
+                        break;
+                    case LineBreakInline:
+                        itemText += "\r\n";
+                        break;
+                    case ParagraphBlock:
+                        // Ignore.  Its text will be in a descendent LiteralInline
+                        break;
+                    default:
+                        Error += $"Unexpected child type in list at line {child.Line}.";
+                        return null;
+                }
+            }
+            return itemText;
+        }
+
+        private string? GetMarkdownListBlockAsText(Block block)
         {
             if (block is not ListBlock)
             {
@@ -981,7 +1009,6 @@ namespace Dokimion
 
             int listItemNumber = 1;
             string listText = "";
-            StringSlice slice;
             foreach (ListItemBlock item in (ListBlock)block)
             {
                 listText += "\r\n";
@@ -994,23 +1021,12 @@ namespace Dokimion
                     listText += $"{listItemNumber}. ";
                     listItemNumber++;
                 }
-                foreach (var child in item.Descendants())
+                string? text = GetListItemText(item);
+                if (text == null)
                 {
-                    switch(child)
-                    {
-                        case LiteralInline literal:
-                            slice = literal.Content;
-                            string text = slice.ToString();
-                            listText += text;
-                            break;
-                        case ParagraphBlock:
-                            // Ignore.  We will get its Inline as a descendent
-                            break;
-                        default:
-                            Error += $"Unexpected child type at line {child.Line}.";
-                            return null;
-                    }
+                    return null;
                 }
+                listText += text;
             }
 
             return listText;
@@ -1025,7 +1041,7 @@ namespace Dokimion
                 Block block = markdownDoc[index];
                 if (block is not HeadingBlock)
                 {
-                    Error = $"Expect a Header at line {block.Line}";
+                    Error += $"Expect a Header at line {block.Line}";
                     return false;
                 }
 
@@ -1037,20 +1053,20 @@ namespace Dokimion
 
                 if (heading.Level != 2)
                 {
-                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    Error += $"Expect a Header 2 for Step under Steps at line {block.Line}";
                     return false;
                 }
 
                 if (heading.Inline == null)
                 {
-                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    Error += $"Expect a Header 2 for Step under Steps at line {block.Line}";
                     return false;
                 }
 
                 string? text = GetInlineText(heading.Inline);
                 if ((string.IsNullOrEmpty(text)) || (text.ToLower() != "step"))
                 {
-                    Error = $"Expect a Header 2 for Step under Steps at line {block.Line}";
+                    Error += $"Expect a Header 2 for Step under Steps at line {block.Line}";
                     return false;
                 }
 
@@ -1073,7 +1089,7 @@ namespace Dokimion
             }
 
             string? expectation = GetMarkdownExpectation(markdownDoc, ref index, tc);
-            if (string.IsNullOrEmpty(expectation))
+            if (expectation == null)
             {
                 return false;
             }
@@ -1117,20 +1133,20 @@ namespace Dokimion
 
             if (heading.Level != 3)
             {
-                Error = $"Expect a Header 3 for {detail} under Step at line {block.Line}";
+                Error += $"Expect a Header 3 for {detail} under Step at line {block.Line}";
                 return null;
             }
 
             if (heading.Inline == null)
             {
-                Error = $"Expect a Header 3 for {detail} under Step at line {block.Line}";
+                Error += $"Expect a Header 3 for {detail} under Step at line {block.Line}";
                 return null;
             }
 
             string? headerName = GetInlineText(heading.Inline);
             if ((string.IsNullOrEmpty(headerName)) || (headerName.ToLower() != detail.ToLower()))
             {
-                Error = $"Expect a Header 2 for {detail} under Step at line {block.Line}";
+                Error += $"Expect a Header 2 for {detail} under Step at line {block.Line}";
                 return null;
             }
 
@@ -1207,15 +1223,15 @@ namespace Dokimion
                 return false;
             }
 
-            // Generate the XML format for this testcaseFromDokimion
-            string xml = GenerateXml(testcase, project);
-            if (string.IsNullOrEmpty(xml))
+            // Generate the XML format for this testcase From Dokimion
+            string md = GenerateMarkdown(testcase, project);
+            if (string.IsNullOrEmpty(md))
             {
                 return false;
             }
 
             // Save the xml of the test case:
-            if (false == SaveTestCase(testcaseId, folderPath, xml))
+            if (false == SaveTestCase(testcaseId, folderPath, md))
             {
                 return false;
             }
@@ -1238,6 +1254,73 @@ namespace Dokimion
 
             return true;
         }
+
+
+        public string GenerateMarkdown(TestCase tc, Project project)
+        {
+            string md = "";
+            md += $"# ID {tc.id}\r\n\r\n";
+            md += $"# Name {tc.name}\r\n\r\n";
+            md += $"# Description\r\n\r\n";
+            md += $"{tc.description}\r\n\r\n";
+            md += $"# Preconditions\r\n\r\n";
+            md += $"{tc.preconditions}\r\n\r\n";
+
+            md += $"# Steps\r\n\r\n";
+            foreach(Step step in tc.steps)
+            {
+                md += $"## Step\r\n\r\n";
+                md += $"### Action\r\n\r\n";
+                md += $"{step.action}\r\n\r\n";
+                md += $"### Expectation\r\n\r\n";
+                if (false == string.IsNullOrEmpty(step.expectation))
+                {
+                    md += $"{step.expectation}\r\n\r\n";
+                }
+            }
+
+            md += $"# Attributes\r\n\r\n";
+            foreach (var attr in tc.attributes)
+            {
+                string? attrName = null;
+                try
+                {
+                    attrName = project.attributes[attr.Key];
+                }
+                catch
+                {
+                    Error += $"Test case {tc.id} has a garbage attribute.\r\n";
+                }
+                if (false == string.IsNullOrEmpty(attrName))
+                {
+                    attrName = attrName.Replace(" ", SPACE_REPLACER);
+                    string s = "";
+                    bool first = true;
+                    foreach (string value in attr.Value)
+                    {
+                        string trimmedValue = value.Trim();
+                        s += first ? $"{trimmedValue}" : $", {trimmedValue}";
+                        first = false;
+                    }
+                    md += $"* {attrName}: {s}\r\n";
+                }
+            }
+            md += $"\r\n";
+
+            md += $"# Metadata\r\n\r\n";
+            md += $"* automated: {tc.automated}\r\n";
+            md += $"* broken: {tc.broken}\r\n";
+            md += $"* createdBy: {tc.createdBy}\r\n";
+            md += $"* createdTime: {tc.createdTime}\r\n";
+            md += $"* deleted: {tc.deleted}\r\n";
+            md += $"* lastModifiedBy: {tc.lastModifiedBy}\r\n";
+            md += $"* lastModifiedTime: {tc.lastModifiedTime}\r\n";
+            md += $"* launchBroken: {tc.launchBroken}\r\n";
+            md += $"* locked: {tc.locked}\r\n";
+
+            return md;
+        }
+
 
         public string GenerateXml(TestCase tc, Project project)
         {
@@ -1410,7 +1493,7 @@ namespace Dokimion
             }
 
             // Save the file in the repo folder
-            string path = Path.Combine(folderPath, testcaseId + ".xml");
+            string path = Path.Combine(folderPath, testcaseId + ".md");
             try
             {
                 File.WriteAllText(path, xml);

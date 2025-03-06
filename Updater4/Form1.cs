@@ -508,7 +508,7 @@ namespace Updater4
                             }
 
                             testcasesDownloaded++;
-                            string filePath = Path.Combine(folderPath, id + ".xml");
+                            string filePath = Path.Combine(folderPath, id + ".md");
                             GetFileSystemTestCase(project, filePath);
                             CompareTestCase(project, row);
                             row.Cells[SELECT_COLUMN].Value = false;
