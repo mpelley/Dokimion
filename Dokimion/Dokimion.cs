@@ -1,7 +1,6 @@
 ﻿using MimeMapping;
 
 using System.Text;
-using System.Xml;
 using Newtonsoft.Json;
 using Serilog;
 using Markdig;
@@ -438,250 +437,41 @@ namespace Dokimion
             TestCaseForUpload? uploaded;
 
             uploaded = null;
-            // Read text from XML file.
-            string xmlText = "";
+            // Read text from Markdown file.
+            string markdownText = "";
             try
             {
-                xmlText = File.ReadAllText(path);
+                markdownText = File.ReadAllText(path);
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
+                Error += ex.Message;
                 return null;
             }
 
-            // Create XmlDocument.
-            XmlDocument? xmlDoc = new XmlDocument();
+            // Parse the file into MarkdownDocument
+            MarkdownDocument? markdownDocument = null;
             try
             {
-                xmlDoc.LoadXml(xmlText);
+                markdownDocument = Markdig.Markdown.Parse(markdownText);
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
+                Error += ex.Message;
                 return null;
             }
 
-            // Extract info from XmlDocument to an instance of TestCaseForUpload.
-            uploaded = XmlToObject(xmlDoc, path, project);
+            // Extract info from markdownDocument to an instance of TestCaseForUpload.
+            uploaded = MarkdownToObject(markdownDocument, path, project);
             if (uploaded == null)
             {
-                Error += $"\r\nCannot convert XML file {path} to a test case object";
+                Error += $"\r\nCannot convert Markdown file {path} to a test case object";
                 return null;
             }
 
             return uploaded;
         }
 
-        private TestCaseForUpload? XmlToObject(XmlDocument xmlDoc, string filename, Project project)
-        {
-            TestCaseForUpload tc = new TestCaseForUpload();
-            XmlNode? overall = xmlDoc.FirstChild;
-            if (overall == null)
-            {
-                Error = $"Base node of {filename} does not exist.";
-                return null;
-            }
-            if (overall.Name != "TestCase")
-            {
-                Error = $"Base node of {filename} is not \"TestCase\".";
-                return null;
-            }
-
-            XmlNode? idNode = FindNodeNamed(overall, "id");
-            if (idNode == null)
-            {
-                Error = $"id node in {filename} is missing.";
-                return null;
-            }
-            tc.id = idNode.InnerText;
-
-            XmlNode? nameNode = FindNodeNamed(overall, "name");
-            if (nameNode == null)
-            {
-                Error = $"name node in {filename} is missing.";
-                return null;
-            }
-            tc.name = nameNode.InnerText;
-
-            XmlNode? descNode = FindNodeNamed(overall, "description");
-            if (descNode == null)
-            {
-                Error = $"description node in {filename} is missing.";
-                return null;
-            }
-            tc.description = CleanText(descNode.InnerText);
-
-            XmlNode? preconditionsNode = FindNodeNamed(overall, "preconditions");
-            if (preconditionsNode == null)
-            {
-                tc.preconditions = "";
-            }
-            else
-            {
-                tc.preconditions = CleanText(preconditionsNode.InnerText);
-            }
-
-            XmlNode? autoNode = FindNodeNamed(overall, "automated");
-            if (autoNode == null)
-            {
-                Error = $"automated node in {filename} is missing.";
-                return null;
-            }
-            tc.automated = autoNode.InnerText.ToLower() == "true";
-
-            XmlNode? brokenNode = FindNodeNamed(overall, "broken");
-            if (brokenNode == null)
-            {
-                return null;
-            }
-            tc.broken = brokenNode.InnerText.ToLower() == "true";
-
-            XmlNode? deletedNode = FindNodeNamed(overall, "deleted");
-            if (deletedNode == null)
-            {
-                Error = $"broken node in {filename} is missing.";
-                return null;
-            }
-            tc.deleted = deletedNode.InnerText.ToLower() == "true";
-
-            XmlNode? lockedNode = FindNodeNamed(overall, "locked");
-            if (lockedNode == null)
-            {
-                Error = $"locked node in {filename} is missing.";
-                return null;
-            }
-            tc.locked = lockedNode.InnerText.ToLower() == "true";
-
-            XmlNode? launchBrokenNode = FindNodeNamed(overall, "launchBroken");
-            if (launchBrokenNode == null)
-            {
-                Error = $"launchbroken node in {filename} is missing.";
-                return null;
-            }
-            tc.launchBroken = launchBrokenNode.InnerText.ToLower() == "true";
-
-            XmlNode? modifiedNode = FindNodeNamed(overall, "lastModifiedTime");
-            if (modifiedNode == null)
-            {
-                Error = $"lastModifiedTime node in {filename} is missing.";
-                return null;
-            }
-            Int64 time = Int64.Parse(modifiedNode.InnerText);
-            tc.lastModifiedTime = time;
-
-            XmlNode? stepsNode = FindNodeNamed(overall, "steps");
-            if (stepsNode == null)
-            {
-                Error = $"steps node in {filename} is missing.";
-                return null;
-            }
-            tc.steps = new List<Step>();
-            foreach (XmlNode stepNode in stepsNode.ChildNodes)
-            {
-                if (stepNode.Name != "step")
-                {
-                    Error = $"Expected child of <steps> to be <step>, not <{stepNode.Name}>.";
-                    return null;
-                }
-                Step step = new Step();
-                XmlNode? actionNode = FindNodeNamed(stepNode, "action");
-                if (actionNode == null)
-                {
-                    return null;
-                }
-                step.action = CleanText(actionNode.InnerText);
-                XmlNode? expNode = FindNodeNamed(stepNode, "expectation");
-                if (expNode == null)
-                {
-                    return null;
-                }
-                step.expectation = CleanText(expNode.InnerText);
-                tc.steps.Add(step);
-            }
-
-            XmlNode? attributesNode = FindNodeNamed(overall, "attributes");
-            if (attributesNode == null)
-            {
-                Error = $"attributes node in {filename} is missing.";
-                return null;
-            }
-            tc.attributes = new Dictionary<string, string[]>();
-            foreach (XmlNode attrNode in attributesNode.ChildNodes)
-            {
-                string key = AttributeKeyForName(project, attrNode.Name);
-                // keys might be missing if the project isn't correctly set up
-                if (string.IsNullOrEmpty(key))
-                {
-                    Log.Error($"Missing Attribute {attrNode.Name} in project");
-                }
-                else if (tc.attributes.ContainsKey(key))
-                {
-                    Log.Error($"Duplicate Attribute {key} in test case {tc.name}.");
-                }
-                else
-                {
-                    string[] values = attrNode.InnerText.Split(new char[] { ',' });
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        string value = values[i].Replace("\"", "");
-                        value = value.Trim();
-                        values[i] = value;
-                    }
-                    tc.attributes.Add(key, values);
-                }
-            }
-
-            XmlNode? attachmentsNode = FindNodeNamed(overall, "attachments");
-            if (attachmentsNode == null)
-            {
-                Error = $"attachments node in {filename} is missing.";
-                return null;
-            }
-            tc.attachments = new List<Attachment>();
-            foreach (XmlNode attachNode in attachmentsNode.ChildNodes)
-            {
-                Attachment attach = new Attachment();
-                XmlNode? attachIdNode = FindNodeNamed(attachNode, "id");
-                if (attachIdNode == null)
-                {
-                    Error = $"attachment id node in {filename} is missing.";
-                    return null;
-                }
-                attach.id = attachIdNode.InnerText;
-                XmlNode? attachTitleNode = FindNodeNamed(attachNode, "title");
-                if (attachTitleNode == null)
-                {
-                    Error = $"attachment title node in {filename} is missing.";
-                    return null;
-                }
-                attach.title = attachTitleNode.InnerText;
-                XmlNode? attachCtimeNode = FindNodeNamed(attachNode, "createdTime");
-                if (attachCtimeNode == null)
-                {
-                    Error = $"attachment createdTime node in {filename} is missing.";
-                    return null;
-                }
-                attach.createdTime = Int64.Parse(attachCtimeNode.InnerText);
-                XmlNode? attachCbyNode = FindNodeNamed(attachNode, "createdBy");
-                if (attachCbyNode == null)
-                {
-                    Error = $"attachment createdBy node in {filename} is missing.";
-                    return null;
-                }
-                attach.createdBy = attachCbyNode.InnerText;
-                XmlNode? attachSizeNode = FindNodeNamed(attachNode, "dataSize");
-                if (attachSizeNode == null)
-                {
-                    Error = $"attachment dataSize node in {filename} is missing.";
-                    return null;
-                }
-                attach.dataSize = Int64.Parse(attachSizeNode.InnerText);
-                tc.attachments.Add(attach);
-            }
-
-            return tc;
-        }
 
         private TestCaseForUpload? MarkdownToObject(MarkdownDocument markdownDoc, string filename, Project project)
         {
@@ -743,16 +533,12 @@ namespace Dokimion
                             case "attributes":
                                 if (index < markdownDoc.Count)
                                 {
-                                    var attributes = GetMarkdownAttributes(markdownDoc[index]);
+                                    var attributes = GetMarkdownAttributes(markdownDoc[index], project);
                                     if (attributes != null)
                                     {
                                         tc.attributes = attributes;
+                                        index++;
                                     }
-                                    else
-                                    {
-                                        return null;
-                                    }
-                                    index++;
                                 }
                                 break;
                             case "attachments":
@@ -779,7 +565,7 @@ namespace Dokimion
                         break;
                 }
             }
-            return null;
+            return tc;
         }
 
         string? GetInlineText(ContainerInline container)
@@ -806,6 +592,13 @@ namespace Dokimion
                 switch (block)
                 {
                     case HeadingBlock:
+                        if (text.Length > 3)
+                        {
+                            if (text.Substring(text.Length - 2, 2) == "\r\n")
+                            {
+                                text = text.Substring(0, text.Length - 2);
+                            }
+                        }
                         return text;
                     case HtmlBlock:
                         if (false == firstBlock)
@@ -841,6 +634,9 @@ namespace Dokimion
                                         LineBreakInline lineBreak = (LineBreakInline)inline;
                                         text += "\r\n";
                                         break;
+                                    case HtmlInline:
+                                        text += ((HtmlInline)inline).Tag;
+                                        break;
                                     default:
                                         break;
                                 }
@@ -860,6 +656,13 @@ namespace Dokimion
                         break;
                 }
                 index++;
+            }
+            if (text.Length > 3)
+            {
+                if (text.Substring(text.Length-2, 2) == "\r\n")
+                {
+                    text = text.Substring(0, text.Length-2);
+                }
             }
             return text;
         }
@@ -909,7 +712,7 @@ namespace Dokimion
         }
 
 
-        private Dictionary<string, string[]>? GetMarkdownAttributes(Block block)
+        private Dictionary<string, string[]>? GetMarkdownAttributes(Block block, Project project)
         {
             if (block is not ListBlock)
             {
@@ -931,7 +734,22 @@ namespace Dokimion
                 {
                     values[i] = values[i].Trim();
                 }
-                attributes.Add(item.Key, values);
+
+                // Look up magic number for attribute name:
+                string key = AttributeKeyForName(project, item.Key);
+                // keys might be missing if the project isn't correctly set up
+                if (string.IsNullOrEmpty(key))
+                {
+                    Error += $"Missing Attribute {item.Key} in project";
+                    return null;
+                }
+                else if (attributes.ContainsKey(key))
+                {
+                    Error += $"Duplicate Attribute {key} at {block.Line}.";
+                    return null;
+                }
+
+                attributes.Add(key, values);
             }
 
             return attributes;
@@ -1178,19 +996,6 @@ namespace Dokimion
             return "";
         }
 
-        private XmlNode? FindNodeNamed(XmlNode node, string name)
-        {
-            foreach (XmlNode child in node.ChildNodes)
-            {
-                if (child.Name == name)
-                {
-                    return child;
-                }
-            }
-            Error = $"Node named {node.Name} does not have a child named {name}";
-            return null;
-        }
-
         public string GetTestcasesString(string projectId)
         {
             string url = BaseDokimionApiUrl() + $"/{projectId}/testcase";
@@ -1223,14 +1028,14 @@ namespace Dokimion
                 return false;
             }
 
-            // Generate the XML format for this testcase From Dokimion
+            // Generate the Markdown format for this testcase From Dokimion
             string md = GenerateMarkdown(testcase, project);
             if (string.IsNullOrEmpty(md))
             {
                 return false;
             }
 
-            // Save the xml of the test case:
+            // Save the Markdown of the test case:
             if (false == SaveTestCase(testcaseId, folderPath, md))
             {
                 return false;
@@ -1262,9 +1067,15 @@ namespace Dokimion
             md += $"# ID {tc.id}\r\n\r\n";
             md += $"# Name {tc.name}\r\n\r\n";
             md += $"# Description\r\n\r\n";
-            md += $"{tc.description}\r\n\r\n";
+            if (false == string.IsNullOrEmpty(tc.description))
+            {
+                md += $"{tc.description}\r\n\r\n";
+            }
             md += $"# Preconditions\r\n\r\n";
-            md += $"{tc.preconditions}\r\n\r\n";
+            if (false == string.IsNullOrEmpty(tc.preconditions))
+            {
+                md += $"{tc.preconditions}\r\n\r\n";
+            }
 
             md += $"# Steps\r\n\r\n";
             foreach(Step step in tc.steps)
@@ -1305,7 +1116,10 @@ namespace Dokimion
                     md += $"* {attrName}: {s}\r\n";
                 }
             }
-            md += $"\r\n";
+            if (tc.attachments.Count > 0)
+            {
+                md += $"\r\n";
+            }
 
             md += $"# Metadata\r\n\r\n";
             md += $"* automated: {tc.automated}\r\n";
@@ -1322,157 +1136,7 @@ namespace Dokimion
         }
 
 
-        public string GenerateXml(TestCase tc, Project project)
-        {
-            // Create our top-level node
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlElement testcase = xmlDoc.CreateElement("TestCase");
-            xmlDoc.AppendChild(testcase);
-
-            // Create all the members
-            XmlElement id = xmlDoc.CreateElement("id");
-            id.InnerText = tc.id;
-            testcase.AppendChild(id);
-
-            XmlElement name = xmlDoc.CreateElement("name");
-            name.InnerText = tc.name;
-            testcase.AppendChild(name);
-
-            XmlElement description = xmlDoc.CreateElement("description");
-            description.InnerText = tc.description.Replace("<br>", "<br>\r\n");
-            testcase.AppendChild(description);
-
-            XmlElement preconditions = xmlDoc.CreateElement("preconditions");
-            if (tc.preconditions == null)
-            {
-                preconditions.InnerText = "";
-            }
-            else
-            {
-                preconditions.InnerText = tc.preconditions.Replace("<br>", "<br>\r\n");
-            }
-            testcase.AppendChild(preconditions);
-
-            XmlElement automated = xmlDoc.CreateElement("automated");
-            automated.InnerText = tc.automated.ToString();
-            testcase.AppendChild(automated);
-
-            XmlElement broken = xmlDoc.CreateElement("broken");
-            broken.InnerText = tc.broken.ToString();
-            testcase.AppendChild(broken);
-
-            XmlElement deleted = xmlDoc.CreateElement("deleted");
-            deleted.InnerText = tc.deleted.ToString();
-            testcase.AppendChild(deleted);
-
-            XmlElement locked = xmlDoc.CreateElement("locked");
-            locked.InnerText = tc.locked.ToString();
-            testcase.AppendChild(locked);
-
-            XmlElement launchBroken = xmlDoc.CreateElement("launchBroken");
-            launchBroken.InnerText = tc.launchBroken.ToString();
-            testcase.AppendChild(launchBroken);
-
-            XmlElement createdTime = xmlDoc.CreateElement("createdTime");
-            createdTime.InnerText = tc.createdTime.ToString();
-            testcase.AppendChild(createdTime);
-
-            XmlElement lastModifiedTime = xmlDoc.CreateElement("lastModifiedTime");
-            lastModifiedTime.InnerText = tc.lastModifiedTime.ToString();
-            testcase.AppendChild(lastModifiedTime);
-
-            DateTime timestamp = DateTime.Parse("January 1, 1970");
-            timestamp += TimeSpan.FromMilliseconds(tc.lastModifiedTime);
-            string humanReadableTime = timestamp.ToString("R");
-            XmlElement readableModifiedTime = xmlDoc.CreateElement("readableModifiedTime");
-            readableModifiedTime.InnerText = humanReadableTime;
-            testcase.AppendChild(readableModifiedTime);
-
-            XmlElement lastModifiedBy = xmlDoc.CreateElement("lastModifiedBy");
-            lastModifiedBy.InnerText = tc.lastModifiedBy;
-            testcase.AppendChild(lastModifiedBy);
-
-            XmlElement steps = xmlDoc.CreateElement("steps");
-            testcase.AppendChild(steps);
-            foreach (var step in tc.steps)
-            {
-                XmlElement stepNode = xmlDoc.CreateElement("step");
-                steps.AppendChild(stepNode);
-                XmlElement actionNode = xmlDoc.CreateElement("action");
-                string action = step.action;
-                action = action.Replace("<br>", "<br>\r\n");
-                actionNode.InnerText = action;
-                stepNode.AppendChild(actionNode);
-                XmlElement expectation = xmlDoc.CreateElement("expectation");
-                string exp = step.expectation;
-                exp = exp.Replace("<br>", "<br>\r\n");
-                expectation.InnerText = exp;
-                stepNode.AppendChild(expectation);
-            }
-
-            XmlElement attachments = xmlDoc.CreateElement("attachments");
-            testcase.AppendChild(attachments);
-            foreach (var att in tc.attachments)
-            {
-                XmlElement attNode = xmlDoc.CreateElement("attachment");
-                attachments.AppendChild(attNode);
-                XmlElement attId = xmlDoc.CreateElement("id");
-                attId.InnerText = att.id;
-                attNode.AppendChild(attId);
-                XmlElement title = xmlDoc.CreateElement("title");
-                title.InnerText = att.title;
-                attNode.AppendChild(title);
-                XmlElement created = xmlDoc.CreateElement("createdTime");
-                created.InnerText = att.createdTime.ToString();
-                attNode.AppendChild(created);
-                XmlElement createdBy = xmlDoc.CreateElement("createdBy");
-                createdBy.InnerText = att.createdBy;
-                attNode.AppendChild(createdBy);
-                XmlElement dataSize = xmlDoc.CreateElement("dataSize");
-                dataSize.InnerText = att.dataSize.ToString();
-                attNode.AppendChild(dataSize);
-            }
-
-            XmlElement attributes = xmlDoc.CreateElement("attributes");
-            testcase.AppendChild(attributes);
-            foreach (var attr in tc.attributes)
-            {
-                string? attrName = null;
-                try
-                {
-                    attrName = project.attributes[attr.Key];
-                }
-                catch
-                {
-                    Error += $"Test case {tc.id} has a garbage attribute.\r\n";
-                }
-                if (false == string.IsNullOrEmpty(attrName))
-                {
-                    attrName = attrName.Replace(" ", SPACE_REPLACER);
-                    XmlElement attNode = xmlDoc.CreateElement(attrName);
-                    string s = "";
-                    bool first = true;
-                    foreach (string value in attr.Value)
-                    {
-                        string trimmedValue = value.Trim();
-                        s += first ? $"\"{trimmedValue}\"" : $", \"{trimmedValue}\"";
-                        first = false;
-                    }
-                    attNode.InnerText = s;
-                    attributes.AppendChild(attNode);
-                }
-            }
-
-            // Generate a string to return from the Xml Document
-            MemoryStream stream = new MemoryStream();
-            xmlDoc.Save(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            byte[] bytes = stream.ToArray();
-            UTF8Encoding encoding = new UTF8Encoding();
-            return encoding.GetString(bytes, 0, bytes.Length);
-        }
-
-        private bool SaveTestCase(string testcaseId, string folderPath, string xml)
+        private bool SaveTestCase(string testcaseId, string folderPath, string markdown)
         {
             // Create the folder for this project if it does not exist
             if (false == Directory.Exists(folderPath))
@@ -1496,7 +1160,7 @@ namespace Dokimion
             string path = Path.Combine(folderPath, testcaseId + ".md");
             try
             {
-                File.WriteAllText(path, xml);
+                File.WriteAllText(path, markdown);
             }
             catch (Exception e)
             {
@@ -1533,7 +1197,7 @@ namespace Dokimion
 
         private bool SaveAttachment(string title, string folderPath, byte[] fileContent)
         {
-            // Assume folder exists from saving the XML file.
+            // Assume folder exists from saving the Markdown file.
             // Save the file in the repo folder
             string path = Path.Combine(folderPath, title);
             try
@@ -1567,13 +1231,28 @@ namespace Dokimion
             // Since there are no differences yet, the steps for both have the same size.
             for (int i = 0; i < extracted.steps.Count; i++)
             {
-                if (testcaseFromDokimion.steps[i].action != extracted.steps[i].action) return true;
-                if (testcaseFromDokimion.steps[i].expectation != extracted.steps[i].expectation) return true;
+                string dok = testcaseFromDokimion.steps[i].action;
+                if (false == dok.Contains('\r'))
+                {
+                    dok = dok.Replace("\n", "\r\n");
+                }
+                string file = extracted.steps[i].action;
+                if (dok != file) return true;
+
+                dok = testcaseFromDokimion.steps[i].expectation;
+                if (false == dok.Contains('\r'))
+                {
+                    dok = dok.Replace("\n", "\r\n");
+                }
+                file = extracted.steps[i].expectation;
+                if (dok != file) return true;
             }
             if (testcaseFromDokimion.attributes.Count != extracted.attributes.Count) return true;
             // We know they have the same number of key/value pairs
             foreach (string key in extracted.attributes.Keys)
             {
+                if ((false == testcaseFromDokimion.attributes.ContainsKey(key))
+                    || (false == extracted.attributes.ContainsKey(key))) return true;
                 if (testcaseFromDokimion.attributes[key].Length != extracted.attributes[key].Length) return true;
                 // We know the values have the same number of strings in them.
                 for (int i = 0; i < extracted.attributes[key].Length; i++)
@@ -1637,10 +1316,10 @@ namespace Dokimion
         {
             uploaded = null;
             // Read text from Markdown file.
-            string xmlText = "";
+            string markdownText = "";
             try
             {
-                xmlText = File.ReadAllText(path);
+                markdownText = File.ReadAllText(path);
             }
             catch (Exception ex)
             {
@@ -1652,7 +1331,7 @@ namespace Dokimion
             MarkdownDocument? markdownDocument = null;
             try
             {
-                markdownDocument = Markdig.Markdown.Parse(xmlText);
+                markdownDocument = Markdown.Parse(markdownText);
             }
             catch (Exception ex)
             {
@@ -1978,6 +1657,11 @@ namespace Dokimion
                     attr.Value[val] = attr.Value[val].Trim();
                 }
             }
+            // Trim whitespace from other items, just in case:
+            testcase.id = testcase.id.Trim();
+            testcase.name = testcase.name.Trim();
+            testcase.description = testcase.description.Trim();
+            testcase.preconditions = testcase.preconditions.Trim();
             return testcase;
         }
 

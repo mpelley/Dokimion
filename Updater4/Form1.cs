@@ -259,7 +259,7 @@ namespace Updater4
                 IEnumerable<FileInfo> files;
                 try
                 {
-                    files = dirInfo.EnumerateFiles("*.xml");
+                    files = dirInfo.EnumerateFiles("*.md");
                 }
                 catch (Exception ex)
                 {
@@ -336,7 +336,7 @@ namespace Updater4
                 folder = Path.Combine(folder, project.Name);
             }
             TestCase? fullTestCase = m_Dokimion.GetTestCaseAsObject(id.ToString(), project);
-            string filePath = Path.Combine(folder, id + ".xml");
+            string filePath = Path.Combine(folder, id + ".md");
             TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(filePath, project);
             if (fullTestCase == null && testcaseFromFile == null)
             {
@@ -386,26 +386,24 @@ namespace Updater4
                 }
             }
 
-            string serverXml = "";
+            string serverMarkdown = "";
             if (fullTestCase != null)
             {
-                serverXml = m_Dokimion.GenerateXml(fullTestCase, project);
+                serverMarkdown = m_Dokimion.GenerateMarkdown(fullTestCase, project);
             }
-            string fileSystemXml = "";
+            string fileSystemMarkdown = "";
             try
             {
-                fileSystemXml = File.ReadAllText(filePath);
+                fileSystemMarkdown = File.ReadAllText(filePath);
             }
             catch { }
             DocumentPair dp = new DocumentPair
             {
                 TestCase = testcase,
-                ServerDocument = serverXml,
-                FileSystemDocument = fileSystemXml
+                ServerDocument = serverMarkdown,
+                FileSystemDocument = fileSystemMarkdown
             };
             m_TestCases[id] = dp;
-
-
         }
 
         private void SelectAllButton_Click(object sender, EventArgs e)
