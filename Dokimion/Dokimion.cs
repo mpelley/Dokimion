@@ -479,6 +479,7 @@ namespace Dokimion
             Error = "";
 
             int index = 0;
+            Console.WriteLine(filename);
             while (index < markdownDoc.Count)
             {
                 Block block = markdownDoc[index];
@@ -548,6 +549,8 @@ namespace Dokimion
                                 if (text.Substring(0, 2).ToLower() == "id")
                                 {
                                     tc.id = text.Substring(2).Trim();
+                                    if (tc.id == "429")
+                                        ;
                                 }
                                 else if (text.Substring(0, 4).ToLower() == "name")
                                 {
@@ -570,16 +573,71 @@ namespace Dokimion
 
         string? GetInlineText(ContainerInline container)
         {
-            string text = "";
-            foreach (LiteralInline? inline in container)
+            string inlineText = "";
+            foreach (Inline? inline in container)
             {
                 if (inline != null)
                 {
-                    StringSlice content = inline.Content;
-                    text += content.Text.Substring(content.Start, content.Length);
+                    string? text = GetItemText(inline);
+                    if (text == null)
+                    {
+                        return null;
+                    }
+                    inlineText += text;
+                }
+                else
+                {
+                    ;
                 }
             }
-            return text;
+            return inlineText;
+        }
+
+        string? GetItemText(MarkdownObject item)
+        {
+            string itemText = "";
+            switch (item)
+            {
+                case LiteralInline literal:
+                    StringSlice slice = literal.Content;
+                    string text = slice.ToString();
+                    itemText += text;
+                    break;
+                case LineBreakInline:
+                    itemText += "\r\n";
+                    break;
+                case ParagraphBlock:
+                    // Ignore.  Its text will be in a descendent LiteralInline
+                    break;
+                case HtmlInline html:
+                    itemText += html.Tag;
+                    break;
+                case EmphasisInline emphasis:
+                    for (int i = 0; i < emphasis.DelimiterCount; i++)
+                    {
+                        itemText += emphasis.DelimiterChar;
+                    }
+                    if (emphasis.FirstChild is LiteralInline lit)
+                    {
+                        StringSlice content = lit.Content;
+                        itemText += content.Text.Substring(content.Start, content.Length);
+                    }
+                    else
+                    {
+                        Error += $"Unexpected item type inside emphasis at line {item.Line}.";
+                        return null;
+                    }
+                    for (int i = 0; i < emphasis.DelimiterCount; i++)
+                    {
+                        itemText += emphasis.DelimiterChar;
+                    }
+                    break;
+                default:
+                    string errorText = item.ToPositionText();
+                    Error += $"Unexpected item type at line {item.Line}: {errorText}.";
+                    return null;
+            }
+            return itemText;
         }
 
         private string? GetMarkdownText(MarkdownDocument markdownDoc, ref int index)
@@ -795,24 +853,12 @@ namespace Dokimion
             string itemText = "";
             foreach (var child in item.Descendants())
             {
-                switch (child)
+                string? text = GetItemText(child);
+                if (text == null)
                 {
-                    case LiteralInline:
-                        LiteralInline literal = (LiteralInline)child;
-                        StringSlice slice = literal.Content;
-                        string text = slice.ToString();
-                        itemText += text;
-                        break;
-                    case LineBreakInline:
-                        itemText += "\r\n";
-                        break;
-                    case ParagraphBlock:
-                        // Ignore.  Its text will be in a descendent LiteralInline
-                        break;
-                    default:
-                        Error += $"Unexpected child type in list at line {child.Line}.";
-                        return null;
+                    return null;
                 }
+                itemText += text;
             }
             return itemText;
         }
@@ -901,7 +947,7 @@ namespace Dokimion
         private bool GetMarkdownStep(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
         {
             string? action = GetMarkdownAction(markdownDoc, ref index, tc);
-            if (string.IsNullOrEmpty(action))
+            if (action == null)
             {
                 return false;
             }
