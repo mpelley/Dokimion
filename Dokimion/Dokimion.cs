@@ -1137,6 +1137,8 @@ namespace Dokimion
             }
 
             md += $"# Attributes\r\n\r\n";
+            Dictionary<string, string> attrDictWithNames = new();
+
             foreach (var attr in tc.attributes)
             {
                 string? attrName = null;
@@ -1159,10 +1161,28 @@ namespace Dokimion
                         s += first ? $"{trimmedValue}" : $", {trimmedValue}";
                         first = false;
                     }
-                    md += $"* {attrName}: {s}\r\n";
+                    attrDictWithNames.Add(attrName, s);
                 }
             }
-            if (tc.attachments.Count > 0)
+
+            List<string> keys = attrDictWithNames.Keys.ToList();
+            keys.Sort();
+
+            foreach (var key in keys)
+            {
+                string value = "";
+                try
+                {
+                    value = attrDictWithNames[key];
+                }
+                catch
+                {
+                    Error = $"Cannot get value for {key}";
+                }
+                md += $"* {key}: {value}\r\n";
+            }
+
+            if (tc.attributes.Count > 0)
             {
                 md += $"\r\n";
             }
