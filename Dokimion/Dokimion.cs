@@ -549,7 +549,7 @@ namespace Dokimion
                                 if (text.Substring(0, 2).ToLower() == "id")
                                 {
                                     tc.id = text.Substring(2).Trim();
-                                    if (tc.id == "429")
+                                    if (tc.id == "2")
                                         ;
                                 }
                                 else if (text.Substring(0, 4).ToLower() == "name")
@@ -617,15 +617,9 @@ namespace Dokimion
                     {
                         itemText += emphasis.DelimiterChar;
                     }
-                    if (emphasis.FirstChild is LiteralInline lit)
+                    if (emphasis.FirstChild != null)
                     {
-                        StringSlice content = lit.Content;
-                        itemText += content.Text.Substring(content.Start, content.Length);
-                    }
-                    else
-                    {
-                        Error += $"Unexpected item type inside emphasis at line {item.Line}.";
-                        return null;
+                        itemText += GetItemText(emphasis.FirstChild);
                     }
                     for (int i = 0; i < emphasis.DelimiterCount; i++)
                     {
@@ -681,23 +675,12 @@ namespace Dokimion
                         {
                             foreach (var inline in paragraph.Inline)
                             {
-                                switch (inline)
+                                string? inlineText = GetItemText(inline);
+                                if (inlineText == null)
                                 {
-                                    case LiteralInline:
-                                        LiteralInline literal = (LiteralInline)inline;
-                                        StringSlice slice = literal.Content;
-                                        text += slice.ToString();
-                                        break;
-                                    case LineBreakInline:
-                                        LineBreakInline lineBreak = (LineBreakInline)inline;
-                                        text += "\r\n";
-                                        break;
-                                    case HtmlInline:
-                                        text += ((HtmlInline)inline).Tag;
-                                        break;
-                                    default:
-                                        break;
+                                    return null;
                                 }
+                                text += inlineText;
                             }
                         }
                         firstBlock = false;
@@ -1282,36 +1265,39 @@ namespace Dokimion
             return true;
         }
 
+        bool AreStringsEqual(string a, string b)
+        {
+            if (false == a.Contains('\r'))
+            {
+                a = a.Replace("\n", "\r\n");
+            }
+
+            if (false == b.Contains('\r'))
+            {
+                b = b.Replace("\n", "\r\n");
+            }
+
+            return a == b;
+        }
+
         public bool IsTestCaseChanged(TestCaseForUpload testcaseFromDokimion, TestCaseForUpload extracted)
         {
             if (testcaseFromDokimion.id != extracted.id) return true;
             if (testcaseFromDokimion.name != extracted.name) return true;
-            if (testcaseFromDokimion.description != extracted.description) return true;
-            if (testcaseFromDokimion.preconditions != extracted.preconditions) return true;
+            if (false == AreStringsEqual(testcaseFromDokimion.description, extracted.description)) return true;
+            if (false == AreStringsEqual(testcaseFromDokimion.preconditions, extracted.preconditions)) return true;
             if (testcaseFromDokimion.automated != extracted.automated) return true;
             if (testcaseFromDokimion.broken != extracted.broken) return true;
             if (testcaseFromDokimion.deleted != extracted.deleted) return true;
             if (testcaseFromDokimion.locked != extracted.locked) return true;
             if (testcaseFromDokimion.launchBroken != extracted.launchBroken) return true;
+
             if (testcaseFromDokimion.steps.Count != extracted.steps.Count) return true;
             // Since there are no differences yet, the steps for both have the same size.
             for (int i = 0; i < extracted.steps.Count; i++)
             {
-                string dok = testcaseFromDokimion.steps[i].action;
-                if (false == dok.Contains('\r'))
-                {
-                    dok = dok.Replace("\n", "\r\n");
-                }
-                string file = extracted.steps[i].action;
-                if (dok != file) return true;
-
-                dok = testcaseFromDokimion.steps[i].expectation;
-                if (false == dok.Contains('\r'))
-                {
-                    dok = dok.Replace("\n", "\r\n");
-                }
-                file = extracted.steps[i].expectation;
-                if (dok != file) return true;
+                if (false == AreStringsEqual(testcaseFromDokimion.steps[i].action, extracted.steps[i].action)) return true;
+                if (false == AreStringsEqual(testcaseFromDokimion.steps[i].expectation, extracted.steps[i].expectation)) return true;
             }
             if (testcaseFromDokimion.attributes.Count != extracted.attributes.Count) return true;
             // We know they have the same number of key/value pairs
