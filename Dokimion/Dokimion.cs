@@ -543,6 +543,10 @@ namespace Dokimion
                                 }
                                 break;
                             case "attachments":
+                                if (false == GetMarkdownAttachments(markdownDoc, ref index, tc))
+                                {
+                                    return null;
+                                }
                                 break;
                             default:
                                 // Handle ID and Name...
@@ -626,6 +630,17 @@ namespace Dokimion
                         itemText += emphasis.DelimiterChar;
                     }
                     break;
+                case CodeInline code:
+                    for (int i = 0; i < code.DelimiterCount; i++)
+                    {
+                        itemText += code.Delimiter;
+                    }
+                    itemText += code.Content;
+                    for (int i = 0; i < code.DelimiterCount; i++)
+                    {
+                        itemText += code.Delimiter;
+                    }
+                    break;
                 default:
                     string errorText = item.ToPositionText();
                     Error += $"Unexpected item type at line {item.Line}: {errorText}.";
@@ -652,12 +667,11 @@ namespace Dokimion
                             }
                         }
                         return text;
-                    case HtmlBlock:
+                    case HtmlBlock html:
                         if (false == firstBlock)
                         {
                             text += "\r\n\r\n";
                         }
-                        HtmlBlock html = (HtmlBlock)block;
                         foreach (StringLine line in html.Lines)
                         {
                             text += line.Slice.ToString();
@@ -665,12 +679,11 @@ namespace Dokimion
                         }
                         firstBlock = false;
                         break;
-                    case ParagraphBlock:
+                    case ParagraphBlock paragraph:
                         if (false == firstBlock)
                         {
                             text += "\r\n\r\n";
                         }
-                        ParagraphBlock paragraph = (ParagraphBlock)block;
                         if (paragraph.Inline != null)
                         {
                             foreach (var inline in paragraph.Inline)
@@ -692,6 +705,14 @@ namespace Dokimion
                             return null;
                         }
                         text += listText;
+                        break;
+                    case FencedCodeBlock code:
+                        foreach (StringLine line in code.Lines)
+                        {
+                            text += line.Slice.ToString();
+                            text += "\r\n";
+                        }
+
                         break;
                     default:
                         break;
@@ -757,7 +778,7 @@ namespace Dokimion
         {
             if (block is not ListBlock)
             {
-                Error += $"Was expecting a list at line {block.Line}";
+                Error += $"Was expecting an Attribute list at line {block.Line}";
                 return null;
             }
 
@@ -770,7 +791,11 @@ namespace Dokimion
 
             foreach(var item in items)
             {
-                string[] values = item.Value.Split(",");
+                string[] values = new string[0];
+                if (item.Value != "")
+                {
+                    values = item.Value.Split(",");
+                }
                 for (int i = 0; i < values.Length; i++)
                 {
                     values[i] = values[i].Trim();
@@ -950,6 +975,110 @@ namespace Dokimion
         }
 
 
+        private bool GetMarkdownAttachments(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
+        {
+            tc.attachments = new List<Attachment>();
+            while (index < markdownDoc.Count)
+            {
+                Block block = markdownDoc[index];
+                if (block is not HeadingBlock)
+                {
+                    Error += $"Expect a Header at line {block.Line}";
+                    return false;
+                }
+
+                HeadingBlock heading = (HeadingBlock)block;
+                if (heading.Level == 1)
+                {
+                    return true;
+                }
+
+                if (heading.Level != 2)
+                {
+                    Error += $"Expect a Header 2 for Attachment under Attachments at line {block.Line}";
+                    return false;
+                }
+
+                if (heading.Inline == null)
+                {
+                    Error += $"Expect a Header 2 for Attachment under Attachments at line {block.Line}";
+                    return false;
+                }
+
+                string? text = GetInlineText(heading.Inline);
+                if ((string.IsNullOrEmpty(text)) || (text.ToLower() != "attachment"))
+                {
+                    Error += $"Expect a Header 2 for Attachment under Attachments at line {block.Line}";
+                    return false;
+                }
+
+                index++;
+                if (false == GetMarkdownAttachment(markdownDoc[index], tc))
+                {
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+
+        private bool GetMarkdownAttachment(Block block, TestCaseForUpload tc)
+        {
+            if (block is not ListBlock)
+            {
+                Error += $"Expect only a list in Attachment at line {block.Line}.";
+                return false;
+            }
+
+            Dictionary<string, string>? items = GetMarkdownDictionary(block);
+            if (items == null)
+            {
+                return false;
+            }
+
+            Attachment attachment = new();
+            foreach (var item in items)
+            {
+                switch (item.Key.ToLower())
+                {
+                    case "id":
+                        attachment.id = item.Value;
+                        break;
+                    case "title":
+                        attachment.title = item.Value;
+                        break;
+                    case "createdby":
+                        attachment.createdBy = item.Value;
+                        break;
+                    case "createdtime":
+                        try
+                        {
+                            attachment.createdTime = long.Parse(item.Value);
+                        }
+                        catch
+                        {
+                            Error += $"Cannot parse {item.Value} as an integer for attachment's createdTime";
+                        }
+                        break;
+                    case "datasize":
+                        try
+                        {
+                            attachment.dataSize = long.Parse(item.Value);
+                        }
+                        catch
+                        {
+                            Error += $"Cannot parse {item.Value} as an integer for attachment's dataSize";
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            tc.attachments.Add(attachment);
+            return true;
+        }
+
+
         private string? GetMarkdownAction(MarkdownDocument markdownDoc, ref int index, TestCaseForUpload tc)
         {
             return GetMarkdownStepDetails(markdownDoc, ref index, tc, "Action");
@@ -1002,18 +1131,6 @@ namespace Dokimion
             return text;
         }
 
-
-        private string CleanText(string t)
-        {
-            string newT = t.Replace("<br>\r\n", "<br>");
-            newT = newT.Replace("<br>\n", "<br>");
-            while (t != newT)
-            {
-                t = newT;
-                newT = CleanText(t);
-            };
-            return newT;
-        }
 
         private string AttributeKeyForName(Project project, string name)
         {
@@ -1095,31 +1212,91 @@ namespace Dokimion
             string md = "";
             md += $"# ID {tc.id}\r\n\r\n";
             md += $"# Name {tc.name}\r\n\r\n";
-            md += $"# Description\r\n\r\n";
+
             if (false == string.IsNullOrEmpty(tc.description))
             {
-                md += $"{tc.description}\r\n\r\n";
-            }
-            md += $"# Preconditions\r\n\r\n";
-            if (false == string.IsNullOrEmpty(tc.preconditions))
-            {
-                md += $"{tc.preconditions}\r\n\r\n";
+                md += $"# Description\r\n\r\n";
+                md += "```html\r\n";
+                md += $"{ImproveBreaks(tc.description)}\r\n";
+                md += "```\r\n\r\n";
             }
 
-            md += $"# Steps\r\n\r\n";
-            foreach(Step step in tc.steps)
+            if (false == string.IsNullOrEmpty(tc.preconditions))
             {
-                md += $"## Step\r\n\r\n";
-                md += $"### Action\r\n\r\n";
-                md += $"{step.action}\r\n\r\n";
-                md += $"### Expectation\r\n\r\n";
-                if (false == string.IsNullOrEmpty(step.expectation))
+                md += $"# Preconditions\r\n\r\n";
+                md += "```html\r\n";
+                md += $"{ImproveBreaks(tc.preconditions)}\r\n";
+                md += "```\r\n\r\n";
+            }
+
+            if (tc.steps.Count > 0)
+            {
+                md += $"# Steps\r\n\r\n";
+                foreach (Step step in tc.steps)
                 {
-                    md += $"{step.expectation}\r\n\r\n";
+                    md += $"## Step\r\n\r\n";
+                    md += $"### Action\r\n\r\n";
+                    if (false == string.IsNullOrEmpty(step.action))
+                    {
+                        md += "```html\r\n";
+                        md += $"{ImproveBreaks(step.action)}\r\n";
+                        md += "```\r\n\r\n";
+                    }
+                    md += $"### Expectation\r\n\r\n";
+                    if (false == string.IsNullOrEmpty(step.expectation))
+                    {
+                        md += "```html\r\n";
+                        md += $"{ImproveBreaks(step.expectation)}\r\n";
+                        md += "```\r\n\r\n";
+                    }
                 }
             }
 
-            md += $"# Attributes\r\n\r\n";
+            if (tc.attributes.Count > 0)
+            {
+                md += $"# Attributes\r\n\r\n";
+                md += GenerateAttributesMarkdown(tc, project);
+            }
+
+            if (tc.attachments.Count > 0)
+            {
+                md += $"# Attachments\r\n\r\n";
+                md += GenerateAttachmentsMarkdown(tc);
+            }
+
+            md += $"# Metadata\r\n\r\n";
+            md += $"* automated: {tc.automated}\r\n";
+            md += $"* broken: {tc.broken}\r\n";
+            md += $"* createdBy: {tc.createdBy}\r\n";
+            md += $"* createdTime: {tc.createdTime}\r\n";
+            md += $"* deleted: {tc.deleted}\r\n";
+            md += $"* lastModifiedBy: {tc.lastModifiedBy}\r\n";
+            md += $"* lastModifiedTime: {tc.lastModifiedTime}\r\n";
+            md += $"* launchBroken: {tc.launchBroken}\r\n";
+            md += $"* locked: {tc.locked}\r\n";
+
+            return md;
+        }
+
+        private string GenerateAttachmentsMarkdown(TestCase tc)
+        {
+            string text = "";
+            foreach (Attachment attachment in tc.attachments)
+            {
+                text += $"## Attachment\r\n\r\n";
+                text += $"* id: {attachment.id}\r\n";
+                text += $"* title: {attachment.title}\r\n";
+                text += $"* createdTime: {attachment.createdTime}\r\n";
+                text += $"* createdBy: {attachment.createdBy}\r\n";
+                text += $"* dataSize: {attachment.dataSize}\r\n\r\n";
+            }
+            return text;
+        }
+
+        private string GenerateAttributesMarkdown(TestCase tc, Project project)
+        {
+            // First generate a copy of the test case attributes
+            // with a human name instead of the magic number.
             Dictionary<string, string> attrDictWithNames = new();
 
             foreach (var attr in tc.attributes)
@@ -1148,9 +1325,13 @@ namespace Dokimion
                 }
             }
 
+            // Sort the keys so they always are in the same order in the md file
+            // to make comparing easier.
             List<string> keys = attrDictWithNames.Keys.ToList();
             keys.Sort();
 
+            // Generate the markdown text.
+            string text = "";
             foreach (var key in keys)
             {
                 string value = "";
@@ -1162,28 +1343,25 @@ namespace Dokimion
                 {
                     Error = $"Cannot get value for {key}";
                 }
-                md += $"* {key}: {value}\r\n";
+                text += $"* {key}: {value}\r\n";
             }
+            text += $"\r\n";
 
-            if (tc.attributes.Count > 0)
-            {
-                md += $"\r\n";
-            }
-
-            md += $"# Metadata\r\n\r\n";
-            md += $"* automated: {tc.automated}\r\n";
-            md += $"* broken: {tc.broken}\r\n";
-            md += $"* createdBy: {tc.createdBy}\r\n";
-            md += $"* createdTime: {tc.createdTime}\r\n";
-            md += $"* deleted: {tc.deleted}\r\n";
-            md += $"* lastModifiedBy: {tc.lastModifiedBy}\r\n";
-            md += $"* lastModifiedTime: {tc.lastModifiedTime}\r\n";
-            md += $"* launchBroken: {tc.launchBroken}\r\n";
-            md += $"* locked: {tc.locked}\r\n";
-
-            return md;
+            return text;
         }
 
+        private string ImproveBreaks(string s)
+        {
+            // This is to add CR/LF after a <br> so that the saved markdown is more readable.
+            s = s.Replace("<br>", "<br>\r\n");
+            s = s.Replace("<br>\r\n\r\n", "<br>\r\n");
+            s = s.Replace("<br>\r\n\n", "<br>\r\n");
+
+            // replace solo \n with \r\n, just to be consistent
+            s = s.Replace("\n", "\r\n");
+            s = s.Replace("\r\r", "\r");
+            return s;
+        }
 
         private bool SaveTestCase(string testcaseId, string folderPath, string markdown)
         {
@@ -1282,10 +1460,13 @@ namespace Dokimion
 
         public bool IsTestCaseChanged(TestCaseForUpload testcaseFromDokimion, TestCaseForUpload extracted)
         {
+            string fromDokimion;
             if (testcaseFromDokimion.id != extracted.id) return true;
             if (testcaseFromDokimion.name != extracted.name) return true;
-            if (false == AreStringsEqual(testcaseFromDokimion.description, extracted.description)) return true;
-            if (false == AreStringsEqual(testcaseFromDokimion.preconditions, extracted.preconditions)) return true;
+            fromDokimion = ImproveBreaks(testcaseFromDokimion.description);
+            if (false == AreStringsEqual(fromDokimion, extracted.description)) return true;
+            fromDokimion = ImproveBreaks(testcaseFromDokimion.preconditions);
+            if (false == AreStringsEqual(fromDokimion, extracted.preconditions)) return true;
             if (testcaseFromDokimion.automated != extracted.automated) return true;
             if (testcaseFromDokimion.broken != extracted.broken) return true;
             if (testcaseFromDokimion.deleted != extracted.deleted) return true;
@@ -1296,8 +1477,10 @@ namespace Dokimion
             // Since there are no differences yet, the steps for both have the same size.
             for (int i = 0; i < extracted.steps.Count; i++)
             {
-                if (false == AreStringsEqual(testcaseFromDokimion.steps[i].action, extracted.steps[i].action)) return true;
-                if (false == AreStringsEqual(testcaseFromDokimion.steps[i].expectation, extracted.steps[i].expectation)) return true;
+                fromDokimion = ImproveBreaks(testcaseFromDokimion.steps[i].action);
+                if (false == AreStringsEqual(fromDokimion, extracted.steps[i].action)) return true;
+                fromDokimion = ImproveBreaks(testcaseFromDokimion.steps[i].expectation);
+                if (false == AreStringsEqual(fromDokimion, extracted.steps[i].expectation)) return true;
             }
             if (testcaseFromDokimion.attributes.Count != extracted.attributes.Count) return true;
             // We know they have the same number of key/value pairs

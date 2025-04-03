@@ -38,6 +38,7 @@
             TitleInFileSystem = new DataGridViewTextBoxColumn();
             DokimionToFsButton = new Button();
             groupBox1 = new GroupBox();
+            FolderForAllProjectsCheckBox = new CheckBox();
             FolderTextBox = new TextBox();
             BrowseFileSystemButton = new Button();
             FsToDokimionButton = new Button();
@@ -58,7 +59,6 @@
             RestoreProjectButton = new Button();
             button1 = new Button();
             DeleteEmptyButton = new Button();
-            FolderForAllProjectsCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -93,7 +93,7 @@
             TestCaseDataGridView.Name = "TestCaseDataGridView";
             TestCaseDataGridView.RowHeadersVisible = false;
             TestCaseDataGridView.RowHeadersWidth = 51;
-            TestCaseDataGridView.Size = new Size(869, 149);
+            TestCaseDataGridView.Size = new Size(1305, 259);
             TestCaseDataGridView.TabIndex = 20;
             // 
             // TitleInDokimion
@@ -138,7 +138,7 @@
             // DokimionToFsButton
             // 
             DokimionToFsButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DokimionToFsButton.Location = new Point(34, 535);
+            DokimionToFsButton.Location = new Point(34, 645);
             DokimionToFsButton.Name = "DokimionToFsButton";
             DokimionToFsButton.Size = new Size(152, 53);
             DokimionToFsButton.TabIndex = 21;
@@ -154,10 +154,20 @@
             groupBox1.Controls.Add(BrowseFileSystemButton);
             groupBox1.Location = new Point(481, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(354, 95);
+            groupBox1.Size = new Size(790, 95);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "GitHub Repo";
+            // 
+            // FolderForAllProjectsCheckBox
+            // 
+            FolderForAllProjectsCheckBox.AutoSize = true;
+            FolderForAllProjectsCheckBox.Location = new Point(118, 26);
+            FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
+            FolderForAllProjectsCheckBox.Size = new Size(205, 24);
+            FolderForAllProjectsCheckBox.TabIndex = 2;
+            FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
+            FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
             // 
             // FolderTextBox
             // 
@@ -165,7 +175,7 @@
             FolderTextBox.Location = new Point(18, 58);
             FolderTextBox.Name = "FolderTextBox";
             FolderTextBox.ReadOnly = true;
-            FolderTextBox.Size = new Size(330, 27);
+            FolderTextBox.Size = new Size(766, 27);
             FolderTextBox.TabIndex = 1;
             // 
             // BrowseFileSystemButton
@@ -181,7 +191,7 @@
             // FsToDokimionButton
             // 
             FsToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            FsToDokimionButton.Location = new Point(382, 535);
+            FsToDokimionButton.Location = new Point(382, 645);
             FsToDokimionButton.Name = "FsToDokimionButton";
             FsToDokimionButton.Size = new Size(152, 53);
             FsToDokimionButton.TabIndex = 26;
@@ -212,7 +222,7 @@
             // ShowDiffsButton
             // 
             ShowDiffsButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            ShowDiffsButton.Location = new Point(210, 535);
+            ShowDiffsButton.Location = new Point(210, 645);
             ShowDiffsButton.Name = "ShowDiffsButton";
             ShowDiffsButton.Size = new Size(152, 53);
             ShowDiffsButton.TabIndex = 29;
@@ -223,7 +233,7 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            QuitButton.Location = new Point(742, 535);
+            QuitButton.Location = new Point(1178, 645);
             QuitButton.Name = "QuitButton";
             QuitButton.Size = new Size(152, 53);
             QuitButton.TabIndex = 30;
@@ -235,12 +245,12 @@
             // 
             StatusTextBox.AcceptsReturn = true;
             StatusTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            StatusTextBox.Location = new Point(25, 455);
+            StatusTextBox.Location = new Point(25, 565);
             StatusTextBox.Multiline = true;
             StatusTextBox.Name = "StatusTextBox";
             StatusTextBox.ReadOnly = true;
             StatusTextBox.ScrollBars = ScrollBars.Both;
-            StatusTextBox.Size = new Size(869, 64);
+            StatusTextBox.Size = new Size(1305, 64);
             StatusTextBox.TabIndex = 2;
             // 
             // ProjectsListBox
@@ -268,16 +278,16 @@
             FilterListBox.FormattingEnabled = true;
             FilterListBox.Location = new Point(627, 139);
             FilterListBox.Name = "FilterListBox";
-            FilterListBox.Size = new Size(267, 104);
+            FilterListBox.Size = new Size(703, 104);
             FilterListBox.TabIndex = 33;
             FilterListBox.SelectedIndexChanged += FilterListBox_SelectedIndexChanged;
             // 
             // ProgressBar
             // 
-            ProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ProgressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             ProgressBar.Location = new Point(215, 249);
             ProgressBar.Name = "ProgressBar";
-            ProgressBar.Size = new Size(679, 45);
+            ProgressBar.Size = new Size(1115, 45);
             ProgressBar.Step = 1;
             ProgressBar.Style = ProgressBarStyle.Continuous;
             ProgressBar.TabIndex = 34;
@@ -336,7 +346,7 @@
             RestoreProjectButton.Name = "RestoreProjectButton";
             RestoreProjectButton.Size = new Size(129, 53);
             RestoreProjectButton.TabIndex = 40;
-            RestoreProjectButton.Text = "Create Project From Info";
+            RestoreProjectButton.Text = "Update Project From Info";
             RestoreProjectButton.UseVisualStyleBackColor = true;
             RestoreProjectButton.Click += RestoreProjectButton_Click;
             // 
@@ -353,7 +363,7 @@
             // DeleteEmptyButton
             // 
             DeleteEmptyButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DeleteEmptyButton.Location = new Point(554, 535);
+            DeleteEmptyButton.Location = new Point(554, 645);
             DeleteEmptyButton.Name = "DeleteEmptyButton";
             DeleteEmptyButton.Size = new Size(110, 53);
             DeleteEmptyButton.TabIndex = 42;
@@ -361,22 +371,12 @@
             DeleteEmptyButton.UseVisualStyleBackColor = true;
             DeleteEmptyButton.Click += DeleteEmptyButton_Click;
             // 
-            // FolderForAllProjectsCheckBox
-            // 
-            FolderForAllProjectsCheckBox.AutoSize = true;
-            FolderForAllProjectsCheckBox.Location = new Point(118, 26);
-            FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
-            FolderForAllProjectsCheckBox.Size = new Size(205, 24);
-            FolderForAllProjectsCheckBox.TabIndex = 2;
-            FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
-            FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
-            ClientSize = new Size(912, 611);
+            ClientSize = new Size(1348, 721);
             Controls.Add(DeleteEmptyButton);
             Controls.Add(button1);
             Controls.Add(RestoreProjectButton);
