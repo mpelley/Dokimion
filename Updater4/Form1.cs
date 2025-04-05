@@ -550,6 +550,7 @@ namespace Updater4
                 {
                     folderPath = Path.Combine(folderPath, project.Name);
                 }
+                m_Dokimion.ProjectFolder = folderPath;
 
                 int testcases = TestCaseDataGridView.Rows.Count;
                 // Get count of selected test cases, in case we get an error while downloading
@@ -672,6 +673,14 @@ namespace Updater4
         {
 
             string folder = FolderTextBox.Text;
+            RestoreProject dlg = new();
+            dlg.FolderPathTextBox.Text = folder;
+            DialogResult result = dlg.ShowDialog();
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+            folder = dlg.FolderPathTextBox.Text;
             if (string.IsNullOrEmpty(folder))
             {
                 StatusTextBox.Text = "Select a folder to create project from.";

@@ -140,6 +140,7 @@ namespace Dokimion
         public string ServerUrl = "";
         public bool UseHttps;
         public string Error = "";
+        public string ProjectFolder = "";
         private const string SPACE_REPLACER = "_";
 
         // Default constructor is private so callers use the constructor providing the URL.
@@ -1196,7 +1197,7 @@ namespace Dokimion
                     return false;
                 }
 
-                string filename = $"{testcaseId}_{attachment.title}";
+                string filename = $"{testcaseId}_{attachment.id}_{attachment.title}";
                 if (false == SaveAttachment(filename, folderPath, fileContent))
                 {
                     return false;
@@ -1651,11 +1652,12 @@ namespace Dokimion
 
         UploadStatus UploadAttachments(string folderPath, TestCaseForUpload testcase, Project project)
         {
+            return UploadStatus.Updated;
             bool didUpload = false;
             foreach (var attachment in testcase.attachments)
             {
                 // Get the content from our disk:
-                string filename = $"{testcase.id}_{attachment.title}";
+                string filename = $"{testcase.id}_{attachment.id}_{attachment.title}";
                 string filePath = Path.Combine(folderPath, filename);
                 Byte[] diskContent;
                 try
@@ -1865,6 +1867,24 @@ namespace Dokimion
             return DialogResult.OK;
         }
 
+        private bool UploadAttachments(Project project, TestCaseForUpload tc, Attachment att)
+        {
+            string uri = BaseDokimionApiUrl() + $"/{project.id}/testcase/{tc.id}/attachment";
+
+            string filePath = Path.Combine(ProjectFolder, $"{tc.id}_{att.id}_{att.title}");
+            ByteArrayContent fileData = new(File.ReadAllBytes(filePath));
+
+            StringContent fileName = new(att.title);
+
+            MultipartFormDataContent form = new();
+            form.Add(fileData, "file", att.title);
+            form.Add(fileName, "fileId");
+
+            HttpClient client = new();
+            var response = client.PostAsync(uri, form).Result;
+            string jsonContent = response.Content.ReadAsStringAsync().Result;
+            return true;
+        }
 
         public TestCase? GetTestCaseAsObject(string url)
         {

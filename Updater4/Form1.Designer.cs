@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             LoginButton = new Button();
             TestCaseDataGridView = new DataGridView();
             TitleInDokimion = new DataGridViewTextBoxColumn();
@@ -79,14 +79,14 @@
             TestCaseDataGridView.AllowUserToAddRows = false;
             TestCaseDataGridView.AllowUserToDeleteRows = false;
             TestCaseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem });
             TestCaseDataGridView.Location = new Point(25, 300);
@@ -154,7 +154,7 @@
             groupBox1.Controls.Add(BrowseFileSystemButton);
             groupBox1.Location = new Point(481, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(790, 95);
+            groupBox1.Size = new Size(849, 95);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "GitHub Repo";
@@ -175,7 +175,7 @@
             FolderTextBox.Location = new Point(18, 58);
             FolderTextBox.Name = "FolderTextBox";
             FolderTextBox.ReadOnly = true;
-            FolderTextBox.Size = new Size(766, 27);
+            FolderTextBox.Size = new Size(825, 27);
             FolderTextBox.TabIndex = 1;
             // 
             // BrowseFileSystemButton
@@ -264,9 +264,9 @@
             // 
             // GetTestCasesButton
             // 
-            GetTestCasesButton.Location = new Point(399, 131);
+            GetTestCasesButton.Location = new Point(379, 131);
             GetTestCasesButton.Name = "GetTestCasesButton";
-            GetTestCasesButton.Size = new Size(201, 53);
+            GetTestCasesButton.Size = new Size(261, 53);
             GetTestCasesButton.TabIndex = 32;
             GetTestCasesButton.Text = "Compare Test Cases in Project";
             GetTestCasesButton.UseVisualStyleBackColor = true;
@@ -276,9 +276,9 @@
             // 
             FilterListBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             FilterListBox.FormattingEnabled = true;
-            FilterListBox.Location = new Point(627, 139);
+            FilterListBox.Location = new Point(646, 139);
             FilterListBox.Name = "FilterListBox";
-            FilterListBox.Size = new Size(703, 104);
+            FilterListBox.Size = new Size(684, 104);
             FilterListBox.TabIndex = 33;
             FilterListBox.SelectedIndexChanged += FilterListBox_SelectedIndexChanged;
             // 
@@ -305,7 +305,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(627, 114);
+            label2.Location = new Point(646, 115);
             label2.Name = "label2";
             label2.Size = new Size(110, 20);
             label2.TabIndex = 36;
@@ -344,9 +344,9 @@
             // 
             RestoreProjectButton.Location = new Point(492, 190);
             RestoreProjectButton.Name = "RestoreProjectButton";
-            RestoreProjectButton.Size = new Size(129, 53);
+            RestoreProjectButton.Size = new Size(148, 53);
             RestoreProjectButton.TabIndex = 40;
-            RestoreProjectButton.Text = "Update Project From Info";
+            RestoreProjectButton.Text = "Restore Project From Info Files";
             RestoreProjectButton.UseVisualStyleBackColor = true;
             RestoreProjectButton.Click += RestoreProjectButton_Click;
             // 
