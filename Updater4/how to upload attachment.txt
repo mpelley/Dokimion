@@ -1,0 +1,107 @@
+dokimion-dev.psonet
+
+testing.languagetechnology.org
+
+To upload attachment:
+POST to http://dokimion-dev.psonet/api/helloworld/testcase/1/attachment
+with "form data":
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8
+Content-Disposition: form-data; name="file"; filename="PelleyTestFile_001.txt"
+Content-Type: text/plain
+
+In the beginning God created the heavens and the earth.
+
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8
+Content-Disposition: form-data; name="fileId"
+
+57_PelleyTestFile_001.txt
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8
+Content-Disposition: form-data; name="initialPreview"
+
+[]
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8
+Content-Disposition: form-data; name="initialPreviewConfig"
+
+[]
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8
+Content-Disposition: form-data; name="initialPreviewThumbTags"
+
+[]
+------geckoformboundarye7767161ee0cefb99bcdd0862cd36ad8--
+
+The response to uploading an attachment seems to be the same as getting the testcase.
+It now contains the info about the new attachment:
+{
+  "description" : "<p>***************************************</p>\r\n<p><strong>Important</strong>: Do not skip!</p>\r\n<p>***************************************</p>",
+  "preconditions" : "",
+  "steps" : [ {
+    "action" : "This is the action for this test case.\r\n<ul>\r\n<li>Step One</li>\r\n<li>Step two</li>\r\n</ul>\r\nand so on...",
+    "expectation" : ""
+  }, {
+    "action" : "<p>Setup Step 2</p>",
+    "expectation" : "<p>completes</p>"
+  } ],
+  "attachments" : [ {
+    "id" : "a90d0ecc-b634-43ea-bed2-8d42095cfc12",
+    "title" : "PelleyTestFile_001.txt",
+    "url" : "67ee980591236e622468df6e",
+    "createdBy" : "admin",
+    "createdTime" : 1743689733757,
+    "dataSize" : -1
+  } ],
+  "automated" : false,
+  "locked" : false,
+  "broken" : false,
+  "launchBroken" : false,
+  "id" : "1",
+  "name" : "Number1",
+  "deleted" : false,
+  "createdTime" : 0,
+  "lastModifiedTime" : 1743689733761,
+  "lastModifiedBy" : "admin",
+  "attributes" : {
+    "67ed355291236e622468df57" : [ "Windows" ]
+  },
+  "metaData" : { }
+}
+
+Another request:
+------geckoformboundary6bd901387a0df07362976553f9e3295d
+Content-Disposition: form-data; name="file"; filename="Use Case 2 info.txt"
+Content-Type: text/plain
+
+Diagnostic Information
+Build Id: 679110fe624023cf587a83b0
+Corpora Ids: 67911012624023cf587a839e, 679110fd624023cf587a83a9, 67911012624023cf587a839c
+Parallel Corpora Ids: 679110fe624023cf587a83ae, 679110fe624023cf587a83af
+Date Finished:
+Message:
+Percent Completed: 0.08
+Revision: 13
+Queue Depth: 0
+State: ACTIVE
+Step: 0
+Translation Engine Id: 679110fc624023cf587a83a4
+
+------geckoformboundary6bd901387a0df07362976553f9e3295d
+Content-Disposition: form-data; name="fileId"
+
+379_Use_20Case_202_20info.txt
+------geckoformboundary6bd901387a0df07362976553f9e3295d
+Content-Disposition: form-data; name="initialPreview"
+
+[]
+------geckoformboundary6bd901387a0df07362976553f9e3295d
+Content-Disposition: form-data; name="initialPreviewConfig"
+
+[]
+------geckoformboundary6bd901387a0df07362976553f9e3295d
+Content-Disposition: form-data; name="initialPreviewThumbTags"
+
+[]
+------geckoformboundary6bd901387a0df07362976553f9e3295d--
+
+The "379" prefix to the filename is the file size.
+
+To delete the attachment:
+DELETE http://dokimion-dev.psonet/api/helloworld/testcase/1/attachment/47466c6f-01ca-4311-b141-3dda1aed1353
