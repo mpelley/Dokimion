@@ -286,7 +286,8 @@ namespace Updater4
 
         private void GetFileSystemTestCase(Project project, string path)
         {
-            TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(path, project);
+            MarkdownFile markdownFile = new();
+            TestCaseForUpload? testcaseFromFile = markdownFile.GetTestCaseFromFileSystem(path, project);
             if (testcaseFromFile == null)
             {
                 StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
@@ -337,7 +338,8 @@ namespace Updater4
             }
             TestCase? fullTestCase = m_Dokimion.GetTestCaseAsObject(id.ToString(), project);
             string filePath = Path.Combine(folder, id + ".md");
-            TestCaseForUpload? testcaseFromFile = m_Dokimion.GetTestCaseFromFileSystem(filePath, project);
+            MarkdownFile markdownFile = new();
+            TestCaseForUpload? testcaseFromFile = markdownFile.GetTestCaseFromFileSystem(filePath, project);
             if (fullTestCase == null && testcaseFromFile == null)
             {
                 StatusTextBox.Text += $"Cannot get test case from either Dokimion or file system for id {id}.";

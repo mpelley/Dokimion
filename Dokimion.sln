@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Updater4", "Updater4\Update
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dokimion", "Dokimion\Dokimion.csproj", "{D103DE4F-4C72-4766-97BC-7A624212E7A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubToDokimion", "GitHubToDokimion\GitHubToDokimion.csproj", "{F4BD8FD4-5F71-4029-A705-9B63959A46CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{D103DE4F-4C72-4766-97BC-7A624212E7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D103DE4F-4C72-4766-97BC-7A624212E7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D103DE4F-4C72-4766-97BC-7A624212E7A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4BD8FD4-5F71-4029-A705-9B63959A46CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4BD8FD4-5F71-4029-A705-9B63959A46CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4BD8FD4-5F71-4029-A705-9B63959A46CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4BD8FD4-5F71-4029-A705-9B63959A46CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
