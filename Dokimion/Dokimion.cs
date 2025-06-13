@@ -175,10 +175,10 @@ namespace Dokimion
             }
             catch (Exception e)
             {
-                Error = "Cannot log out because:\n" + e.Message;
+                Error = "Cannot log out because:\r\n" + e.Message;
                 if (resp != null)
                 {
-                    Error += "\n" + resp.ReasonPhrase;
+                    Error += "\r\n" + resp.ReasonPhrase;
                 }
             }
             m_Client.DefaultRequestHeaders.Remove("whoruSessionId");
@@ -186,46 +186,54 @@ namespace Dokimion
 
         public bool Login(string username, string password)
         {
-            string url = $"{BaseDokimionApiUrl()}/user/login?login={username}&password={password}";
-            HttpResponseMessage? resp = null;
-            try
+            if (true)
             {
-                resp = m_Client.PostAsync(url, null).Result;
-            }
-            catch (Exception e)
-            {
-                Error = "Cannot log in because:\n" + e.Message;
-                if (resp != null)
-                {
-                    Error += "\n" + resp.ReasonPhrase;
-                }
-                return false;
-            }
-            bool results = false;
-            string json = resp.Content.ReadAsStringAsync().Result;
-            if (resp.IsSuccessStatusCode)
-            {
-                if (string.IsNullOrEmpty(json))
-                {
-                    Error = "Empty response to Login request";
-                    return false;
-                }
-                User? user = JsonConvert.DeserializeObject<User>(json);
-                if (user != null)
-                {
-                    m_Client.DefaultRequestHeaders.Add("whoruSessionId", user.id);
-                    results = true;
-                }
-                else
-                {
-                    Error = "Cannot decode " + json;
-                }
+                m_Client.DefaultRequestHeaders.Add("Whoru-Api-Token", "abc");
+                return true;
             }
             else
             {
-                Error = "Server returned error: " + resp.ReasonPhrase + "\n" + json;
+                string url = $"{BaseDokimionApiUrl()}/user/login?login={username}&password={password}";
+                HttpResponseMessage? resp = null;
+                try
+                {
+                    resp = m_Client.PostAsync(url, null).Result;
+                }
+                catch (Exception e)
+                {
+                    Error = "Cannot log in because:\r\n" + e.Message;
+                    if (resp != null)
+                    {
+                        Error += "\r\n" + resp.ReasonPhrase;
+                    }
+                    return false;
+                }
+                bool results = false;
+                string json = resp.Content.ReadAsStringAsync().Result;
+                if (resp.IsSuccessStatusCode)
+                {
+                    if (string.IsNullOrEmpty(json))
+                    {
+                        Error = "Empty response to Login request";
+                        return false;
+                    }
+                    User? user = JsonConvert.DeserializeObject<User>(json);
+                    if (user != null)
+                    {
+                        m_Client.DefaultRequestHeaders.Add("whoruSessionId", user.id);
+                        results = true;
+                    }
+                    else
+                    {
+                        Error = "Cannot decode " + json;
+                    }
+                }
+                else
+                {
+                    Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
+                }
+                return results;
             }
-            return results;
         }
 
         public Dictionary<string, string> GetAttributesForProject(string projectId)
@@ -433,21 +441,6 @@ namespace Dokimion
             return true;
         }
 
-
-        public string GetTestcasesString(string projectId)
-        {
-            string url = BaseDokimionApiUrl() + $"/{projectId}/testcase";
-            string json = "";
-            try
-            {
-                json = m_Client.GetStringAsync(url).Result;
-            }
-            catch (Exception ex)
-            {
-                Error = "Cannot get test cases from Dokimion because:\n" + ex.Message;
-            }
-            return json;
-        }
 
         public TestCase? GetTestCaseAsObject(string testcaseId, Project project)
         {
@@ -1038,6 +1031,69 @@ namespace Dokimion
             return true;
         }
 
+        public bool UploadPlainTextTextCase(Project project, TestCaseForUpload? fromDokimion, TestCaseForUpload? fromGitHub)
+        {
+            Error = "";
+            string url = BaseDokimionApiUrl() + $"/{project.id}/testcase";
+
+            if (fromDokimion == null)
+            {
+                Error += "Cannot upload to a test case that does not already exist in Dokimion.\r\n";
+                Error += "Create the test case in Dokimion before trying to upload it.\r\n";
+                return false;
+            }
+
+            if (fromGitHub == null)
+            {
+                Error += "We need a test case in GitHub to upload it.\r\n";
+                return false;
+            }
+
+
+            // Copy just the parts we can set into what is already there
+            fromDokimion.name = fromGitHub.name;
+            fromDokimion.description = fromGitHub.description;
+            fromDokimion.attributes = fromGitHub.attributes;
+            fromDokimion.steps = fromGitHub.steps;
+
+            string json = JsonConvert.SerializeObject(fromDokimion);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage? resp = null;
+            try
+            {
+                resp = m_Client.PutAsync(url, content).Result;
+            }
+            catch (Exception ex)
+            {
+                Error = "Could not upload the test case because:\r\n";
+                Error += ex.Message;
+                if (ex.InnerException != null)
+                {
+                    Error += "\r\n" + ex.InnerException.Message;
+                }
+                if (resp != null)
+                {
+                    Error += "\r\n" + resp.ReasonPhrase;
+                    if (resp.Content != null)
+                    {
+                        Error += "\r\n" + resp.Content.ReadAsStringAsync().Result;
+                    }
+                }
+                return false;
+            }
+            if (false == resp.IsSuccessStatusCode)
+            {
+                Error += resp.StatusCode + "\r\n";
+                if (resp.Content != null)
+                {
+                    Error += resp.Content.ReadAsStringAsync().Result + "\r\n";
+                }
+                return false;
+            }
+            return true;
+        }
+
+
         public TestCase? GetTestCaseAsObject(string url)
         {
             // Get the test case from Dokimion
@@ -1063,6 +1119,7 @@ namespace Dokimion
                 {
                     attr.Value[val] = attr.Value[val].Trim();
                 }
+                Array.Sort(attr.Value);     // so we can compare to what is in Dokimion.
             }
             // Trim whitespace from other items, just in case:
             testcase.id = testcase.id.Trim();

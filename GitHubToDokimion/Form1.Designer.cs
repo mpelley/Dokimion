@@ -39,7 +39,7 @@
             FolderForAllProjectsCheckBox = new CheckBox();
             FolderTextBox = new TextBox();
             BrowseFileSystemButton = new Button();
-            GetTestCasesButton = new Button();
+            CompareTestCasesButton = new Button();
             ProgressBar = new ProgressBar();
             StatusTextBox = new TextBox();
             FilterListBox = new ListBox();
@@ -53,9 +53,9 @@
             Selected = new DataGridViewCheckBoxColumn();
             TitleInFileSystem = new DataGridViewTextBoxColumn();
             FileName = new DataGridViewTextBoxColumn();
-            diffViewer1 = new DiffPlex.WindowsForms.Controls.DiffViewer();
-            label2 = new Label();
             label3 = new Label();
+            label2 = new Label();
+            diffViewer1 = new DiffPlex.WindowsForms.Controls.DiffViewer();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -163,15 +163,15 @@
             BrowseFileSystemButton.UseVisualStyleBackColor = true;
             BrowseFileSystemButton.Click += BrowseFileSystemButton_Click;
             // 
-            // GetTestCasesButton
+            // CompareTestCasesButton
             // 
-            GetTestCasesButton.Location = new Point(30, 293);
-            GetTestCasesButton.Name = "GetTestCasesButton";
-            GetTestCasesButton.Size = new Size(261, 32);
-            GetTestCasesButton.TabIndex = 33;
-            GetTestCasesButton.Text = "Compare Test Cases in Project";
-            GetTestCasesButton.UseVisualStyleBackColor = true;
-            GetTestCasesButton.Click += GetTestCasesButton_Click;
+            CompareTestCasesButton.Location = new Point(30, 293);
+            CompareTestCasesButton.Name = "CompareTestCasesButton";
+            CompareTestCasesButton.Size = new Size(261, 32);
+            CompareTestCasesButton.TabIndex = 33;
+            CompareTestCasesButton.Text = "Compare Test Cases in Project";
+            CompareTestCasesButton.UseVisualStyleBackColor = true;
+            CompareTestCasesButton.Click += CompareTestCasesButton_Click;
             // 
             // ProgressBar
             // 
@@ -263,6 +263,7 @@
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem, FileName });
             TestCaseDataGridView.Location = new Point(6, 11);
+            TestCaseDataGridView.MultiSelect = false;
             TestCaseDataGridView.Name = "TestCaseDataGridView";
             TestCaseDataGridView.RowHeadersWidth = 51;
             TestCaseDataGridView.Size = new Size(818, 164);
@@ -316,6 +317,25 @@
             FileName.Visible = false;
             FileName.Width = 125;
             // 
+            // label3
+            // 
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label3.AutoSize = true;
+            label3.Location = new Point(765, 7);
+            label3.Name = "label3";
+            label3.Size = new Size(56, 20);
+            label3.TabIndex = 54;
+            label3.Text = "GitHub";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(15, 7);
+            label2.Name = "label2";
+            label2.Size = new Size(74, 20);
+            label2.TabIndex = 53;
+            label2.Text = "Dokimion";
+            // 
             // diffViewer1
             // 
             diffViewer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -362,25 +382,6 @@
             diffViewer1.UnchangedBackColor = Color.FromArgb(12, 128, 128, 128);
             diffViewer1.UnchangedForeColor = Color.FromArgb(0, 0, 0);
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(15, 7);
-            label2.Name = "label2";
-            label2.Size = new Size(74, 20);
-            label2.TabIndex = 53;
-            label2.Text = "Dokimion";
-            // 
-            // label3
-            // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label3.AutoSize = true;
-            label3.Location = new Point(765, 7);
-            label3.Name = "label3";
-            label3.Size = new Size(56, 20);
-            label3.TabIndex = 54;
-            label3.Text = "GitHub";
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -392,7 +393,7 @@
             Controls.Add(FilterListBox);
             Controls.Add(ProgressBar);
             Controls.Add(StatusTextBox);
-            Controls.Add(GetTestCasesButton);
+            Controls.Add(CompareTestCasesButton);
             Controls.Add(groupBox1);
             Controls.Add(RefreshButton);
             Controls.Add(label1);
@@ -425,7 +426,7 @@
         private CheckBox FolderForAllProjectsCheckBox;
         private TextBox FolderTextBox;
         private Button BrowseFileSystemButton;
-        private Button GetTestCasesButton;
+        private Button CompareTestCasesButton;
         private ProgressBar ProgressBar;
         private TextBox StatusTextBox;
         private ListBox FilterListBox;

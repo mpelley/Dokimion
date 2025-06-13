@@ -16,6 +16,7 @@ namespace Dokimion
     {
         private enum Parts
         {
+            None,
             Description,
             Attributes,
             Steps
@@ -151,7 +152,7 @@ namespace Dokimion
                         string key = AttributeKeyForName(project, parts[0].Trim());
                         if (key == "")
                         {
-                            Error += $"Invalid attribute name: {parts[0]}.\n";
+                            Error += $"Invalid attribute name: {parts[0]}.\r\n";
                             return;
                         }
                         string[] values = parts[1].Split(",");
@@ -159,6 +160,7 @@ namespace Dokimion
                         {
                             values[i] = values[i].Trim();
                         }
+                        Array.Sort(values);     // so we can compare to what is in Dokimion.
                         attributes.Add(key, values);
                     }
                     tc.attributes = attributes;
@@ -169,6 +171,8 @@ namespace Dokimion
                     List<Step> steps = new ();
                     steps.Add(step);
                     tc.steps = steps;
+                    break;
+                default:
                     break;
             }
         }
@@ -183,9 +187,8 @@ namespace Dokimion
                 {
                     first = false;
                 }
-                else if (line == content.Last())
+                else if ((line == "") && (line == content.Last()))
                 {
-                    result += "\r\n";
                 }
                 else
                 {
@@ -208,6 +211,7 @@ namespace Dokimion
 
         private string AttributeKeyForName(Project project, string name)
         {
+            name = name.Replace(" ", Dokimion.SPACE_REPLACER);
             foreach (var att in project.attributes)
             {
                 if (att.Value == name)
