@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            RefreshButton = new Button();
+            RefreshProjectListButton = new Button();
             label1 = new Label();
             groupBox2 = new GroupBox();
             DokimionProjectsListBox = new ListBox();
@@ -50,9 +50,9 @@
             TitleInDokimion = new DataGridViewTextBoxColumn();
             ID = new DataGridViewTextBoxColumn();
             Status = new DataGridViewTextBoxColumn();
-            Selected = new DataGridViewCheckBoxColumn();
             TitleInFileSystem = new DataGridViewTextBoxColumn();
             FileName = new DataGridViewTextBoxColumn();
+            TestCaseNameTextBox = new TextBox();
             label3 = new Label();
             label2 = new Label();
             diffViewer1 = new DiffPlex.WindowsForms.Controls.DiffViewer();
@@ -65,15 +65,15 @@
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).BeginInit();
             SuspendLayout();
             // 
-            // RefreshButton
+            // RefreshProjectListButton
             // 
-            RefreshButton.Location = new Point(189, 102);
-            RefreshButton.Name = "RefreshButton";
-            RefreshButton.Size = new Size(175, 30);
-            RefreshButton.TabIndex = 44;
-            RefreshButton.Text = "Refresh Project List";
-            RefreshButton.UseVisualStyleBackColor = true;
-            RefreshButton.Click += RefreshButton_Click;
+            RefreshProjectListButton.Location = new Point(189, 102);
+            RefreshProjectListButton.Name = "RefreshProjectListButton";
+            RefreshProjectListButton.Size = new Size(175, 30);
+            RefreshProjectListButton.TabIndex = 44;
+            RefreshProjectListButton.Text = "Refresh Project List";
+            RefreshProjectListButton.UseVisualStyleBackColor = true;
+            RefreshProjectListButton.Click += RefreshProjectListButton_Click;
             // 
             // label1
             // 
@@ -144,6 +144,7 @@
             FolderForAllProjectsCheckBox.TabIndex = 2;
             FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
             FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
+            FolderForAllProjectsCheckBox.CheckedChanged += FolderForAllProjectsCheckBox_CheckedChanged;
             // 
             // FolderTextBox
             // 
@@ -240,6 +241,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            splitContainer1.Panel2.Controls.Add(TestCaseNameTextBox);
             splitContainer1.Panel2.Controls.Add(label3);
             splitContainer1.Panel2.Controls.Add(label2);
             splitContainer1.Panel2.Controls.Add(diffViewer1);
@@ -261,7 +263,7 @@
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem, FileName });
+            TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, TitleInFileSystem, FileName });
             TestCaseDataGridView.Location = new Point(6, 11);
             TestCaseDataGridView.MultiSelect = false;
             TestCaseDataGridView.Name = "TestCaseDataGridView";
@@ -294,13 +296,6 @@
             Status.ReadOnly = true;
             Status.Width = 60;
             // 
-            // Selected
-            // 
-            Selected.HeaderText = "Select";
-            Selected.MinimumWidth = 20;
-            Selected.Name = "Selected";
-            Selected.Width = 60;
-            // 
             // TitleInFileSystem
             // 
             TitleInFileSystem.HeaderText = "Title in File System";
@@ -316,6 +311,15 @@
             FileName.Name = "FileName";
             FileName.Visible = false;
             FileName.Width = 125;
+            // 
+            // TestCaseNameTextBox
+            // 
+            TestCaseNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            TestCaseNameTextBox.Location = new Point(253, 4);
+            TestCaseNameTextBox.Name = "TestCaseNameTextBox";
+            TestCaseNameTextBox.ReadOnly = true;
+            TestCaseNameTextBox.Size = new Size(359, 27);
+            TestCaseNameTextBox.TabIndex = 55;
             // 
             // label3
             // 
@@ -395,7 +399,7 @@
             Controls.Add(StatusTextBox);
             Controls.Add(CompareTestCasesButton);
             Controls.Add(groupBox1);
-            Controls.Add(RefreshButton);
+            Controls.Add(RefreshProjectListButton);
             Controls.Add(label1);
             Controls.Add(groupBox2);
             Controls.Add(splitContainer1);
@@ -417,7 +421,7 @@
 
         #endregion
 
-        private Button RefreshButton;
+        private Button RefreshProjectListButton;
         private Label label1;
         private GroupBox groupBox2;
         private TextBox ServerTextBox;
@@ -436,13 +440,13 @@
         private SplitContainer splitContainer1;
         private DataGridView TestCaseDataGridView;
         private DiffPlex.WindowsForms.Controls.DiffViewer diffViewer1;
+        private Label label3;
+        private Label label2;
+        private TextBox TestCaseNameTextBox;
         private DataGridViewTextBoxColumn TitleInDokimion;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn Status;
-        private DataGridViewCheckBoxColumn Selected;
         private DataGridViewTextBoxColumn TitleInFileSystem;
         private DataGridViewTextBoxColumn FileName;
-        private Label label3;
-        private Label label2;
     }
 }

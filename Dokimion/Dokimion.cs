@@ -1119,7 +1119,7 @@ namespace Dokimion
                 {
                     attr.Value[val] = attr.Value[val].Trim();
                 }
-                Array.Sort(attr.Value);     // so we can compare to what is in Dokimion.
+                Array.Sort(attr.Value);     // so we can compare what is in the file to what is in Dokimion.
             }
             // Trim whitespace from other items, just in case:
             testcase.id = testcase.id.Trim();

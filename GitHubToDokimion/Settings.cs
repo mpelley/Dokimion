@@ -12,6 +12,7 @@ namespace GitHubToDokimion
         public string server = "";
         public string repo = "";
         public bool useHttps = false;
+        public bool useOneFolderForAllProjects = false;
     }
 
 }

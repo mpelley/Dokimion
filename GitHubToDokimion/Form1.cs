@@ -6,13 +6,13 @@ namespace GitHubToDokimion
         Dictionary<int, DocumentPair> m_Documents;
         Dictionary<int, TestCasePair> m_TestCases;
         Project m_Project;
+        Settings m_Settings;
 
         public const int DOKIMION_TITLE_COLUMN = 0;
         public const int ID_COLUMN = 1;
         public const int STATUS_COLUMN = 2;
-        public const int SELECT_COLUMN = 3;
-        public const int FILE_SYSTEM_TITLE_COLUMN = 4;
-        public const int FILE_SYSTEM_FILENAME_COLUMN = 5;
+        public const int FILE_SYSTEM_TITLE_COLUMN = 3;
+        public const int FILE_SYSTEM_FILENAME_COLUMN = 4;
 
 
 
@@ -26,7 +26,6 @@ namespace GitHubToDokimion
             TitleInFileSystem.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             ID.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             Status.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            Selected.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
             TestCaseDataGridView.Rows.Clear();
 
@@ -42,6 +41,14 @@ namespace GitHubToDokimion
             m_Documents = new Dictionary<int, DocumentPair>();
             m_TestCases = new Dictionary<int, TestCasePair>();
             m_Project = new();
+
+            m_Settings = GetSettings();
+            if (null == m_Settings)
+            {
+                m_Settings = new Settings();
+            }
+            FolderForAllProjectsCheckBox.Checked = m_Settings.useOneFolderForAllProjects;
+            FolderTextBox.Text = m_Settings.repo;
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -50,28 +57,20 @@ namespace GitHubToDokimion
             StatusTextBox.Refresh();
             LoginDialog dlg = new();
 
-            Settings? settings = GetSettings();
-            if (null == settings)
-            {
-                settings = new Settings();
-            }
-            else
-            {
-                dlg.Username = settings.username;
-                dlg.ServerUrl = settings.server;
-                dlg.UseHttps = settings.useHttps;
-                FolderTextBox.Text = settings.repo;
-            }
+            dlg.Username = m_Settings.username;
+            dlg.ServerUrl = m_Settings.server;
+            dlg.UseHttps = m_Settings.useHttps;
+
             ServerTextBox.Text = "";
 
             DialogResult result = dlg.ShowDialog();
             if (result != DialogResult.OK)
                 return;
 
-            settings.username = dlg.Username;
-            settings.server = dlg.ServerUrl;
-            settings.useHttps = dlg.UseHttps;
-            SaveSettings(settings);
+            m_Settings.username = dlg.Username;
+            m_Settings.server = dlg.ServerUrl;
+            m_Settings.useHttps = dlg.UseHttps;
+            SaveSettings();
 
             StatusTextBox.Text = "Logging into Dokimion.";
             StatusTextBox.Refresh();
@@ -90,7 +89,7 @@ namespace GitHubToDokimion
             }
         }
 
-        private Settings? GetSettings()
+        private Settings GetSettings()
         {
             string settingsJson = "";
             try
@@ -101,7 +100,7 @@ namespace GitHubToDokimion
             {
                 // Ignore errors
             }
-            Settings? settings = new Settings();
+            Settings? settings = null;
             if (false == string.IsNullOrEmpty(settingsJson))
             {
                 try
@@ -113,14 +112,18 @@ namespace GitHubToDokimion
                     StatusTextBox.Text = "Cannot decode Updater.json which contains: \r\n" + settingsJson;
                 }
             }
+            if (settings == null)
+            {
+                settings = new Settings();
+            }
             return settings;
         }
 
-        private void SaveSettings(Settings settings)
+        private void SaveSettings()
         {
             try
             {
-                File.WriteAllText("Updater.json", JsonConvert.SerializeObject(settings));
+                File.WriteAllText("Updater.json", JsonConvert.SerializeObject(m_Settings));
             }
             catch
             {
@@ -179,16 +182,22 @@ namespace GitHubToDokimion
 
         }
 
-        private void RefreshButton_Click(object sender, EventArgs e)
+        private void RefreshProjectListButton_Click(object sender, EventArgs e)
         {
-            FsToDokimionButton.Enabled = false;
-            diffViewer1.OldText = null;
-            diffViewer1.NewText = null;
-            diffViewer1.Refresh();
+            ClearCompares();
             StatusTextBox.Text = "Getting Projects from Dokimion.";
             StatusTextBox.Refresh();
             GetProjectsFromDokimion();
             StatusTextBox.Text += "\r\nDone.";
+        }
+
+        private void ClearCompares()
+        {
+            TestCaseDataGridView.Rows.Clear();
+            FsToDokimionButton.Enabled = false;
+            diffViewer1.OldText = null;
+            diffViewer1.NewText = null;
+            diffViewer1.Refresh();
         }
 
         private void BrowseFileSystemButton_Click(object sender, EventArgs e)
@@ -200,27 +209,15 @@ namespace GitHubToDokimion
             if (result == DialogResult.OK)
             {
                 FolderTextBox.Text = dlg.SelectedPath;
-                Settings? settings = GetSettings();
-                if (settings != null)
-                {
-                    settings.repo = dlg.SelectedPath;
-                    SaveSettings(settings);
-                }
-                TestCaseDataGridView.Rows.Clear();
-                FsToDokimionButton.Enabled = false;
-                diffViewer1.OldText = null;
-                diffViewer1.NewText = null;
-                diffViewer1.Refresh();
+                m_Settings.repo = dlg.SelectedPath;
+                SaveSettings();
+                ClearCompares();
             }
         }
 
         private void CompareTestCasesButton_Click(object sender, EventArgs e)
         {
-            TestCaseDataGridView.Rows.Clear();
-            FsToDokimionButton.Enabled = false;
-            diffViewer1.OldText = null;
-            diffViewer1.NewText = null;
-            diffViewer1.Refresh();
+            ClearCompares();
             m_Documents = new Dictionary<int, DocumentPair>();
 
             FilterListBox.SelectedIndex = 0;
@@ -245,6 +242,7 @@ namespace GitHubToDokimion
 
         private void GetDokimionTestCases(Project project)
         {
+            StatusTextBox.Text = "Getting list of test cases from Dokimion.\r\n";
             string projectId = project.id;
             List<TestCaseShort>? testcases = m_Dokimion.GetTestCaseSummariesForProject(projectId);
 
@@ -266,9 +264,9 @@ namespace GitHubToDokimion
                     }
                     TestCaseDataGridView.Rows[index].Cells[DOKIMION_TITLE_COLUMN].Value = shortTestCase.name;
                     TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
-                    TestCaseDataGridView.Rows[index].Cells[SELECT_COLUMN].Value = false;
                 }
             }
+            StatusTextBox.Text += "Done.\r\n";
         }
 
         private bool GetFileSystemTestCases(Project project)
@@ -365,7 +363,6 @@ namespace GitHubToDokimion
                 }
                 TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
                 TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
-                TestCaseDataGridView.Rows[index].Cells[SELECT_COLUMN].Value = false;
                 TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_FILENAME_COLUMN].Value = file.FullName;
             }
         }
@@ -464,6 +461,7 @@ namespace GitHubToDokimion
                     row.Cells[STATUS_COLUMN].Value = "=";
                 }
             }
+            m_Documents[id].TestCase = testcase;
         }
 
         private int IndexForId(int id)
@@ -480,13 +478,8 @@ namespace GitHubToDokimion
 
         private void ProjectsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            FsToDokimionButton.Enabled = false;
-            TestCaseDataGridView.Rows.Clear();
             m_Documents = new Dictionary<int, DocumentPair>();
-            diffViewer1.OldText = null;
-            diffViewer1.NewText = null;
-            diffViewer1.Refresh();
-
+            ClearCompares();
         }
 
         private void FilterListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -527,10 +520,20 @@ namespace GitHubToDokimion
             int i = e.RowIndex;
             int id = (int)TestCaseDataGridView.Rows[i].Cells[ID_COLUMN].Value;
 
+            TestCaseNameTextBox.Text = m_Documents[id].TestCase;
+
             diffViewer1.OldText = m_Documents[id].ServerDocument;
             diffViewer1.NewText = m_Documents[id].FileSystemDocument;
             diffViewer1.Refresh();
+
+            FsToDokimionButton.Text = $"Send Test Case {id} to Dokimion";
             FsToDokimionButton.Enabled = true;
+        }
+
+        private void FolderForAllProjectsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            m_Settings.useOneFolderForAllProjects = FolderForAllProjectsCheckBox.Checked;
+            SaveSettings();
         }
 
     }

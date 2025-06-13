@@ -160,7 +160,7 @@ namespace Dokimion
                         {
                             values[i] = values[i].Trim();
                         }
-                        Array.Sort(values);     // so we can compare to what is in Dokimion.
+                        Array.Sort(values);     // so we can compare what is in the file to what is in Dokimion.
                         attributes.Add(key, values);
                     }
                     tc.attributes = attributes;
