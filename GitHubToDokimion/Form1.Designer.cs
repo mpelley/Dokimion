@@ -52,7 +52,10 @@
             Status = new DataGridViewTextBoxColumn();
             Selected = new DataGridViewCheckBoxColumn();
             TitleInFileSystem = new DataGridViewTextBoxColumn();
+            FileName = new DataGridViewTextBoxColumn();
             diffViewer1 = new DiffPlex.WindowsForms.Controls.DiffViewer();
+            label2 = new Label();
+            label3 = new Label();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -189,7 +192,7 @@
             StatusTextBox.Name = "StatusTextBox";
             StatusTextBox.ReadOnly = true;
             StatusTextBox.ScrollBars = ScrollBars.Both;
-            StatusTextBox.Size = new Size(433, 162);
+            StatusTextBox.Size = new Size(433, 218);
             StatusTextBox.TabIndex = 47;
             // 
             // FilterListBox
@@ -199,11 +202,12 @@
             FilterListBox.Name = "FilterListBox";
             FilterListBox.Size = new Size(207, 44);
             FilterListBox.TabIndex = 50;
+            FilterListBox.SelectedIndexChanged += FilterListBox_SelectedIndexChanged;
             // 
             // FsToDokimionButton
             // 
             FsToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            FsToDokimionButton.Location = new Point(463, 498);
+            FsToDokimionButton.Location = new Point(463, 554);
             FsToDokimionButton.Name = "FsToDokimionButton";
             FsToDokimionButton.Size = new Size(224, 53);
             FsToDokimionButton.TabIndex = 52;
@@ -214,7 +218,7 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            QuitButton.Location = new Point(1118, 498);
+            QuitButton.Location = new Point(1129, 554);
             QuitButton.Name = "QuitButton";
             QuitButton.Size = new Size(152, 53);
             QuitButton.TabIndex = 53;
@@ -236,9 +240,11 @@
             // 
             // splitContainer1.Panel2
             // 
+            splitContainer1.Panel2.Controls.Add(label3);
+            splitContainer1.Panel2.Controls.Add(label2);
             splitContainer1.Panel2.Controls.Add(diffViewer1);
-            splitContainer1.Size = new Size(818, 429);
-            splitContainer1.SplitterDistance = 158;
+            splitContainer1.Size = new Size(829, 485);
+            splitContainer1.SplitterDistance = 178;
             splitContainer1.TabIndex = 54;
             // 
             // TestCaseDataGridView
@@ -255,13 +261,13 @@
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem });
+            TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, Selected, TitleInFileSystem, FileName });
             TestCaseDataGridView.Location = new Point(6, 11);
             TestCaseDataGridView.Name = "TestCaseDataGridView";
-            TestCaseDataGridView.RowHeadersVisible = false;
             TestCaseDataGridView.RowHeadersWidth = 51;
-            TestCaseDataGridView.Size = new Size(807, 144);
+            TestCaseDataGridView.Size = new Size(818, 164);
             TestCaseDataGridView.TabIndex = 50;
+            TestCaseDataGridView.RowHeaderMouseClick += TestCaseDataGridView_RowHeaderMouseClick;
             // 
             // TitleInDokimion
             // 
@@ -302,6 +308,14 @@
             TitleInFileSystem.ReadOnly = true;
             TitleInFileSystem.Width = 300;
             // 
+            // FileName
+            // 
+            FileName.HeaderText = "FileName";
+            FileName.MinimumWidth = 6;
+            FileName.Name = "FileName";
+            FileName.Visible = false;
+            FileName.Width = 125;
+            // 
             // diffViewer1
             // 
             diffViewer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -331,7 +345,7 @@
             diffViewer1.LineNumberForeColor = Color.FromArgb(64, 128, 160);
             diffViewer1.LineNumberWidth = 60;
             diffViewer1.LinesContext = 1;
-            diffViewer1.Location = new Point(6, 4);
+            diffViewer1.Location = new Point(6, 34);
             diffViewer1.Margin = new Padding(3, 4, 3, 4);
             diffViewer1.Name = "diffViewer1";
             diffViewer1.NewText = null;
@@ -339,7 +353,7 @@
             diffViewer1.OldText = null;
             diffViewer1.OldTextHeader = null;
             diffViewer1.SideBySideModeToggleTitle = "_Split view";
-            diffViewer1.Size = new Size(807, 259);
+            diffViewer1.Size = new Size(818, 265);
             diffViewer1.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
             diffViewer1.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             diffViewer1.SplitterBorderWidth = new Padding(0);
@@ -348,12 +362,31 @@
             diffViewer1.UnchangedBackColor = Color.FromArgb(12, 128, 128, 128);
             diffViewer1.UnchangedForeColor = Color.FromArgb(0, 0, 0);
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(15, 7);
+            label2.Name = "label2";
+            label2.Size = new Size(74, 20);
+            label2.TabIndex = 53;
+            label2.Text = "Dokimion";
+            // 
+            // label3
+            // 
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label3.AutoSize = true;
+            label3.Location = new Point(765, 7);
+            label3.Name = "label3";
+            label3.Size = new Size(56, 20);
+            label3.TabIndex = 54;
+            label3.Text = "GitHub";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
-            ClientSize = new Size(1282, 563);
+            ClientSize = new Size(1293, 619);
             Controls.Add(QuitButton);
             Controls.Add(FsToDokimionButton);
             Controls.Add(FilterListBox);
@@ -373,6 +406,7 @@
             groupBox1.PerformLayout();
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
+            splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)TestCaseDataGridView).EndInit();
@@ -400,11 +434,14 @@
         private ListBox DokimionProjectsListBox;
         private SplitContainer splitContainer1;
         private DataGridView TestCaseDataGridView;
+        private DiffPlex.WindowsForms.Controls.DiffViewer diffViewer1;
         private DataGridViewTextBoxColumn TitleInDokimion;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn Status;
         private DataGridViewCheckBoxColumn Selected;
         private DataGridViewTextBoxColumn TitleInFileSystem;
-        private DiffPlex.WindowsForms.Controls.DiffViewer diffViewer1;
+        private DataGridViewTextBoxColumn FileName;
+        private Label label3;
+        private Label label2;
     }
 }

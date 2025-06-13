@@ -10,6 +10,7 @@ namespace GitHubToDokimion
         public const int STATUS_COLUMN = 2;
         public const int SELECT_COLUMN = 3;
         public const int FILE_SYSTEM_TITLE_COLUMN = 4;
+        public const int FILE_SYSTEM_FILENAME_COLUMN = 5;
 
 
 
@@ -30,7 +31,7 @@ namespace GitHubToDokimion
             TestCaseDataGridView.Rows.Clear();
 
             FilterListBox.Items.Clear();
-            FilterListBox.Items.AddRange(new string[] { "No Filtering", "Not Equal", "Dokimion Newer", "File System Newer", "Dokimion missing", "File System missing", "Unknown" });
+            FilterListBox.Items.AddRange(new string[] { "No Filtering", "Not Equal", "Different", "Dokimion missing", "File System missing" });
             FilterListBox.SelectedIndex = 0;
 
             ProgressBar.Visible = false;
@@ -255,13 +256,20 @@ namespace GitHubToDokimion
                 IEnumerable<FileInfo> files;
                 try
                 {
-                    files = dirInfo.EnumerateFiles("*.md");
+                    files = dirInfo.EnumerateFiles("*.txt");
                 }
                 catch (Exception ex)
                 {
                     StatusTextBox.Text += $"\r\nCannot get test cases from file system for folder {folderPath} because:\r\n" + ex.Message;
                     return false;
                 }
+
+                if ((files == null) || (files.Count() == 0))
+                {
+                    StatusTextBox.Text += $"\r\nNo DOKnnn.txt files found in folder {folderPath}.";
+                    return false;
+                }
+
                 ProgressBar.Maximum = files.Count();
                 ProgressBar.Step = 1;
                 ProgressBar.Value = 0;
@@ -271,7 +279,7 @@ namespace GitHubToDokimion
                 foreach (var file in files)
                 {
                     string path = file.FullName;
-                    GetFileSystemTestCase(project, path);
+                    GetFileSystemTestCase(project, file);
                     ProgressBar.PerformStep();
                 }
                 ProgressBar.Visible = false;
@@ -280,17 +288,38 @@ namespace GitHubToDokimion
             return true;
         }
 
-        private void GetFileSystemTestCase(Project project, string path)
+        private void GetFileSystemTestCase(Project project, FileInfo file)
         {
-            MarkdownFile markdownFile = new();
-            TestCaseForUpload? testcaseFromFile = markdownFile.GetTestCaseFromFileSystem(path, project);
+            const string pattern = @"DOK(\d+)(_|\d|\w)*\.txt";
+            Regex regex = new Regex(pattern);
+            Match match = regex.Match(file.Name);
+            if (false == match.Success)
+            {
+                StatusTextBox.Text += $"\r\n{file.Name} does not match desired file name pattern.";
+                return;
+            }
+            if (match.Groups[1].Captures.Count < 1)
+            {
+                StatusTextBox.Text += $"\r\n{file.Name} does not match desired file name pattern.";
+                return;
+            }
+            string idString = match.Groups[1].Captures[0].Value;
+            int testCaseId = int.Parse(idString);
+
+            PlainTextFile plainTextFile = new();
+
+            TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(file.FullName, project);
             if (testcaseFromFile == null)
             {
-                StatusTextBox.Text += "\r\n" + m_Dokimion.Error;
+                StatusTextBox.Text += "\r\n" + plainTextFile.Error;
             }
             else
             {
-                int testCaseId = int.Parse(testcaseFromFile.id);
+                if (false == string.IsNullOrEmpty(plainTextFile.Error))
+                {
+                    StatusTextBox.Text += "\r\n" + plainTextFile.Error;
+                }
+                testcaseFromFile.id = testCaseId.ToString();
                 int index = IndexForId(testCaseId);
                 if (index < 0)
                 {
@@ -301,6 +330,7 @@ namespace GitHubToDokimion
                 TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
                 TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
                 TestCaseDataGridView.Rows[index].Cells[SELECT_COLUMN].Value = false;
+                TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_FILENAME_COLUMN].Value = file.FullName;
             }
         }
 
@@ -332,11 +362,24 @@ namespace GitHubToDokimion
             {
                 folder = Path.Combine(folder, project.Name);
             }
-            TestCase? fullTestCase = m_Dokimion.GetTestCaseAsObject(id.ToString(), project);
-            string filePath = Path.Combine(folder, id + ".md");
-            PlainTextFile plainTextFile = new();
 
+            DocumentPair documentPair = new DocumentPair();
+            PlainTextFile plainTextFile = new();
+            TestCase? fullTestCase = m_Dokimion.GetTestCaseAsObject(id.ToString(), project);
+            if (fullTestCase != null)
+            {
+                documentPair.ServerDocument = plainTextFile.GeneratePlainText(fullTestCase, project);
+            }
+
+            string filePath = (string)row.Cells[FILE_SYSTEM_FILENAME_COLUMN].Value;
             TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(filePath, project);
+            if (testcaseFromFile != null)
+            {
+                documentPair.FileSystemDocument = plainTextFile.GeneratePlainText(testcaseFromFile, project);
+            }
+
+            m_TestCases.Add(id, documentPair);
+
             if (fullTestCase == null && testcaseFromFile == null)
             {
                 StatusTextBox.Text += $"Cannot get test case from either Dokimion or file system for id {id}.";
@@ -357,52 +400,26 @@ namespace GitHubToDokimion
             }
             else if (testcaseFromFile != null && fullTestCase != null)
             {
+                // Use the items from Dokimion for those that are not in the file
+                testcaseFromFile.lastModifiedTime = fullTestCase.lastModifiedTime;
+                testcaseFromFile.automated = fullTestCase.automated;
+                testcaseFromFile.broken = fullTestCase.broken;
+                testcaseFromFile.deleted = fullTestCase.deleted;
+                testcaseFromFile.locked = fullTestCase.locked;
+                testcaseFromFile.launchBroken = fullTestCase.launchBroken;
+
                 row.Cells[DOKIMION_TITLE_COLUMN].Value = fullTestCase.name;
                 row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
                 testcase = $"{id}: {fullTestCase.name}";
-                if (fullTestCase.lastModifiedTime == 0 || testcaseFromFile.lastModifiedTime == 0)
+                if (m_Dokimion.IsTestCaseChanged(fullTestCase, testcaseFromFile))
                 {
                     row.Cells[STATUS_COLUMN].Value = "<>";
                 }
-                else if (fullTestCase.lastModifiedTime == testcaseFromFile.lastModifiedTime)
-                {
-                    if (m_Dokimion.IsTestCaseChanged(fullTestCase, testcaseFromFile))
-                    {
-                        row.Cells[STATUS_COLUMN].Value = "<>";
-                    }
-                    else
-                    {
-                        row.Cells[STATUS_COLUMN].Value = "=";
-                    }
-                }
-                else if (fullTestCase.lastModifiedTime > testcaseFromFile.lastModifiedTime)
-                {
-                    row.Cells[STATUS_COLUMN].Value = ">";
-                }
                 else
                 {
-                    row.Cells[STATUS_COLUMN].Value = "<";
+                    row.Cells[STATUS_COLUMN].Value = "=";
                 }
             }
-
-            string serverMarkdown = "";
-            if (fullTestCase != null)
-            {
-                serverMarkdown = m_Dokimion.GenerateMarkdown(fullTestCase, project);
-            }
-            string fileSystemMarkdown = "";
-            try
-            {
-                fileSystemMarkdown = File.ReadAllText(filePath);
-            }
-            catch { }
-            DocumentPair dp = new DocumentPair
-            {
-                TestCase = testcase,
-                ServerDocument = serverMarkdown,
-                FileSystemDocument = fileSystemMarkdown
-            };
-            m_TestCases[id] = dp;
         }
 
         private int IndexForId(int id)
@@ -419,8 +436,57 @@ namespace GitHubToDokimion
 
         private void ProjectsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            TestCaseDataGridView.Rows.Clear();
+            m_TestCases = new Dictionary<int, DocumentPair>();
+            diffViewer1.OldText = null;
+            diffViewer1.NewText = null;
+            diffViewer1.Refresh();
 
         }
+
+        private void FilterListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string? filter = (string?)FilterListBox.SelectedItem;
+            for (int i = 0; i < TestCaseDataGridView.Rows.Count; i++)
+            {
+                if (filter == "No Filtering")
+                {
+                    TestCaseDataGridView.Rows[i].Visible = true;
+                }
+                else
+                {
+                    switch (TestCaseDataGridView.Rows[i].Cells[STATUS_COLUMN].Value)
+                    {
+                        case "»":
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "File System missing") || (filter == "Not Equal"));
+                            break;
+                        case "«":
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "Dokimion missing") || (filter == "Not Equal"));
+                            break;
+                        case "=":
+                            TestCaseDataGridView.Rows[i].Visible = false;
+                            break;
+                        case "<>":
+                            TestCaseDataGridView.Rows[i].Visible = ((filter == "Different") || (filter == "Not Equal"));
+                            break;
+                        default:
+                            TestCaseDataGridView.Rows[i].Visible = true;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void TestCaseDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            int i = e.RowIndex;
+            int id = (int)TestCaseDataGridView.Rows[i].Cells[ID_COLUMN].Value;
+
+            diffViewer1.OldText = m_TestCases[id].ServerDocument;
+            diffViewer1.NewText = m_TestCases[id].FileSystemDocument;
+            diffViewer1.Refresh();
+        }
+
     }
 
     public class DocumentPair

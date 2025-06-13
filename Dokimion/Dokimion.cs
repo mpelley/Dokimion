@@ -141,7 +141,7 @@ namespace Dokimion
         public bool UseHttps;
         public string Error = "";
         public string ProjectFolder = "";
-        private const string SPACE_REPLACER = "_";
+        public const string SPACE_REPLACER = "_";
 
         // Default constructor is private so callers use the constructor providing the URL.
         private Dokimion()
@@ -467,7 +467,8 @@ namespace Dokimion
             }
 
             // Generate the Markdown format for this testcase From Dokimion
-            string md = GenerateMarkdown(testcase, project);
+            MarkdownFile markdownFile = new MarkdownFile();
+            string md = markdownFile.GenerateMarkdown(testcase, project);
             if (string.IsNullOrEmpty(md))
             {
                 return false;
@@ -499,150 +500,8 @@ namespace Dokimion
         }
 
 
-        public string GenerateMarkdown(TestCase tc, Project project)
-        {
-            string md = "";
-            md += $"# ID {tc.id}\r\n\r\n";
-            md += $"# Name {tc.name}\r\n\r\n";
 
-            if (false == string.IsNullOrEmpty(tc.description))
-            {
-                md += $"# Description\r\n\r\n";
-                md += "```html\r\n";
-                md += $"{ImproveBreaks(tc.description)}\r\n";
-                md += "```\r\n\r\n";
-            }
-
-            if (false == string.IsNullOrEmpty(tc.preconditions))
-            {
-                md += $"# Preconditions\r\n\r\n";
-                md += "```html\r\n";
-                md += $"{ImproveBreaks(tc.preconditions)}\r\n";
-                md += "```\r\n\r\n";
-            }
-
-            if (tc.steps.Count > 0)
-            {
-                md += $"# Steps\r\n\r\n";
-                foreach (Step step in tc.steps)
-                {
-                    md += $"## Step\r\n\r\n";
-                    md += $"### Action\r\n\r\n";
-                    if (false == string.IsNullOrEmpty(step.action))
-                    {
-                        md += "```html\r\n";
-                        md += $"{ImproveBreaks(step.action)}\r\n";
-                        md += "```\r\n\r\n";
-                    }
-                    md += $"### Expectation\r\n\r\n";
-                    if (false == string.IsNullOrEmpty(step.expectation))
-                    {
-                        md += "```html\r\n";
-                        md += $"{ImproveBreaks(step.expectation)}\r\n";
-                        md += "```\r\n\r\n";
-                    }
-                }
-            }
-
-            if (tc.attributes.Count > 0)
-            {
-                md += $"# Attributes\r\n\r\n";
-                md += GenerateAttributesMarkdown(tc, project);
-            }
-
-            if (tc.attachments.Count > 0)
-            {
-                md += $"# Attachments\r\n\r\n";
-                md += GenerateAttachmentsMarkdown(tc);
-            }
-
-            md += $"# Metadata\r\n\r\n";
-            md += $"* automated: {tc.automated}\r\n";
-            md += $"* broken: {tc.broken}\r\n";
-            md += $"* createdBy: {tc.createdBy}\r\n";
-            md += $"* createdTime: {tc.createdTime}\r\n";
-            md += $"* deleted: {tc.deleted}\r\n";
-            md += $"* lastModifiedBy: {tc.lastModifiedBy}\r\n";
-            md += $"* lastModifiedTime: {tc.lastModifiedTime}\r\n";
-            md += $"* launchBroken: {tc.launchBroken}\r\n";
-            md += $"* locked: {tc.locked}\r\n";
-
-            return md;
-        }
-
-        private string GenerateAttachmentsMarkdown(TestCase tc)
-        {
-            string text = "";
-            foreach (Attachment attachment in tc.attachments)
-            {
-                text += $"## Attachment\r\n\r\n";
-                text += $"* id: {attachment.id}\r\n";
-                text += $"* title: {attachment.title}\r\n";
-                text += $"* createdTime: {attachment.createdTime}\r\n";
-                text += $"* createdBy: {attachment.createdBy}\r\n";
-                text += $"* dataSize: {attachment.dataSize}\r\n\r\n";
-            }
-            return text;
-        }
-
-        private string GenerateAttributesMarkdown(TestCase tc, Project project)
-        {
-            // First generate a copy of the test case attributes
-            // with a human name instead of the magic number.
-            Dictionary<string, string> attrDictWithNames = new();
-
-            foreach (var attr in tc.attributes)
-            {
-                string? attrName = null;
-                try
-                {
-                    attrName = project.attributes[attr.Key];
-                }
-                catch
-                {
-                    Error += $"Test case {tc.id} has a garbage attribute.\r\n";
-                }
-                if (false == string.IsNullOrEmpty(attrName))
-                {
-                    attrName = attrName.Replace(" ", SPACE_REPLACER);
-                    string s = "";
-                    bool first = true;
-                    foreach (string value in attr.Value)
-                    {
-                        string trimmedValue = value.Trim();
-                        s += first ? $"{trimmedValue}" : $", {trimmedValue}";
-                        first = false;
-                    }
-                    attrDictWithNames.Add(attrName, s);
-                }
-            }
-
-            // Sort the keys so they always are in the same order in the md file
-            // to make comparing easier.
-            List<string> keys = attrDictWithNames.Keys.ToList();
-            keys.Sort();
-
-            // Generate the markdown text.
-            string text = "";
-            foreach (var key in keys)
-            {
-                string value = "";
-                try
-                {
-                    value = attrDictWithNames[key];
-                }
-                catch
-                {
-                    Error = $"Cannot get value for {key}";
-                }
-                text += $"* {key}: {value}\r\n";
-            }
-            text += $"\r\n";
-
-            return text;
-        }
-
-        private string ImproveBreaks(string s)
+        public static string ImproveBreaks(string s)
         {
             // This is to add CR/LF after a <br> so that the saved markdown is more readable.
             s = s.Replace("<br>", "<br>\r\n");
@@ -774,6 +633,7 @@ namespace Dokimion
                 fromDokimion = ImproveBreaks(testcaseFromDokimion.steps[i].expectation);
                 if (false == AreStringsEqual(fromDokimion, extracted.steps[i].expectation)) return true;
             }
+
             if (testcaseFromDokimion.attributes.Count != extracted.attributes.Count) return true;
             // We know they have the same number of key/value pairs
             foreach (string key in extracted.attributes.Keys)
