@@ -67,9 +67,10 @@
             // 
             // RefreshProjectListButton
             // 
-            RefreshProjectListButton.Location = new Point(189, 102);
+            RefreshProjectListButton.Location = new Point(165, 76);
+            RefreshProjectListButton.Margin = new Padding(3, 2, 3, 2);
             RefreshProjectListButton.Name = "RefreshProjectListButton";
-            RefreshProjectListButton.Size = new Size(175, 30);
+            RefreshProjectListButton.Size = new Size(153, 22);
             RefreshProjectListButton.TabIndex = 44;
             RefreshProjectListButton.Text = "Refresh Project List";
             RefreshProjectListButton.UseVisualStyleBackColor = true;
@@ -78,9 +79,9 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(18, 107);
+            label1.Location = new Point(16, 80);
             label1.Name = "label1";
-            label1.Size = new Size(154, 20);
+            label1.Size = new Size(124, 15);
             label1.TabIndex = 42;
             label1.Text = "Projects on Dokimion:";
             // 
@@ -89,9 +90,11 @@
             groupBox2.Controls.Add(DokimionProjectsListBox);
             groupBox2.Controls.Add(ServerTextBox);
             groupBox2.Controls.Add(LoginButton);
-            groupBox2.Location = new Point(12, 12);
+            groupBox2.Location = new Point(10, 9);
+            groupBox2.Margin = new Padding(3, 2, 3, 2);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(433, 174);
+            groupBox2.Padding = new Padding(3, 2, 3, 2);
+            groupBox2.Size = new Size(379, 130);
             groupBox2.TabIndex = 43;
             groupBox2.TabStop = false;
             groupBox2.Text = "Dokimion Server";
@@ -99,25 +102,29 @@
             // DokimionProjectsListBox
             // 
             DokimionProjectsListBox.FormattingEnabled = true;
-            DokimionProjectsListBox.Location = new Point(16, 129);
+            DokimionProjectsListBox.ItemHeight = 15;
+            DokimionProjectsListBox.Location = new Point(14, 97);
+            DokimionProjectsListBox.Margin = new Padding(3, 2, 3, 2);
             DokimionProjectsListBox.Name = "DokimionProjectsListBox";
-            DokimionProjectsListBox.Size = new Size(411, 24);
+            DokimionProjectsListBox.Size = new Size(360, 19);
             DokimionProjectsListBox.TabIndex = 38;
             DokimionProjectsListBox.SelectedIndexChanged += ProjectsListBox_SelectedIndexChanged;
             // 
             // ServerTextBox
             // 
-            ServerTextBox.Location = new Point(13, 55);
+            ServerTextBox.Location = new Point(11, 41);
+            ServerTextBox.Margin = new Padding(3, 2, 3, 2);
             ServerTextBox.Name = "ServerTextBox";
             ServerTextBox.ReadOnly = true;
-            ServerTextBox.Size = new Size(414, 27);
+            ServerTextBox.Size = new Size(363, 23);
             ServerTextBox.TabIndex = 37;
             // 
             // LoginButton
             // 
-            LoginButton.Location = new Point(13, 20);
+            LoginButton.Location = new Point(11, 15);
+            LoginButton.Margin = new Padding(3, 2, 3, 2);
             LoginButton.Name = "LoginButton";
-            LoginButton.Size = new Size(218, 29);
+            LoginButton.Size = new Size(191, 22);
             LoginButton.TabIndex = 17;
             LoginButton.Text = "Log into Dokimion Server...";
             LoginButton.UseVisualStyleBackColor = true;
@@ -128,9 +135,11 @@
             groupBox1.Controls.Add(FolderForAllProjectsCheckBox);
             groupBox1.Controls.Add(FolderTextBox);
             groupBox1.Controls.Add(BrowseFileSystemButton);
-            groupBox1.Location = new Point(12, 192);
+            groupBox1.Location = new Point(10, 144);
+            groupBox1.Margin = new Padding(3, 2, 3, 2);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(435, 95);
+            groupBox1.Padding = new Padding(3, 2, 3, 2);
+            groupBox1.Size = new Size(381, 71);
             groupBox1.TabIndex = 46;
             groupBox1.TabStop = false;
             groupBox1.Text = "GitHub Repo";
@@ -138,9 +147,10 @@
             // FolderForAllProjectsCheckBox
             // 
             FolderForAllProjectsCheckBox.AutoSize = true;
-            FolderForAllProjectsCheckBox.Location = new Point(118, 26);
+            FolderForAllProjectsCheckBox.Location = new Point(103, 20);
+            FolderForAllProjectsCheckBox.Margin = new Padding(3, 2, 3, 2);
             FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
-            FolderForAllProjectsCheckBox.Size = new Size(205, 24);
+            FolderForAllProjectsCheckBox.Size = new Size(164, 19);
             FolderForAllProjectsCheckBox.TabIndex = 2;
             FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
             FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
@@ -148,17 +158,19 @@
             // 
             // FolderTextBox
             // 
-            FolderTextBox.Location = new Point(18, 58);
+            FolderTextBox.Location = new Point(16, 44);
+            FolderTextBox.Margin = new Padding(3, 2, 3, 2);
             FolderTextBox.Name = "FolderTextBox";
             FolderTextBox.ReadOnly = true;
-            FolderTextBox.Size = new Size(409, 27);
+            FolderTextBox.Size = new Size(358, 23);
             FolderTextBox.TabIndex = 1;
             // 
             // BrowseFileSystemButton
             // 
-            BrowseFileSystemButton.Location = new Point(18, 23);
+            BrowseFileSystemButton.Location = new Point(16, 17);
+            BrowseFileSystemButton.Margin = new Padding(3, 2, 3, 2);
             BrowseFileSystemButton.Name = "BrowseFileSystemButton";
-            BrowseFileSystemButton.Size = new Size(94, 29);
+            BrowseFileSystemButton.Size = new Size(82, 22);
             BrowseFileSystemButton.TabIndex = 0;
             BrowseFileSystemButton.Text = "Browse...";
             BrowseFileSystemButton.UseVisualStyleBackColor = true;
@@ -166,9 +178,10 @@
             // 
             // CompareTestCasesButton
             // 
-            CompareTestCasesButton.Location = new Point(30, 293);
+            CompareTestCasesButton.Location = new Point(26, 220);
+            CompareTestCasesButton.Margin = new Padding(3, 2, 3, 2);
             CompareTestCasesButton.Name = "CompareTestCasesButton";
-            CompareTestCasesButton.Size = new Size(261, 32);
+            CompareTestCasesButton.Size = new Size(228, 24);
             CompareTestCasesButton.TabIndex = 33;
             CompareTestCasesButton.Text = "Compare Test Cases in Project";
             CompareTestCasesButton.UseVisualStyleBackColor = true;
@@ -176,9 +189,10 @@
             // 
             // ProgressBar
             // 
-            ProgressBar.Location = new Point(12, 331);
+            ProgressBar.Location = new Point(10, 248);
+            ProgressBar.Margin = new Padding(3, 2, 3, 2);
             ProgressBar.Name = "ProgressBar";
-            ProgressBar.Size = new Size(433, 45);
+            ProgressBar.Size = new Size(379, 34);
             ProgressBar.Step = 1;
             ProgressBar.Style = ProgressBarStyle.Continuous;
             ProgressBar.TabIndex = 48;
@@ -188,29 +202,33 @@
             // 
             StatusTextBox.AcceptsReturn = true;
             StatusTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            StatusTextBox.Location = new Point(12, 389);
+            StatusTextBox.Location = new Point(10, 292);
+            StatusTextBox.Margin = new Padding(3, 2, 3, 2);
             StatusTextBox.Multiline = true;
             StatusTextBox.Name = "StatusTextBox";
             StatusTextBox.ReadOnly = true;
             StatusTextBox.ScrollBars = ScrollBars.Both;
-            StatusTextBox.Size = new Size(433, 218);
+            StatusTextBox.Size = new Size(379, 164);
             StatusTextBox.TabIndex = 47;
             // 
             // FilterListBox
             // 
             FilterListBox.FormattingEnabled = true;
-            FilterListBox.Location = new Point(463, 17);
+            FilterListBox.ItemHeight = 15;
+            FilterListBox.Location = new Point(405, 13);
+            FilterListBox.Margin = new Padding(3, 2, 3, 2);
             FilterListBox.Name = "FilterListBox";
-            FilterListBox.Size = new Size(207, 44);
+            FilterListBox.Size = new Size(182, 34);
             FilterListBox.TabIndex = 50;
             FilterListBox.SelectedIndexChanged += FilterListBox_SelectedIndexChanged;
             // 
             // FsToDokimionButton
             // 
             FsToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            FsToDokimionButton.Location = new Point(463, 554);
+            FsToDokimionButton.Location = new Point(405, 416);
+            FsToDokimionButton.Margin = new Padding(3, 2, 3, 2);
             FsToDokimionButton.Name = "FsToDokimionButton";
-            FsToDokimionButton.Size = new Size(224, 53);
+            FsToDokimionButton.Size = new Size(196, 40);
             FsToDokimionButton.TabIndex = 52;
             FsToDokimionButton.Text = "Send Test Case to Dokimion";
             FsToDokimionButton.UseVisualStyleBackColor = true;
@@ -219,9 +237,10 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            QuitButton.Location = new Point(1129, 554);
+            QuitButton.Location = new Point(988, 416);
+            QuitButton.Margin = new Padding(3, 2, 3, 2);
             QuitButton.Name = "QuitButton";
-            QuitButton.Size = new Size(152, 53);
+            QuitButton.Size = new Size(133, 40);
             QuitButton.TabIndex = 53;
             QuitButton.Text = "Quit";
             QuitButton.UseVisualStyleBackColor = true;
@@ -230,14 +249,14 @@
             // splitContainer1
             // 
             splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            splitContainer1.Location = new Point(460, 67);
+            splitContainer1.Location = new Point(402, 50);
+            splitContainer1.Margin = new Padding(3, 2, 3, 2);
             splitContainer1.Name = "splitContainer1";
             splitContainer1.Orientation = Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
             splitContainer1.Panel1.Controls.Add(TestCaseDataGridView);
-            splitContainer1.Panel1.Paint += splitContainer1_Panel1_Paint;
             // 
             // splitContainer1.Panel2
             // 
@@ -245,8 +264,9 @@
             splitContainer1.Panel2.Controls.Add(label3);
             splitContainer1.Panel2.Controls.Add(label2);
             splitContainer1.Panel2.Controls.Add(diffViewer1);
-            splitContainer1.Size = new Size(829, 485);
-            splitContainer1.SplitterDistance = 178;
+            splitContainer1.Size = new Size(725, 364);
+            splitContainer1.SplitterDistance = 133;
+            splitContainer1.SplitterWidth = 3;
             splitContainer1.TabIndex = 54;
             // 
             // TestCaseDataGridView
@@ -264,12 +284,14 @@
             TestCaseDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             TestCaseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             TestCaseDataGridView.Columns.AddRange(new DataGridViewColumn[] { TitleInDokimion, ID, Status, TitleInFileSystem, FileName });
-            TestCaseDataGridView.Location = new Point(6, 11);
+            TestCaseDataGridView.Location = new Point(5, 8);
+            TestCaseDataGridView.Margin = new Padding(3, 2, 3, 2);
             TestCaseDataGridView.MultiSelect = false;
             TestCaseDataGridView.Name = "TestCaseDataGridView";
             TestCaseDataGridView.RowHeadersWidth = 51;
-            TestCaseDataGridView.Size = new Size(818, 164);
+            TestCaseDataGridView.Size = new Size(716, 122);
             TestCaseDataGridView.TabIndex = 50;
+            TestCaseDataGridView.CellClick += TestCaseDataGridView_CellClick;
             TestCaseDataGridView.RowHeaderMouseClick += TestCaseDataGridView_RowHeaderMouseClick;
             // 
             // TitleInDokimion
@@ -315,28 +337,29 @@
             // TestCaseNameTextBox
             // 
             TestCaseNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            TestCaseNameTextBox.Location = new Point(253, 4);
+            TestCaseNameTextBox.Location = new Point(221, 3);
+            TestCaseNameTextBox.Margin = new Padding(3, 2, 3, 2);
             TestCaseNameTextBox.Name = "TestCaseNameTextBox";
             TestCaseNameTextBox.ReadOnly = true;
-            TestCaseNameTextBox.Size = new Size(359, 27);
+            TestCaseNameTextBox.Size = new Size(315, 23);
             TestCaseNameTextBox.TabIndex = 55;
             // 
             // label3
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(765, 7);
+            label3.Location = new Point(669, 5);
             label3.Name = "label3";
-            label3.Size = new Size(56, 20);
+            label3.Size = new Size(45, 15);
             label3.TabIndex = 54;
             label3.Text = "GitHub";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(15, 7);
+            label2.Location = new Point(13, 5);
             label2.Name = "label2";
-            label2.Size = new Size(74, 20);
+            label2.Size = new Size(59, 15);
             label2.TabIndex = 53;
             label2.Text = "Dokimion";
             // 
@@ -369,15 +392,14 @@
             diffViewer1.LineNumberForeColor = Color.FromArgb(64, 128, 160);
             diffViewer1.LineNumberWidth = 60;
             diffViewer1.LinesContext = 1;
-            diffViewer1.Location = new Point(6, 34);
-            diffViewer1.Margin = new Padding(3, 4, 3, 4);
+            diffViewer1.Location = new Point(5, 26);
             diffViewer1.Name = "diffViewer1";
             diffViewer1.NewText = null;
             diffViewer1.NewTextHeader = null;
             diffViewer1.OldText = null;
             diffViewer1.OldTextHeader = null;
             diffViewer1.SideBySideModeToggleTitle = "_Split view";
-            diffViewer1.Size = new Size(818, 265);
+            diffViewer1.Size = new Size(716, 200);
             diffViewer1.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
             diffViewer1.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             diffViewer1.SplitterBorderWidth = new Padding(0);
@@ -388,10 +410,10 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = QuitButton;
-            ClientSize = new Size(1293, 619);
+            ClientSize = new Size(1131, 464);
             Controls.Add(QuitButton);
             Controls.Add(FsToDokimionButton);
             Controls.Add(FilterListBox);
@@ -403,6 +425,7 @@
             Controls.Add(label1);
             Controls.Add(groupBox2);
             Controls.Add(splitContainer1);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
             Text = "GitHub To Dokimion";
             groupBox2.ResumeLayout(false);

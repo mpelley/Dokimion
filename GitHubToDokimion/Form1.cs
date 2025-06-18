@@ -151,13 +151,14 @@ namespace GitHubToDokimion
 
         private void FsToDokimionButton_Click(object sender, EventArgs e)
         {
-            var rows = TestCaseDataGridView.SelectedRows;
-            if (rows.Count == 0)
+            var cells = TestCaseDataGridView.SelectedCells;
+            if (cells.Count == 0)
             {
-                StatusTextBox.Text = "Select the row for the test case to send.";
+                StatusTextBox.Text = "Select a cell in the grid for the test case to send.";
                 return;
             }
-            var row = rows[0];
+            var cell = cells[0];
+            var row = TestCaseDataGridView.Rows[cell.RowIndex];
             int id = (int)row.Cells[ID_COLUMN].Value;
 
             StatusTextBox.Text = $"Sending test case {id} to Dokimion.\r\n";
@@ -175,11 +176,6 @@ namespace GitHubToDokimion
         private void QuitButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e)
-        {
-
         }
 
         private void RefreshProjectListButton_Click(object sender, EventArgs e)
@@ -262,7 +258,7 @@ namespace GitHubToDokimion
                         TestCaseDataGridView.Rows[index].Visible = true;
                         TestCaseDataGridView.Rows[index].Cells[ID_COLUMN].Value = testCaseId;
                     }
-                    TestCaseDataGridView.Rows[index].Cells[DOKIMION_TITLE_COLUMN].Value = shortTestCase.name;
+                    TestCaseDataGridView.Rows[index].Cells[DOKIMION_TITLE_COLUMN].Value = PlainTextFile.RemoveHtml(shortTestCase.name);
                     TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
                 }
             }
@@ -361,7 +357,7 @@ namespace GitHubToDokimion
                     TestCaseDataGridView.Rows[index].Visible = true;
                     TestCaseDataGridView.Rows[index].Cells[ID_COLUMN].Value = testCaseId;
                 }
-                TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
+                TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_TITLE_COLUMN].Value = PlainTextFile.RemoveHtml(testcaseFromFile.name);
                 TestCaseDataGridView.Rows[index].Cells[STATUS_COLUMN].Value = "";
                 TestCaseDataGridView.Rows[index].Cells[FILE_SYSTEM_FILENAME_COLUMN].Value = file.FullName;
             }
@@ -448,9 +444,10 @@ namespace GitHubToDokimion
                 testcaseFromFile.deleted = fullTestCase.deleted;
                 testcaseFromFile.locked = fullTestCase.locked;
                 testcaseFromFile.launchBroken = fullTestCase.launchBroken;
+                testcaseFromFile.attachments = fullTestCase.attachments;
 
-                row.Cells[DOKIMION_TITLE_COLUMN].Value = fullTestCase.name;
-                row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value = testcaseFromFile.name;
+                row.Cells[DOKIMION_TITLE_COLUMN].Value = PlainTextFile.RemoveHtml(fullTestCase.name);
+                row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value = PlainTextFile.RemoveHtml(testcaseFromFile.name);
                 testcase = $"{id}: {fullTestCase.name}";
                 if (m_Dokimion.IsTestCaseChanged(fullTestCase, testcaseFromFile))
                 {
@@ -517,13 +514,28 @@ namespace GitHubToDokimion
 
         private void TestCaseDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            int i = e.RowIndex;
-            int id = (int)TestCaseDataGridView.Rows[i].Cells[ID_COLUMN].Value;
+            int row = e.RowIndex;
+            HandleDataGridClick(row);
+        }
 
-            TestCaseNameTextBox.Text = m_Documents[id].TestCase;
+        private void TestCaseDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int row = e.RowIndex;
+            HandleDataGridClick(row);
+        }
 
-            diffViewer1.OldText = m_Documents[id].ServerDocument;
-            diffViewer1.NewText = m_Documents[id].FileSystemDocument;
+        private void HandleDataGridClick(int row)
+        {
+            if (row < 0)
+            {
+                return;
+            }
+            int id = (int)TestCaseDataGridView.Rows[row].Cells[ID_COLUMN].Value;
+
+            TestCaseNameTextBox.Text = PlainTextFile.RemoveHtml(m_Documents[id].TestCase);
+
+            diffViewer1.OldText = PlainTextFile.RemoveHtml(m_Documents[id].ServerDocument);
+            diffViewer1.NewText = PlainTextFile.RemoveHtml(m_Documents[id].FileSystemDocument);
             diffViewer1.Refresh();
 
             FsToDokimionButton.Text = $"Send Test Case {id} to Dokimion";

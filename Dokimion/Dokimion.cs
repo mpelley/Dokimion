@@ -58,7 +58,7 @@ namespace Dokimion
         public string id = "";
         public string name = "";
         public bool deleted;
-        public Dictionary<string, string> attributes = new Dictionary<string, string>();
+        public Dictionary<string, string> attributeNameForKey = new Dictionary<string, string>();
 
         public string Name
         {
@@ -66,7 +66,7 @@ namespace Dokimion
         }
     }
 
-    public class Attribute
+    public class AttributeIdToName
     {
         public string id = "";
         public string name = "";
@@ -186,7 +186,7 @@ namespace Dokimion
 
         public bool Login(string username, string password)
         {
-            if (true)
+            if (false)
             {
                 m_Client.DefaultRequestHeaders.Add("Whoru-Api-Token", "abc");
                 return true;
@@ -236,18 +236,18 @@ namespace Dokimion
             }
         }
 
-        public Dictionary<string, string> GetAttributesForProject(string projectId)
+        public Dictionary<string, string> GetAttributeNamesForProject(string projectId)
         {
             string url = BaseDokimionApiUrl() + "/" + projectId + "/attribute";
 
-            List<Attribute>? attrList = null;
+            List<AttributeIdToName>? attrList = null;
             Error = "";
 
             var resp = m_Client.GetAsync(url).Result;
             string json = resp.Content.ReadAsStringAsync().Result;
             if (resp.IsSuccessStatusCode)
             {
-                attrList = JsonConvert.DeserializeObject<List<Attribute>>(json);
+                attrList = JsonConvert.DeserializeObject<List<AttributeIdToName>>(json);
                 if (attrList == null)
                 {
                     Error = "Cannot decode: \r\n" + json;
@@ -295,7 +295,7 @@ namespace Dokimion
             {
                 foreach (Project project in projectList)
                 {
-                    project.attributes = GetAttributesForProject(project.id);
+                    project.attributeNameForKey = GetAttributeNamesForProject(project.id);
                 }
             }
 
@@ -798,6 +798,7 @@ namespace Dokimion
         UploadStatus UploadAttachments(string folderPath, TestCaseForUpload testcase, Project project)
         {
             return UploadStatus.Updated;
+
             bool didUpload = false;
             foreach (var attachment in testcase.attachments)
             {

@@ -717,7 +717,7 @@ namespace Dokimion
 
         private string AttributeKeyForName(Project project, string name)
         {
-            foreach (var att in project.attributes)
+            foreach (var att in project.attributeNameForKey)
             {
                 if (att.Value == name)
                     return att.Key;
@@ -822,7 +822,7 @@ namespace Dokimion
                 string? attrName = null;
                 try
                 {
-                    attrName = project.attributes[attr.Key];
+                    attrName = project.attributeNameForKey[attr.Key];
                 }
                 catch
                 {

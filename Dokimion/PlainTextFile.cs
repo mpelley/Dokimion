@@ -70,7 +70,7 @@ namespace Dokimion
                 {
                     if (line.StartsWith(titleText))
                     {
-                        tc.name = line.Substring(titleText.Length).Trim();
+                        tc.name = MakeHtml(line.Substring(titleText.Length).Trim());
                         if (tc.name == "")
                         {
                             Error += "Title should not be empty";
@@ -161,6 +161,15 @@ namespace Dokimion
                             values[i] = values[i].Trim();
                         }
                         Array.Sort(values);     // so we can compare what is in the file to what is in Dokimion.
+                        foreach (string value in values)
+                        {
+                            if (false == project.attributeNameForKey[key].Contains(value))
+                            {
+                                Error += $"Attribute value {value} does not exist in project {project.name} for attribute {parts[0]}.\r\n";
+
+                            }
+                        }
+
                         attributes.Add(key, values);
                     }
                     tc.attributes = attributes;
@@ -195,12 +204,7 @@ namespace Dokimion
                     result += "<br>\r\n";
                 }
 
-                string html = line;
-                html = html.Replace("\"", "&quot;");
-                html = html.Replace("'", "&apos;");
-                html = html.Replace("&", "&amp;");
-                html = html.Replace("<", "&lt;");
-                html = html.Replace(">", "&gt;");
+                string html = MakeHtml(line);
 
                 result += html;
             }
@@ -208,11 +212,33 @@ namespace Dokimion
             return result;
         }
 
+        private string MakeHtml(string line)
+        {
+            string html = line;
+            html = html.Replace("\"", "&quot;");
+            html = html.Replace("'", "&apos;");
+            html = html.Replace("&", "&amp;");
+            html = html.Replace("<", "&lt;");
+            html = html.Replace(">", "&gt;");
+            return html;
+        }
+
+        public static string RemoveHtml(string html)
+        {
+            string clean = html.Replace("<br>\r\n", "\r\n");
+            clean = clean.Replace("&quot;", "\"");
+            clean = clean.Replace("&apos;", "'");
+            clean = clean.Replace("&amp;", "&");
+            clean = clean.Replace("&lt;", "<");
+            clean = clean.Replace("&gt;", ">");
+            return clean;
+        }
+
 
         private string AttributeKeyForName(Project project, string name)
         {
             name = name.Replace(" ", Dokimion.SPACE_REPLACER);
-            foreach (var att in project.attributes)
+            foreach (var att in project.attributeNameForKey)
             {
                 if (att.Value == name)
                     return att.Key;
@@ -229,7 +255,7 @@ namespace Dokimion
             pt += "Attributes:\r\n";
             foreach(var att in tc.attributes)
             {
-                string name = project.attributes[att.Key];
+                string name = project.attributeNameForKey[att.Key];
                 pt += $"{name}: {string.Join(",", att.Value)}<br>\r\n";
             }
             pt += "Steps:\r\n";
