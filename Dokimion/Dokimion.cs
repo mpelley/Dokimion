@@ -8,6 +8,7 @@ using Markdig.Syntax;
 using Markdig.Parsers;
 using Markdig.Syntax.Inlines;
 using Markdig.Helpers;
+using System.Collections.Immutable;
 
 // See https://github.com/greatbit/quack/wiki for the API specifications
 
@@ -37,9 +38,9 @@ namespace Dokimion
 
     public class AttributeForUpload
     {
-        public string? id = null;
-        public string? name = null;
-        public string? type = null;
+        public string id = "";
+        public string name = "";
+        public string type = "";
         public AttributeValue[]? attrValues;
     }
 
@@ -58,7 +59,8 @@ namespace Dokimion
         public string id = "";
         public string name = "";
         public bool deleted;
-        public Dictionary<string, string> attributeNameForKey = new Dictionary<string, string>();
+        public Dictionary<string, string> attributeNamesForKeys = new Dictionary<string, string>();
+        public List<AttributeForUpload> attributes = new();
 
         public string Name
         {
@@ -236,39 +238,43 @@ namespace Dokimion
             }
         }
 
-        public Dictionary<string, string> GetAttributeNamesForProject(string projectId)
+        public List<AttributeForUpload> GetAttributesForProject(string projectId)
         {
             string url = BaseDokimionApiUrl() + "/" + projectId + "/attribute";
 
-            List<AttributeIdToName>? attrList = null;
+            List<AttributeForUpload>? attrList = new();
             Error = "";
 
             var resp = m_Client.GetAsync(url).Result;
             string json = resp.Content.ReadAsStringAsync().Result;
             if (resp.IsSuccessStatusCode)
             {
-                attrList = JsonConvert.DeserializeObject<List<AttributeIdToName>>(json);
+                attrList = JsonConvert.DeserializeObject<List<AttributeForUpload>>(json);
                 if (attrList == null)
                 {
                     Error = "Cannot decode: \r\n" + json;
-                    return new Dictionary<string, string>();
+                    return new List<AttributeForUpload>();
                 }
             }
             else
             {
                 Error = "Server returned error: " + resp.ReasonPhrase + "\r\n" + json;
-                return new Dictionary<string, string>();
+                return attrList;
             }
 
-            Dictionary<string, string> attrDict = new Dictionary<string, string>();
-            foreach (var attr in attrList)
-            {
-                string name = attr.name.Replace(" ", SPACE_REPLACER);
-                attrDict.Add(attr.id, name);
-            }
+            attrList.Sort(new ProjectAttributeCompare());
 
-            return attrDict;
+            return attrList;
         }
+
+        private class ProjectAttributeCompare : IComparer<AttributeForUpload>
+        {
+            public int Compare(AttributeForUpload? a, AttributeForUpload? b)
+            {
+                return string.Compare(a?.name, b?.name);
+            }
+        }
+
 
         public List<Project>? GetProjects()
         {
@@ -295,11 +301,36 @@ namespace Dokimion
             {
                 foreach (Project project in projectList)
                 {
-                    project.attributeNameForKey = GetAttributeNamesForProject(project.id);
+                    project.attributes = GetAttributesForProject(project.id);
                 }
             }
 
             return projectList;
+        }
+
+        public static AttributeForUpload? GetAttributeForId(Project project, string id)
+        {
+            foreach(var attribute in project.attributes)
+            {
+                if (attribute.id == id)
+                {
+                    return attribute;
+                }
+            }
+            return null;
+        }
+
+
+        public static AttributeForUpload? GetAttributeForName(Project project, string name)
+        {
+            foreach (var attribute in project.attributes)
+            {
+                if (attribute.name == name)
+                {
+                    return attribute;
+                }
+            }
+            return null;
         }
 
 
@@ -424,7 +455,7 @@ namespace Dokimion
 
             foreach(var attr in attributes)
             {
-                attr.id = null;
+                attr.id = "";
                 attr.type = "TESTCASE";
                 string json = JsonConvert.SerializeObject(attr);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -1113,6 +1144,7 @@ namespace Dokimion
                 Error = "Cannot decode: \r\n" + json;
                 return null;
             }
+
             // Trim whitespace from start and end of attribute values since Dokimion gives some.
             foreach (var attr in testcase.attributes)
             {

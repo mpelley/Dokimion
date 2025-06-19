@@ -24,11 +24,10 @@ namespace Dokimion
 
         public string Error = "";
 
-        public TestCaseForUpload? GetTestCaseFromFileSystem(string path, Project project)
+        public TestCaseForUpload? GetTestCaseFromFileSystem(string path, Project project, int testCaseId)
         {
-            TestCaseForUpload? uploaded;
+            TestCaseForUpload? uploaded = null;
 
-            uploaded = null;
             // Read text from Markdown file.
             string[] plainTextDocument;
             try
@@ -42,7 +41,7 @@ namespace Dokimion
             }
 
             // Extract info from markdownDocument to an instance of TestCaseForUpload.
-            uploaded = PlainTextToObject(plainTextDocument, path, project);
+            uploaded = PlainTextToObject(plainTextDocument, path, project, testCaseId);
             if (uploaded == null)
             {
                 Error += $"\r\nCannot convert Plain Text file {path} to a test case object";
@@ -53,9 +52,10 @@ namespace Dokimion
         }
 
 
-        public TestCaseForUpload? PlainTextToObject(string[] plainTextDoc, string filename, Project project)
+        public TestCaseForUpload? PlainTextToObject(string[] plainTextDoc, string filename, Project project, int testCaseId)
         {
             TestCaseForUpload tc = new TestCaseForUpload();
+            tc.id = testCaseId.ToString();
             Error = "";
             string titleText = "Title:";
             Parts part = Parts.Description;
@@ -146,15 +146,19 @@ namespace Dokimion
                         string[] parts = item.Split(':');
                         if (parts.Length != 2)
                         {
+                            Error += $"For test case {tc.id}:\r\n";
                             Error += $"Invalid attribute format {item}\n";
                             return;
                         }
-                        string key = AttributeKeyForName(project, parts[0].Trim());
-                        if (key == "")
+
+                        AttributeForUpload? attribute = Dokimion.GetAttributeForName(project, parts[0].Trim());
+                        if (attribute == null)
                         {
+                            Error += $"For test case {tc.id}:\r\n";
                             Error += $"Invalid attribute name: {parts[0]}.\r\n";
                             return;
                         }
+
                         string[] values = parts[1].Split(",");
                         for (int i=0; i<values.Length; i++)
                         {
@@ -163,14 +167,27 @@ namespace Dokimion
                         Array.Sort(values);     // so we can compare what is in the file to what is in Dokimion.
                         foreach (string value in values)
                         {
-                            if (false == project.attributeNameForKey[key].Contains(value))
+                            bool found = false;
+                            if (attribute.attrValues != null)
                             {
+                                foreach (var attValue in attribute.attrValues)
+                                {
+                                    if (attValue.value == value)
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (false == found)
+                            {
+                                Error += $"For test case {tc.id}:\r\n";
                                 Error += $"Attribute value {value} does not exist in project {project.name} for attribute {parts[0]}.\r\n";
-
+                                return;
                             }
                         }
 
-                        attributes.Add(key, values);
+                        attributes.Add(attribute.id, values);
                     }
                     tc.attributes = attributes;
                     break;
@@ -235,29 +252,40 @@ namespace Dokimion
         }
 
 
-        private string AttributeKeyForName(Project project, string name)
-        {
-            name = name.Replace(" ", Dokimion.SPACE_REPLACER);
-            foreach (var att in project.attributeNameForKey)
-            {
-                if (att.Value == name)
-                    return att.Key;
-            }
-            return "";
-        }
-
         public string GeneratePlainText(TestCaseForUpload tc, Project project)
         {
             string pt = "";
             pt += $"Title: {tc.name}\r\n";
             pt += "Description:\r\n";
             pt += tc.description + "\r\n";
+
             pt += "Attributes:\r\n";
-            foreach(var att in tc.attributes)
+            List<string> names = new List<string>();
+            foreach(var testCaseAttribute in tc.attributes)
             {
-                string name = project.attributeNameForKey[att.Key];
-                pt += $"{name}: {string.Join(",", att.Value)}<br>\r\n";
+                var projectAttribute = Dokimion.GetAttributeForId(project, testCaseAttribute.Key);
+                names.Add(projectAttribute.name);
             }
+            names.Sort();
+
+            foreach( var name in names)
+            {
+                var projectAttribute = Dokimion.GetAttributeForName(project, name);
+                var testCaseAttribute = tc.attributes[projectAttribute.id];
+                if (testCaseAttribute != null)
+                {
+                    pt += $"{name}: {string.Join(",", testCaseAttribute)}<br>\r\n";
+                }
+            }
+            //foreach(var att in tc.attributes)
+            //{
+            //    var attribute = Dokimion.GetAttributeForId(project, att.Key);
+            //    if (attribute != null)
+            //    {
+            //        pt += $"{attribute.name}: {string.Join(",", att.Value)}<br>\r\n";
+            //    }
+            //}
+
             pt += "Steps:\r\n";
             if (tc.steps.Count > 0)
             {

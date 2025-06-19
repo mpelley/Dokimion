@@ -8,10 +8,10 @@ namespace GitHubToDokimion
         Project m_Project;
         Settings m_Settings;
 
-        public const int DOKIMION_TITLE_COLUMN = 0;
+        public const int FILE_SYSTEM_TITLE_COLUMN = 0;
         public const int ID_COLUMN = 1;
         public const int STATUS_COLUMN = 2;
-        public const int FILE_SYSTEM_TITLE_COLUMN = 3;
+        public const int DOKIMION_TITLE_COLUMN = 3;
         public const int FILE_SYSTEM_FILENAME_COLUMN = 4;
 
 
@@ -338,7 +338,7 @@ namespace GitHubToDokimion
 
             PlainTextFile plainTextFile = new();
 
-            TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(file.FullName, project);
+            TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(file.FullName, project, testCaseId);
             if (testcaseFromFile == null)
             {
                 StatusTextBox.Text += "\r\n" + plainTextFile.Error;
@@ -403,7 +403,7 @@ namespace GitHubToDokimion
             }
 
             string filePath = (string)row.Cells[FILE_SYSTEM_FILENAME_COLUMN].Value;
-            TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(filePath, project);
+            TestCaseForUpload? testcaseFromFile = plainTextFile.GetTestCaseFromFileSystem(filePath, project, id);
             if (testcaseFromFile != null)
             {
                 documentPair.FileSystemDocument = plainTextFile.GeneratePlainText(testcaseFromFile, project);
@@ -425,13 +425,13 @@ namespace GitHubToDokimion
             if (fullTestCase == null && testcaseFromFile != null)
             {
                 row.Cells[DOKIMION_TITLE_COLUMN].Value = "";
-                row.Cells[STATUS_COLUMN].Value = "«";
+                row.Cells[STATUS_COLUMN].Value = "»";
                 testcase = $"{id}: {testcaseFromFile.name}";
             }
             else if (testcaseFromFile == null && fullTestCase != null)
             {
                 row.Cells[FILE_SYSTEM_TITLE_COLUMN].Value = "";
-                row.Cells[STATUS_COLUMN].Value = "»";
+                row.Cells[STATUS_COLUMN].Value = "«";
                 testcase = $"{id}: {fullTestCase.name}";
             }
             else if (testcaseFromFile != null && fullTestCase != null)
@@ -534,8 +534,8 @@ namespace GitHubToDokimion
 
             TestCaseNameTextBox.Text = PlainTextFile.RemoveHtml(m_Documents[id].TestCase);
 
-            diffViewer1.OldText = PlainTextFile.RemoveHtml(m_Documents[id].ServerDocument);
-            diffViewer1.NewText = PlainTextFile.RemoveHtml(m_Documents[id].FileSystemDocument);
+            diffViewer1.OldText = PlainTextFile.RemoveHtml(m_Documents[id].FileSystemDocument);
+            diffViewer1.NewText = PlainTextFile.RemoveHtml(m_Documents[id].ServerDocument);
             diffViewer1.Refresh();
 
             FsToDokimionButton.Text = $"Send Test Case {id} to Dokimion";

@@ -386,20 +386,20 @@ namespace Dokimion
                 }
 
                 // Look up magic number for attribute name:
-                string key = AttributeKeyForName(project, item.Key);
+                var attribute = Dokimion.GetAttributeForId(project, item.Key);
                 // keys might be missing if the project isn't correctly set up
-                if (string.IsNullOrEmpty(key))
+                if ((attribute == null) || (string.IsNullOrEmpty(attribute.id)))
                 {
                     Error += $"Missing Attribute {item.Key} in project";
                     return null;
                 }
-                else if (attributes.ContainsKey(key))
+                else if (attributes.ContainsKey(attribute.id))
                 {
-                    Error += $"Duplicate Attribute {key} at {block.Line}.";
+                    Error += $"Duplicate Attribute {attribute.id} at {block.Line}.";
                     return null;
                 }
 
-                attributes.Add(key, values);
+                attributes.Add(attribute.id, values);
             }
 
             return attributes;
@@ -715,16 +715,6 @@ namespace Dokimion
             return text;
         }
 
-        private string AttributeKeyForName(Project project, string name)
-        {
-            foreach (var att in project.attributeNameForKey)
-            {
-                if (att.Value == name)
-                    return att.Key;
-            }
-            return "";
-        }
-
         public string GenerateMarkdown(TestCase tc, Project project)
         {
             string md = "";
@@ -819,18 +809,10 @@ namespace Dokimion
 
             foreach (var attr in tc.attributes)
             {
-                string? attrName = null;
-                try
+                var attribute= Dokimion.GetAttributeForId(project, attr.Key);
+                if ((attribute != null) && (false == string.IsNullOrEmpty(attribute.name)))
                 {
-                    attrName = project.attributeNameForKey[attr.Key];
-                }
-                catch
-                {
-                    Error += $"Test case {tc.id} has a garbage attribute.\r\n";
-                }
-                if (false == string.IsNullOrEmpty(attrName))
-                {
-                    attrName = attrName.Replace(" ", Dokimion.SPACE_REPLACER);
+                    string attrName = attribute.name.Replace(" ", Dokimion.SPACE_REPLACER);
                     string s = "";
                     bool first = true;
                     foreach (string value in attr.Value)
