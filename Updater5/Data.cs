@@ -23,13 +23,18 @@ namespace Updater5
         public bool LoggedIn;
         public Dokimion.Dokimion Dokimion;
         public List<Project>? Projects;
-        public int ProjectIndex;
+        // This is the project we are working on:
+        public Project Project;
         public Settings Settings;
+        // The string is the test case ID:
+        public Dictionary<string, TestCase> TestCases;
 
         public Data()
         {
             Dokimion = new("", false);
             Settings = new();
+            TestCases = new Dictionary<string, TestCase>();
+            Project = new();
         }
 
         public string? GetSettings()

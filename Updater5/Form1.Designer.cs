@@ -32,7 +32,7 @@
             NextButton = new Button();
             QuitButton = new Button();
             StepTextBox = new TextBox();
-            progressBar1 = new ProgressBar();
+            StepProgressBar = new ProgressBar();
             FeedbackTextBox = new TextBox();
             panelLogin = new Panel();
             label8 = new Label();
@@ -55,7 +55,17 @@
             BrowseFileSystemButton = new Button();
             label3 = new Label();
             panelDownloadMetadata = new Panel();
-            label4 = new Label();
+            RescanButton = new Button();
+            ClearAllButton = new Button();
+            SelectAllButton = new Button();
+            MetadataDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
+            DownloadMetadataButton = new Button();
+            MetadataDataGridView = new DataGridView();
+            MetadataSelect = new DataGridViewCheckBoxColumn();
+            MetadataID = new DataGridViewTextBoxColumn();
+            MetadataName = new DataGridViewTextBoxColumn();
+            MetadataIssue = new DataGridViewTextBoxColumn();
+            MetadataProgressBar = new ProgressBar();
             panelHandleDifferences = new Panel();
             label6 = new Label();
             panelDone = new Panel();
@@ -65,6 +75,7 @@
             panelSelectProject.SuspendLayout();
             panelSelectRepo.SuspendLayout();
             panelDownloadMetadata.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)MetadataDataGridView).BeginInit();
             panelHandleDifferences.SuspendLayout();
             panelDone.SuspendLayout();
             SuspendLayout();
@@ -110,12 +121,12 @@
             StepTextBox.Size = new Size(337, 27);
             StepTextBox.TabIndex = 3;
             // 
-            // progressBar1
+            // StepProgressBar
             // 
-            progressBar1.Location = new Point(390, 12);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(380, 29);
-            progressBar1.TabIndex = 4;
+            StepProgressBar.Location = new Point(390, 12);
+            StepProgressBar.Name = "StepProgressBar";
+            StepProgressBar.Size = new Size(380, 29);
+            StepProgressBar.TabIndex = 4;
             // 
             // FeedbackTextBox
             // 
@@ -124,6 +135,7 @@
             FeedbackTextBox.Multiline = true;
             FeedbackTextBox.Name = "FeedbackTextBox";
             FeedbackTextBox.ReadOnly = true;
+            FeedbackTextBox.ScrollBars = ScrollBars.Vertical;
             FeedbackTextBox.Size = new Size(758, 57);
             FeedbackTextBox.TabIndex = 5;
             // 
@@ -292,9 +304,9 @@
             FolderForAllProjectsCheckBox.AutoSize = true;
             FolderForAllProjectsCheckBox.Location = new Point(142, 104);
             FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
-            FolderForAllProjectsCheckBox.Size = new Size(205, 24);
+            FolderForAllProjectsCheckBox.Size = new Size(415, 24);
             FolderForAllProjectsCheckBox.TabIndex = 5;
-            FolderForAllProjectsCheckBox.Text = "One Folder for All Projects";
+            FolderForAllProjectsCheckBox.Text = "Use one folder for all projects, each project in a subfolder.";
             FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
             // 
             // FolderTextBox
@@ -302,7 +314,7 @@
             FolderTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             FolderTextBox.Location = new Point(42, 136);
             FolderTextBox.Name = "FolderTextBox";
-            FolderTextBox.Size = new Size(330, 27);
+            FolderTextBox.Size = new Size(710, 27);
             FolderTextBox.TabIndex = 4;
             FolderTextBox.TextChanged += FolderTextBox_TextChanged;
             // 
@@ -328,21 +340,158 @@
             // panelDownloadMetadata
             // 
             panelDownloadMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelDownloadMetadata.Controls.Add(label4);
+            panelDownloadMetadata.Controls.Add(RescanButton);
+            panelDownloadMetadata.Controls.Add(ClearAllButton);
+            panelDownloadMetadata.Controls.Add(SelectAllButton);
+            panelDownloadMetadata.Controls.Add(MetadataDiffViewer);
+            panelDownloadMetadata.Controls.Add(DownloadMetadataButton);
+            panelDownloadMetadata.Controls.Add(MetadataDataGridView);
+            panelDownloadMetadata.Controls.Add(MetadataProgressBar);
             panelDownloadMetadata.Location = new Point(12, 54);
             panelDownloadMetadata.Name = "panelDownloadMetadata";
             panelDownloadMetadata.Size = new Size(758, 389);
             panelDownloadMetadata.TabIndex = 0;
             panelDownloadMetadata.Visible = false;
             // 
-            // label4
+            // RescanButton
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(16, 17);
-            label4.Name = "label4";
-            label4.Size = new Size(50, 20);
-            label4.TabIndex = 0;
-            label4.Text = "label4";
+            RescanButton.Location = new Point(253, 22);
+            RescanButton.Name = "RescanButton";
+            RescanButton.Size = new Size(131, 29);
+            RescanButton.TabIndex = 7;
+            RescanButton.Text = "Rescan test cases";
+            RescanButton.UseVisualStyleBackColor = true;
+            RescanButton.Click += RescanButton_Click;
+            // 
+            // ClearAllButton
+            // 
+            ClearAllButton.Location = new Point(135, 20);
+            ClearAllButton.Name = "ClearAllButton";
+            ClearAllButton.Size = new Size(94, 29);
+            ClearAllButton.TabIndex = 6;
+            ClearAllButton.Text = "Clear All";
+            ClearAllButton.UseVisualStyleBackColor = true;
+            ClearAllButton.Click += ClearAllButton_Click;
+            // 
+            // SelectAllButton
+            // 
+            SelectAllButton.Location = new Point(16, 21);
+            SelectAllButton.Name = "SelectAllButton";
+            SelectAllButton.Size = new Size(94, 29);
+            SelectAllButton.TabIndex = 5;
+            SelectAllButton.Text = "Select All";
+            SelectAllButton.UseVisualStyleBackColor = true;
+            SelectAllButton.Click += SelectAllButton_Click;
+            // 
+            // MetadataDiffViewer
+            // 
+            MetadataDiffViewer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            MetadataDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
+            MetadataDiffViewer.BorderWidth = new Padding(0);
+            MetadataDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
+            MetadataDiffViewer.CollapseUnchangedSectionsToggleTitle = "_Collapse unchanged sections";
+            MetadataDiffViewer.ContextLinesMenuItemsTitle = "_Lines for context";
+            MetadataDiffViewer.DeletedBackColor = Color.FromArgb(64, 216, 32, 32);
+            MetadataDiffViewer.DeletedForeColor = Color.FromArgb(0, 0, 0);
+            MetadataDiffViewer.FontFamilyNames = "Segoe UI";
+            MetadataDiffViewer.FontSize = 12D;
+            MetadataDiffViewer.FontStretch = System.Windows.FontStretch.FromOpenTypeStretch(5);
+            MetadataDiffViewer.FontWeight = 400;
+            MetadataDiffViewer.HeaderBackColor = Color.FromArgb(12, 128, 128, 128);
+            MetadataDiffViewer.HeaderForeColor = Color.FromArgb(128, 128, 128);
+            MetadataDiffViewer.HeaderHeight = 20D;
+            MetadataDiffViewer.IgnoreCase = false;
+            MetadataDiffViewer.IgnoreUnchanged = false;
+            MetadataDiffViewer.IgnoreWhiteSpace = true;
+            MetadataDiffViewer.ImaginaryBackColor = Color.FromArgb(24, 128, 128, 128);
+            MetadataDiffViewer.InlineModeToggleTitle = "_Unified view";
+            MetadataDiffViewer.InsertedBackColor = Color.FromArgb(0, 0, 0);
+            MetadataDiffViewer.InsertedForeColor = Color.FromArgb(0, 0, 0);
+            MetadataDiffViewer.IsFontItalic = false;
+            MetadataDiffViewer.IsSideBySide = true;
+            MetadataDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
+            MetadataDiffViewer.LineNumberWidth = 60;
+            MetadataDiffViewer.LinesContext = 1;
+            MetadataDiffViewer.Location = new Point(16, 193);
+            MetadataDiffViewer.Name = "MetadataDiffViewer";
+            MetadataDiffViewer.NewText = null;
+            MetadataDiffViewer.NewTextHeader = "Dokimion";
+            MetadataDiffViewer.OldText = null;
+            MetadataDiffViewer.OldTextHeader = "File System";
+            MetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
+            MetadataDiffViewer.Size = new Size(736, 154);
+            MetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
+            MetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
+            MetadataDiffViewer.SplitterBorderWidth = new Padding(0);
+            MetadataDiffViewer.SplitterWidth = 5D;
+            MetadataDiffViewer.TabIndex = 4;
+            MetadataDiffViewer.UnchangedBackColor = Color.FromArgb(64, 128, 128, 128);
+            MetadataDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
+            // 
+            // DownloadMetadataButton
+            // 
+            DownloadMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            DownloadMetadataButton.Location = new Point(14, 354);
+            DownloadMetadataButton.Name = "DownloadMetadataButton";
+            DownloadMetadataButton.Size = new Size(252, 29);
+            DownloadMetadataButton.TabIndex = 3;
+            DownloadMetadataButton.Text = "Download selected metadata files";
+            DownloadMetadataButton.UseVisualStyleBackColor = true;
+            DownloadMetadataButton.Click += DownloadMetadataButton_Click;
+            // 
+            // MetadataDataGridView
+            // 
+            MetadataDataGridView.AllowUserToAddRows = false;
+            MetadataDataGridView.AllowUserToDeleteRows = false;
+            MetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            MetadataDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            MetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, MetadataIssue });
+            MetadataDataGridView.Location = new Point(13, 58);
+            MetadataDataGridView.Name = "MetadataDataGridView";
+            MetadataDataGridView.RowHeadersWidth = 51;
+            MetadataDataGridView.Size = new Size(739, 129);
+            MetadataDataGridView.TabIndex = 2;
+            MetadataDataGridView.RowHeaderMouseClick += MetadataDataGridView_RowHeaderMouseClick;
+            // 
+            // MetadataSelect
+            // 
+            MetadataSelect.HeaderText = "Select";
+            MetadataSelect.MinimumWidth = 6;
+            MetadataSelect.Name = "MetadataSelect";
+            MetadataSelect.Width = 50;
+            // 
+            // MetadataID
+            // 
+            MetadataID.HeaderText = "ID";
+            MetadataID.MinimumWidth = 6;
+            MetadataID.Name = "MetadataID";
+            MetadataID.ReadOnly = true;
+            MetadataID.Width = 50;
+            // 
+            // MetadataName
+            // 
+            MetadataName.HeaderText = "Name";
+            MetadataName.MinimumWidth = 6;
+            MetadataName.Name = "MetadataName";
+            MetadataName.ReadOnly = true;
+            MetadataName.Width = 400;
+            // 
+            // MetadataIssue
+            // 
+            MetadataIssue.HeaderText = "Issue";
+            MetadataIssue.MinimumWidth = 6;
+            MetadataIssue.Name = "MetadataIssue";
+            MetadataIssue.ReadOnly = true;
+            MetadataIssue.Width = 125;
+            // 
+            // MetadataProgressBar
+            // 
+            MetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            MetadataProgressBar.Location = new Point(278, 353);
+            MetadataProgressBar.Name = "MetadataProgressBar";
+            MetadataProgressBar.Size = new Size(474, 29);
+            MetadataProgressBar.Style = ProgressBarStyle.Continuous;
+            MetadataProgressBar.TabIndex = 1;
             // 
             // panelHandleDifferences
             // 
@@ -389,15 +538,15 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 553);
+            Controls.Add(panelDownloadMetadata);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
             Controls.Add(panelSelectProject);
-            Controls.Add(panelDownloadMetadata);
             Controls.Add(panelSendNewTestCases);
             Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(FeedbackTextBox);
-            Controls.Add(progressBar1);
+            Controls.Add(StepProgressBar);
             Controls.Add(StepTextBox);
             Controls.Add(QuitButton);
             Controls.Add(NextButton);
@@ -413,7 +562,7 @@
             panelSelectRepo.ResumeLayout(false);
             panelSelectRepo.PerformLayout();
             panelDownloadMetadata.ResumeLayout(false);
-            panelDownloadMetadata.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)MetadataDataGridView).EndInit();
             panelHandleDifferences.ResumeLayout(false);
             panelHandleDifferences.PerformLayout();
             panelDone.ResumeLayout(false);
@@ -428,7 +577,7 @@
         public Button NextButton;
         private Button QuitButton;
         private TextBox StepTextBox;
-        private ProgressBar progressBar1;
+        private ProgressBar StepProgressBar;
         public TextBox FeedbackTextBox;
 
         private StepLogin StepLogin;
@@ -449,7 +598,6 @@
         private Label label3;
 
         private Panel panelDownloadMetadata;
-        private Label label4;
 
         private Panel panelSendNewTestCases;
         private Label label5;
@@ -479,5 +627,16 @@
         public CheckBox FolderForAllProjectsCheckBox;
         public TextBox FolderTextBox;
         private Button BrowseFileSystemButton;
+        public ProgressBar MetadataProgressBar;
+        public DataGridView MetadataDataGridView;
+        private Button DownloadMetadataButton;
+        public DiffPlex.WindowsForms.Controls.DiffViewer MetadataDiffViewer;
+        private Button ClearAllButton;
+        private Button SelectAllButton;
+        private Button RescanButton;
+        private DataGridViewCheckBoxColumn MetadataSelect;
+        private DataGridViewTextBoxColumn MetadataID;
+        private DataGridViewTextBoxColumn MetadataName;
+        private DataGridViewTextBoxColumn MetadataIssue;
     }
 }

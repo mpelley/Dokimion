@@ -33,6 +33,7 @@ namespace Updater5
 
         public override void Activate()
         {
+            Form.FeedbackTextBox.Text = "";
             Form.FolderTextBox.Text = Data.Settings.repo;
             Form.FolderForAllProjectsCheckBox.Checked = Data.Settings.oneFolderForAllProjects;
 

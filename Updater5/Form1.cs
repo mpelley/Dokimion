@@ -38,9 +38,9 @@ namespace Updater5
             FeedbackTextBox.Text = "";
             ActiveStepCode.Activate();
 
-            progressBar1.Minimum = 0;
-            progressBar1.Maximum = 6;
-            progressBar1.Value = 0;
+            StepProgressBar.Minimum = 0;
+            StepProgressBar.Maximum = 6;
+            StepProgressBar.Value = 0;
         }
 
         private void PrevButton_Click(object sender, EventArgs e)
@@ -49,8 +49,8 @@ namespace Updater5
             bool swapped = SwapSteps(newPanelCode);
             if (swapped)
             {
-                progressBar1.Value -= 1;
-                progressBar1.Refresh();
+                StepProgressBar.Value -= 1;
+                StepProgressBar.Refresh();
             }
         }
 
@@ -60,8 +60,8 @@ namespace Updater5
             bool swapped = SwapSteps(newPanelCode);
             if (swapped)
             {
-                progressBar1.Value += 1;
-                progressBar1.Refresh();
+                StepProgressBar.Value += 1;
+                StepProgressBar.Refresh();
             }
         }
 
@@ -109,6 +109,31 @@ namespace Updater5
         private void FolderTextBox_TextChanged(object sender, EventArgs e)
         {
             StepSelectRepo.FolderTextBox_TextChanged();
+        }
+
+        private void DownloadMetadataButton_Click(object sender, EventArgs e)
+        {
+            StepDownloadMetadata.DownloadMetadataButton_Click();
+        }
+
+        private void SelectAllButton_Click(object sender, EventArgs e)
+        {
+            StepDownloadMetadata.SelectAllButton_Click();
+        }
+
+        private void ClearAllButton_Click(object sender, EventArgs e)
+        {
+            StepDownloadMetadata.ClearAllButton_Click();
+        }
+
+        private void MetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            StepDownloadMetadata.MetadataDataGridView_RowHeaderMouseClick(sender, e);
+        }
+
+        private void RescanButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

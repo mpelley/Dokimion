@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Updater5
 {
@@ -48,7 +49,8 @@ namespace Updater5
                 Form.UrlTextBox.Text = Data.Settings.server;
                 Form.UseHttpsCheckBox.Checked = Data.Settings.useHttps;
             }
-            Form.Text = "Updater";
+            Form.Text = $"Updater version {System.Windows.Forms.Application.ProductVersion}";
+
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dokimion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,13 @@ namespace Updater5
 
         public override StepCode? Next()
         {
-            return NextStepCode;
+            Project? project = Form.ProjectsListBox.SelectedItem as Project;
+            if (project != null)
+            {
+                Data.Project = project;
+                return NextStepCode;
+            }
+            return null;
         }
 
         public override void Activate()
@@ -58,7 +65,6 @@ namespace Updater5
 
         public void ProjectsListBox_SelectedIndexChanged()
         {
-            Data.ProjectIndex = Form.ProjectsListBox.SelectedIndex;
             Form.NextButton.Enabled = true;
         }
     }

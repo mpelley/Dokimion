@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Version>$(VersionPrefix) 0.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="diffplex.wpf" Version="1.4.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Dokimion\Dokimion.csproj" />

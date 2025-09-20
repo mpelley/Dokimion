@@ -124,6 +124,33 @@ namespace Dokimion
         public string createdBy = "";
         public Int64 createdTime;
         public string lastModifiedBy = "";
+
+        public Metadata ExtractMetadata()
+        {
+            string json = JsonConvert.SerializeObject(this);
+            Metadata? metadata = JsonConvert.DeserializeObject<Metadata>(json);
+            if (metadata == null)
+            {
+                throw new Exception($"Cannot extract metadata from test case {this.id}");
+            }
+            return metadata;
+        }
+    }
+
+    public class Metadata : TestCaseShort
+    {
+        // This is TestCase minus the steps member
+        public string description = "";
+        public string preconditions = "";
+        public Int64 lastModifiedTime;
+        public string createdBy = "";
+        public Int64 createdTime;
+        public string lastModifiedBy = "";
+
+        public string PrettyPrint()
+        {
+            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+        }
     }
 
 
