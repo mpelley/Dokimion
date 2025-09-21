@@ -79,6 +79,20 @@ namespace Updater5
             }
         }
 
+        public string GetRepoFolder()
+        {
+            string repo = Settings.repo;
+            if (Settings.oneFolderForAllProjects)
+            {
+                repo = Path.Join(repo, Project.Name);
+            }
+            if (false == Directory.Exists(repo))
+            {
+                Directory.CreateDirectory(repo);
+            }
+
+            return repo;
+        }
 
     }
 }

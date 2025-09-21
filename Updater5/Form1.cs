@@ -133,7 +133,22 @@ namespace Updater5
 
         private void RescanButton_Click(object sender, EventArgs e)
         {
+            StepDownloadMetadata.RescanButton_Click();
+        }
 
+        private void SelectAllNewTestCasesButton_Click(object sender, EventArgs e)
+        {
+            StepSendNewTestCases.SelectAllNewTestCasesButton_Click();
+        }
+
+        private void ClearAllNewTestCasesButton_Click(object sender, EventArgs e)
+        {
+            StepSendNewTestCases.ClearAllNewTestCasesButton_Click();
+        }
+
+        private void UploadNewStepsButton_Click(object sender, EventArgs e)
+        {
+            StepSendNewTestCases.UploadNewTestCasesButton_Click();
         }
     }
 }

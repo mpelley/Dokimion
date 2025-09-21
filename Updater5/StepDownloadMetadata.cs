@@ -97,7 +97,7 @@ namespace Updater5
 
             Form.MetadataDataGridView.Rows.Clear();
             FileJsons = new();
-            string repo = GetRepoFolder();
+            string repo = Data.GetRepoFolder();
             foreach (var tc in Data.TestCases.Values)
             {
                 string id = tc.id;
@@ -150,7 +150,7 @@ namespace Updater5
             Form.MetadataProgressBar.Value = 0;
             Form.MetadataProgressBar.Step = 1;
 
-            string repo = GetRepoFolder();
+            string repo = Data.GetRepoFolder();
 
             for (int i = 0; i < rows.Count; i++)
             {
@@ -184,20 +184,6 @@ namespace Updater5
 
         }
 
-        private string GetRepoFolder()
-        {
-            string repo = Data.Settings.repo;
-            if (Data.Settings.oneFolderForAllProjects)
-            {
-                repo = Path.Join(repo, Data.Project.Name);
-            }
-            if (false == Directory.Exists(repo))
-            {
-                Directory.CreateDirectory(repo);
-            }
-
-            return repo;
-        }
         public void SelectAllButton_Click()
         {
             var rows = Form.MetadataDataGridView.Rows;

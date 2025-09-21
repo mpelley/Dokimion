@@ -45,7 +45,15 @@
             PasswordTextBox = new TextBox();
             UserNameTextBox = new TextBox();
             panelSendNewTestCases = new Panel();
-            label5 = new Label();
+            NewTestCaseProgressBar = new ProgressBar();
+            UploadNewTestCasesButton = new Button();
+            ClearAllNewTestCasesButton = new Button();
+            SelectAllNewTestCasesButton = new Button();
+            NewTestCasesDataGridView = new DataGridView();
+            NewTestCaseSelect = new DataGridViewCheckBoxColumn();
+            NewTestCaseId = new DataGridViewTextBoxColumn();
+            NewTestCaseName = new DataGridViewTextBoxColumn();
+            NewTestCaseNotes = new DataGridViewTextBoxColumn();
             panelSelectProject = new Panel();
             ProjectsListBox = new ListBox();
             label2 = new Label();
@@ -72,6 +80,7 @@
             label7 = new Label();
             panelLogin.SuspendLayout();
             panelSendNewTestCases.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).BeginInit();
             panelSelectProject.SuspendLayout();
             panelSelectRepo.SuspendLayout();
             panelDownloadMetadata.SuspendLayout();
@@ -240,21 +249,100 @@
             // panelSendNewTestCases
             // 
             panelSendNewTestCases.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelSendNewTestCases.Controls.Add(label5);
+            panelSendNewTestCases.Controls.Add(NewTestCaseProgressBar);
+            panelSendNewTestCases.Controls.Add(UploadNewTestCasesButton);
+            panelSendNewTestCases.Controls.Add(ClearAllNewTestCasesButton);
+            panelSendNewTestCases.Controls.Add(SelectAllNewTestCasesButton);
+            panelSendNewTestCases.Controls.Add(NewTestCasesDataGridView);
             panelSendNewTestCases.Location = new Point(12, 54);
             panelSendNewTestCases.Name = "panelSendNewTestCases";
             panelSendNewTestCases.Size = new Size(758, 389);
             panelSendNewTestCases.TabIndex = 0;
             panelSendNewTestCases.Visible = false;
             // 
-            // label5
+            // NewTestCaseProgressBar
             // 
-            label5.AutoSize = true;
-            label5.Location = new Point(16, 17);
-            label5.Name = "label5";
-            label5.Size = new Size(50, 20);
-            label5.TabIndex = 0;
-            label5.Text = "label5";
+            NewTestCaseProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            NewTestCaseProgressBar.Location = new Point(316, 353);
+            NewTestCaseProgressBar.Name = "NewTestCaseProgressBar";
+            NewTestCaseProgressBar.Size = new Size(436, 29);
+            NewTestCaseProgressBar.TabIndex = 4;
+            // 
+            // UploadNewTestCasesButton
+            // 
+            UploadNewTestCasesButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            UploadNewTestCasesButton.Location = new Point(9, 354);
+            UploadNewTestCasesButton.Name = "UploadNewTestCasesButton";
+            UploadNewTestCasesButton.Size = new Size(285, 29);
+            UploadNewTestCasesButton.TabIndex = 3;
+            UploadNewTestCasesButton.Text = "Upload New Test Cases to Dokimion";
+            UploadNewTestCasesButton.UseVisualStyleBackColor = true;
+            UploadNewTestCasesButton.Click += UploadNewStepsButton_Click;
+            // 
+            // ClearAllNewTestCasesButton
+            // 
+            ClearAllNewTestCasesButton.Location = new Point(104, 8);
+            ClearAllNewTestCasesButton.Name = "ClearAllNewTestCasesButton";
+            ClearAllNewTestCasesButton.Size = new Size(94, 29);
+            ClearAllNewTestCasesButton.TabIndex = 2;
+            ClearAllNewTestCasesButton.Text = "Clear All";
+            ClearAllNewTestCasesButton.UseVisualStyleBackColor = true;
+            ClearAllNewTestCasesButton.Click += ClearAllNewTestCasesButton_Click;
+            // 
+            // SelectAllNewTestCasesButton
+            // 
+            SelectAllNewTestCasesButton.Location = new Point(4, 8);
+            SelectAllNewTestCasesButton.Name = "SelectAllNewTestCasesButton";
+            SelectAllNewTestCasesButton.Size = new Size(94, 29);
+            SelectAllNewTestCasesButton.TabIndex = 1;
+            SelectAllNewTestCasesButton.Text = "Select All";
+            SelectAllNewTestCasesButton.UseVisualStyleBackColor = true;
+            SelectAllNewTestCasesButton.Click += SelectAllNewTestCasesButton_Click;
+            // 
+            // NewTestCasesDataGridView
+            // 
+            NewTestCasesDataGridView.AllowUserToAddRows = false;
+            NewTestCasesDataGridView.AllowUserToDeleteRows = false;
+            NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
+            NewTestCasesDataGridView.Location = new Point(3, 43);
+            NewTestCasesDataGridView.Name = "NewTestCasesDataGridView";
+            NewTestCasesDataGridView.RowHeadersVisible = false;
+            NewTestCasesDataGridView.RowHeadersWidth = 51;
+            NewTestCasesDataGridView.Size = new Size(749, 304);
+            NewTestCasesDataGridView.TabIndex = 0;
+            // 
+            // NewTestCaseSelect
+            // 
+            NewTestCaseSelect.HeaderText = "Select";
+            NewTestCaseSelect.MinimumWidth = 6;
+            NewTestCaseSelect.Name = "NewTestCaseSelect";
+            NewTestCaseSelect.Width = 50;
+            // 
+            // NewTestCaseId
+            // 
+            NewTestCaseId.HeaderText = "ID";
+            NewTestCaseId.MinimumWidth = 6;
+            NewTestCaseId.Name = "NewTestCaseId";
+            NewTestCaseId.ReadOnly = true;
+            NewTestCaseId.Width = 50;
+            // 
+            // NewTestCaseName
+            // 
+            NewTestCaseName.HeaderText = "Name";
+            NewTestCaseName.MinimumWidth = 6;
+            NewTestCaseName.Name = "NewTestCaseName";
+            NewTestCaseName.ReadOnly = true;
+            NewTestCaseName.Width = 200;
+            // 
+            // NewTestCaseNotes
+            // 
+            NewTestCaseNotes.HeaderText = "Notes";
+            NewTestCaseNotes.MinimumWidth = 6;
+            NewTestCaseNotes.Name = "NewTestCaseNotes";
+            NewTestCaseNotes.ReadOnly = true;
+            NewTestCaseNotes.Width = 200;
             // 
             // panelSelectProject
             // 
@@ -538,11 +626,11 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 553);
+            Controls.Add(panelSendNewTestCases);
             Controls.Add(panelDownloadMetadata);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
             Controls.Add(panelSelectProject);
-            Controls.Add(panelSendNewTestCases);
             Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(FeedbackTextBox);
@@ -556,7 +644,7 @@
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();
             panelSendNewTestCases.ResumeLayout(false);
-            panelSendNewTestCases.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).EndInit();
             panelSelectProject.ResumeLayout(false);
             panelSelectProject.PerformLayout();
             panelSelectRepo.ResumeLayout(false);
@@ -600,7 +688,6 @@
         private Panel panelDownloadMetadata;
 
         private Panel panelSendNewTestCases;
-        private Label label5;
 
         private Panel panelHandleDifferences;
         private Label label6;
@@ -638,5 +725,14 @@
         private DataGridViewTextBoxColumn MetadataID;
         private DataGridViewTextBoxColumn MetadataName;
         private DataGridViewTextBoxColumn MetadataIssue;
+        private ProgressBar NewTestCaseProgressBar;
+        private Button UploadNewTestCasesButton;
+        private Button ClearAllNewTestCasesButton;
+        private Button SelectAllNewTestCasesButton;
+        private DataGridViewCheckBoxColumn NewTestCaseSelect;
+        private DataGridViewTextBoxColumn NewTestCaseId;
+        private DataGridViewTextBoxColumn NewTestCaseName;
+        private DataGridViewTextBoxColumn NewTestCaseNotes;
+        public DataGridView NewTestCasesDataGridView;
     }
 }
