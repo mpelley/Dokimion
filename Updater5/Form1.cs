@@ -10,8 +10,7 @@ namespace Updater5
             StepLogin = new(panelLogin, Data, this);
             StepSelectProject = new(panelSelectProject, Data, this);
             StepSelectRepo = new(panelSelectRepo, Data, this);
-            StepDownloadMetadata = new(panelDownloadMetadata, Data, this);
-            StepSendNewTestCases = new(panelSendNewTestCases, Data, this);
+            StepDownloadNewTestCases = new(panelDownloadNewTestCases, Data, this);
             StepHandleDifferences = new(panelHandleDifferences, Data, this);
             StepDone = new(panelDone, Data, this);
 
@@ -20,12 +19,10 @@ namespace Updater5
             StepSelectProject.PrevStepCode = StepLogin;
             StepSelectProject.NextStepCode = StepSelectRepo;
             StepSelectRepo.PrevStepCode = StepSelectProject;
-            StepSelectRepo.NextStepCode = StepDownloadMetadata;
-            StepDownloadMetadata.PrevStepCode = StepSelectRepo;
-            StepDownloadMetadata.NextStepCode = StepSendNewTestCases;
-            StepSendNewTestCases.PrevStepCode = StepDownloadMetadata;
-            StepSendNewTestCases.NextStepCode = StepHandleDifferences;
-            StepHandleDifferences.PrevStepCode = StepSendNewTestCases;
+            StepSelectRepo.NextStepCode = StepDownloadNewTestCases;
+            StepDownloadNewTestCases.PrevStepCode = StepSelectRepo;
+            StepDownloadNewTestCases.NextStepCode = StepHandleDifferences;
+            StepHandleDifferences.PrevStepCode = StepDownloadNewTestCases;
             StepHandleDifferences.NextStepCode = StepDone;
             StepDone.PrevStepCode = StepHandleDifferences;
             StepDone.NextStepCode = null;
@@ -39,7 +36,7 @@ namespace Updater5
             ActiveStepCode.Activate();
 
             StepProgressBar.Minimum = 0;
-            StepProgressBar.Maximum = 6;
+            StepProgressBar.Maximum = 5;
             StepProgressBar.Value = 0;
         }
 
@@ -111,44 +108,36 @@ namespace Updater5
             StepSelectRepo.FolderTextBox_TextChanged();
         }
 
-        private void DownloadMetadataButton_Click(object sender, EventArgs e)
+        private void DownloadTestCasesButton_Click(object sender, EventArgs e)
         {
-            StepDownloadMetadata.DownloadMetadataButton_Click();
+            StepDownloadNewTestCases.DownloadTestCasesButton_Click();
         }
 
         private void SelectAllButton_Click(object sender, EventArgs e)
         {
-            StepDownloadMetadata.SelectAllButton_Click();
+            StepDownloadNewTestCases.SelectAllButton_Click();
         }
 
         private void ClearAllButton_Click(object sender, EventArgs e)
         {
-            StepDownloadMetadata.ClearAllButton_Click();
-        }
-
-        private void MetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            StepDownloadMetadata.MetadataDataGridView_RowHeaderMouseClick(sender, e);
+            StepDownloadNewTestCases.ClearAllButton_Click();
         }
 
         private void RescanButton_Click(object sender, EventArgs e)
         {
-            StepDownloadMetadata.RescanButton_Click();
+            StepDownloadNewTestCases.RescanButton_Click();
         }
 
         private void SelectAllNewTestCasesButton_Click(object sender, EventArgs e)
         {
-            StepSendNewTestCases.SelectAllNewTestCasesButton_Click();
         }
 
         private void ClearAllNewTestCasesButton_Click(object sender, EventArgs e)
         {
-            StepSendNewTestCases.ClearAllNewTestCasesButton_Click();
         }
 
         private void UploadNewStepsButton_Click(object sender, EventArgs e)
         {
-            StepSendNewTestCases.UploadNewTestCasesButton_Click();
         }
     }
 }

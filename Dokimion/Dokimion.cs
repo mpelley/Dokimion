@@ -99,6 +99,7 @@ namespace Dokimion
         public Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
         public List<Attachment> attachments = new List<Attachment>();
 
+        [JsonIgnoreAttribute]
         public string Display
         {
             get { return $"ID: {id}, {name}"; }

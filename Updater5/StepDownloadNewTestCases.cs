@@ -9,14 +9,11 @@ using Dokimion;
 
 namespace Updater5
 {
-    public class StepDownloadMetadata : StepCode
+    public class StepDownloadNewTestCases : StepCode
     {
-        Dictionary<string, string> FileJsons;
-
-        public StepDownloadMetadata(Panel panel, Data data, Updater form) : base(panel, data, form)
+        public StepDownloadNewTestCases(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
             StepName = "Download Metadata";
-            FileJsons = new();
         }
 
         public override void Init()
@@ -87,7 +84,7 @@ namespace Updater5
 
         private void CompareTestCases(Project project)
         {
-            Form.FeedbackTextBox.Text += $"\r\nComparing {Data.TestCases.Count} test case metadata to files in repo.";
+            Form.FeedbackTextBox.Text += $"\r\nVerifying that {Data.TestCases.Count} test cases exist in {Data.GetRepoFolder}.";
             Form.FeedbackTextBox.Refresh();
 
             Form.MetadataProgressBar.Minimum = 0;
@@ -96,34 +93,29 @@ namespace Updater5
             Form.MetadataProgressBar.Step = 1;
 
             Form.MetadataDataGridView.Rows.Clear();
-            FileJsons = new();
             string repo = Data.GetRepoFolder();
             foreach (var tc in Data.TestCases.Values)
             {
                 string id = tc.id;
-                string path = Path.Combine(repo, id + ".JSON");
-                string fileJson = "";
-                try
+                if (false == File.Exists(Path.Combine(repo, id + ".JSON")))
                 {
-                    fileJson = File.ReadAllText(path);
-                }
-                catch
-                {
-                    Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "Missing"]);
-                    continue;
-                }
-                FileJsons.Add(id, fileJson);
-                Metadata md = tc.ExtractMetadata();
-                string dokJson = md.PrettyPrint();
-                if (dokJson != fileJson)
-                {
-                    Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "Different"]);
+                    if (File.Exists(Path.Combine(repo, id + ".txt")))
+                    {
+                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "Text step file already exists!"]);
+                    }
+                    if (File.Exists(Path.Combine(repo, id + ".html")))
+                    {
+                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "HTML step file already exists!"]);
+                    }
+                    else
+                    {
+                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, ""]);
+                    }
                 }
             }
         }
 
-
-        public void DownloadMetadataButton_Click()
+        public void DownloadTestCasesButton_Click()
         {
             int numSelected = 0;
             var rows = Form.MetadataDataGridView.Rows;
@@ -142,7 +134,7 @@ namespace Updater5
                 return;
             }
 
-            Form.FeedbackTextBox.Text = $"Downloading {numSelected} test case metadata to files in repo.";
+            Form.FeedbackTextBox.Text = $"Downloading {numSelected} test cases to files in repo.";
             Form.FeedbackTextBox.Refresh();
 
             Form.MetadataProgressBar.Minimum = 0;
@@ -209,30 +201,6 @@ namespace Updater5
             Activate();
         }
 
-        public void MetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            var rows = Form.MetadataDataGridView.Rows;
-            var row = rows[e.RowIndex];
-            string id = (string)row.Cells[1].Value;
-            TestCase tc = Data.TestCases[id];
-            if (tc != null)
-            {
-                Metadata md = tc.ExtractMetadata();
-                string dokJson = md.PrettyPrint();
-                string fileJson;
-                if (FileJsons.ContainsKey(id))
-                {
-                    fileJson = this.FileJsons[id];
-                }
-                else
-                {
-                    fileJson = "<File not in file system>";
-                }
-                Form.MetadataDiffViewer.OldText = fileJson;
-                Form.MetadataDiffViewer.NewText = dokJson;
-                Form.MetadataDiffViewer.Refresh();
-            }
-        }
 
     }
 }
