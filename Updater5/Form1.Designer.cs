@@ -44,12 +44,12 @@
             LoginButton = new Button();
             PasswordTextBox = new TextBox();
             UserNameTextBox = new TextBox();
-            panelSendNewTestCases = new Panel();
-            NewTestCaseProgressBar = new ProgressBar();
-            UploadNewTestCasesButton = new Button();
-            ClearAllNewTestCasesButton = new Button();
-            SelectAllNewTestCasesButton = new Button();
-            NewTestCasesDataGridView = new DataGridView();
+            panelDownloadChangedMetadata = new Panel();
+            ChangedMetadataProgressBar = new ProgressBar();
+            DownloadChangedMetadataButton = new Button();
+            ClearAllChangedMetadataButton = new Button();
+            SelectAllChangedMetadataButton = new Button();
+            ChangedMetadataDataGridView = new DataGridView();
             NewTestCaseSelect = new DataGridViewCheckBoxColumn();
             NewTestCaseId = new DataGridViewTextBoxColumn();
             NewTestCaseName = new DataGridViewTextBoxColumn();
@@ -67,23 +67,23 @@
             ClearAllButton = new Button();
             SelectAllButton = new Button();
             DownloadTestCasesButton = new Button();
-            MetadataDataGridView = new DataGridView();
+            NewTestCasesDataGridView = new DataGridView();
+            MetadataSelect = new DataGridViewCheckBoxColumn();
+            MetadataID = new DataGridViewTextBoxColumn();
+            MetadataName = new DataGridViewTextBoxColumn();
+            Issue = new DataGridViewTextBoxColumn();
             MetadataProgressBar = new ProgressBar();
             panelHandleDifferences = new Panel();
             label6 = new Label();
             panelDone = new Panel();
             label7 = new Label();
-            MetadataSelect = new DataGridViewCheckBoxColumn();
-            MetadataID = new DataGridViewTextBoxColumn();
-            MetadataName = new DataGridViewTextBoxColumn();
-            Issue = new DataGridViewTextBoxColumn();
             panelLogin.SuspendLayout();
-            panelSendNewTestCases.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).BeginInit();
+            panelDownloadChangedMetadata.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)ChangedMetadataDataGridView).BeginInit();
             panelSelectProject.SuspendLayout();
             panelSelectRepo.SuspendLayout();
             panelDownloadNewTestCases.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)MetadataDataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).BeginInit();
             panelHandleDifferences.SuspendLayout();
             panelDone.SuspendLayout();
             SuspendLayout();
@@ -258,78 +258,76 @@
             UserNameTextBox.Size = new Size(197, 23);
             UserNameTextBox.TabIndex = 23;
             // 
-            // panelSendNewTestCases
+            // panelDownloadChangedMetadata
             // 
-            panelSendNewTestCases.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelSendNewTestCases.Controls.Add(NewTestCaseProgressBar);
-            panelSendNewTestCases.Controls.Add(UploadNewTestCasesButton);
-            panelSendNewTestCases.Controls.Add(ClearAllNewTestCasesButton);
-            panelSendNewTestCases.Controls.Add(SelectAllNewTestCasesButton);
-            panelSendNewTestCases.Controls.Add(NewTestCasesDataGridView);
-            panelSendNewTestCases.Location = new Point(10, 40);
-            panelSendNewTestCases.Margin = new Padding(3, 2, 3, 2);
-            panelSendNewTestCases.Name = "panelSendNewTestCases";
-            panelSendNewTestCases.Size = new Size(663, 292);
-            panelSendNewTestCases.TabIndex = 0;
-            panelSendNewTestCases.Visible = false;
+            panelDownloadChangedMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelDownloadChangedMetadata.Controls.Add(ChangedMetadataProgressBar);
+            panelDownloadChangedMetadata.Controls.Add(DownloadChangedMetadataButton);
+            panelDownloadChangedMetadata.Controls.Add(ClearAllChangedMetadataButton);
+            panelDownloadChangedMetadata.Controls.Add(SelectAllChangedMetadataButton);
+            panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDataGridView);
+            panelDownloadChangedMetadata.Location = new Point(0, 0);
+            panelDownloadChangedMetadata.Margin = new Padding(3, 2, 3, 2);
+            panelDownloadChangedMetadata.Name = "panelDownloadChangedMetadata";
+            panelDownloadChangedMetadata.Size = new Size(663, 292);
+            panelDownloadChangedMetadata.TabIndex = 0;
+            panelDownloadChangedMetadata.Visible = false;
             // 
-            // NewTestCaseProgressBar
+            // ChangedMetadataProgressBar
             // 
-            NewTestCaseProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            NewTestCaseProgressBar.Location = new Point(276, 265);
-            NewTestCaseProgressBar.Margin = new Padding(3, 2, 3, 2);
-            NewTestCaseProgressBar.Name = "NewTestCaseProgressBar";
-            NewTestCaseProgressBar.Size = new Size(382, 22);
-            NewTestCaseProgressBar.TabIndex = 4;
+            ChangedMetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ChangedMetadataProgressBar.Location = new Point(299, 265);
+            ChangedMetadataProgressBar.Margin = new Padding(3, 2, 3, 2);
+            ChangedMetadataProgressBar.Name = "ChangedMetadataProgressBar";
+            ChangedMetadataProgressBar.Size = new Size(359, 22);
+            ChangedMetadataProgressBar.TabIndex = 4;
             // 
-            // UploadNewTestCasesButton
+            // DownloadChangedMetadataButton
             // 
-            UploadNewTestCasesButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            UploadNewTestCasesButton.Location = new Point(8, 266);
-            UploadNewTestCasesButton.Margin = new Padding(3, 2, 3, 2);
-            UploadNewTestCasesButton.Name = "UploadNewTestCasesButton";
-            UploadNewTestCasesButton.Size = new Size(249, 22);
-            UploadNewTestCasesButton.TabIndex = 3;
-            UploadNewTestCasesButton.Text = "Upload New Test Cases to Dokimion";
-            UploadNewTestCasesButton.UseVisualStyleBackColor = true;
-            UploadNewTestCasesButton.Click += UploadNewStepsButton_Click;
+            DownloadChangedMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            DownloadChangedMetadataButton.Location = new Point(8, 266);
+            DownloadChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            DownloadChangedMetadataButton.Name = "DownloadChangedMetadataButton";
+            DownloadChangedMetadataButton.Size = new Size(271, 22);
+            DownloadChangedMetadataButton.TabIndex = 3;
+            DownloadChangedMetadataButton.Text = "Download Selected Metadata from Dokimion";
+            DownloadChangedMetadataButton.UseVisualStyleBackColor = true;
+            DownloadChangedMetadataButton.Click += DownloadChangedMetadataButton_Click;
             // 
-            // ClearAllNewTestCasesButton
+            // ClearAllChangedMetadataButton
             // 
-            ClearAllNewTestCasesButton.Location = new Point(91, 6);
-            ClearAllNewTestCasesButton.Margin = new Padding(3, 2, 3, 2);
-            ClearAllNewTestCasesButton.Name = "ClearAllNewTestCasesButton";
-            ClearAllNewTestCasesButton.Size = new Size(82, 22);
-            ClearAllNewTestCasesButton.TabIndex = 2;
-            ClearAllNewTestCasesButton.Text = "Clear All";
-            ClearAllNewTestCasesButton.UseVisualStyleBackColor = true;
-            ClearAllNewTestCasesButton.Click += ClearAllNewTestCasesButton_Click;
+            ClearAllChangedMetadataButton.Location = new Point(91, 6);
+            ClearAllChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            ClearAllChangedMetadataButton.Name = "ClearAllChangedMetadataButton";
+            ClearAllChangedMetadataButton.Size = new Size(82, 22);
+            ClearAllChangedMetadataButton.TabIndex = 2;
+            ClearAllChangedMetadataButton.Text = "Clear All";
+            ClearAllChangedMetadataButton.UseVisualStyleBackColor = true;
+            ClearAllChangedMetadataButton.Click += ClearAllChangedMetadataButton_Click;
             // 
-            // SelectAllNewTestCasesButton
+            // SelectAllChangedMetadataButton
             // 
-            SelectAllNewTestCasesButton.Location = new Point(4, 6);
-            SelectAllNewTestCasesButton.Margin = new Padding(3, 2, 3, 2);
-            SelectAllNewTestCasesButton.Name = "SelectAllNewTestCasesButton";
-            SelectAllNewTestCasesButton.Size = new Size(82, 22);
-            SelectAllNewTestCasesButton.TabIndex = 1;
-            SelectAllNewTestCasesButton.Text = "Select All";
-            SelectAllNewTestCasesButton.UseVisualStyleBackColor = true;
-            SelectAllNewTestCasesButton.Click += SelectAllNewTestCasesButton_Click;
+            SelectAllChangedMetadataButton.Location = new Point(4, 6);
+            SelectAllChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            SelectAllChangedMetadataButton.Name = "SelectAllChangedMetadataButton";
+            SelectAllChangedMetadataButton.Size = new Size(82, 22);
+            SelectAllChangedMetadataButton.TabIndex = 1;
+            SelectAllChangedMetadataButton.Text = "Select All";
+            SelectAllChangedMetadataButton.UseVisualStyleBackColor = true;
+            SelectAllChangedMetadataButton.Click += SelectAllChangedMetadataButton_Click;
             // 
-            // NewTestCasesDataGridView
+            // ChangedMetadataDataGridView
             // 
-            NewTestCasesDataGridView.AllowUserToAddRows = false;
-            NewTestCasesDataGridView.AllowUserToDeleteRows = false;
-            NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
-            NewTestCasesDataGridView.Location = new Point(3, 32);
-            NewTestCasesDataGridView.Margin = new Padding(3, 2, 3, 2);
-            NewTestCasesDataGridView.Name = "NewTestCasesDataGridView";
-            NewTestCasesDataGridView.RowHeadersVisible = false;
-            NewTestCasesDataGridView.RowHeadersWidth = 51;
-            NewTestCasesDataGridView.Size = new Size(655, 228);
-            NewTestCasesDataGridView.TabIndex = 0;
+            ChangedMetadataDataGridView.AllowUserToAddRows = false;
+            ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
+            ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
+            ChangedMetadataDataGridView.Location = new Point(3, 32);
+            ChangedMetadataDataGridView.Margin = new Padding(3, 2, 3, 2);
+            ChangedMetadataDataGridView.Name = "ChangedMetadataDataGridView";
+            ChangedMetadataDataGridView.RowHeadersWidth = 51;
+            ChangedMetadataDataGridView.Size = new Size(655, 228);
+            ChangedMetadataDataGridView.TabIndex = 0;
             // 
             // NewTestCaseSelect
             // 
@@ -457,7 +455,7 @@
             panelDownloadNewTestCases.Controls.Add(ClearAllButton);
             panelDownloadNewTestCases.Controls.Add(SelectAllButton);
             panelDownloadNewTestCases.Controls.Add(DownloadTestCasesButton);
-            panelDownloadNewTestCases.Controls.Add(MetadataDataGridView);
+            panelDownloadNewTestCases.Controls.Add(NewTestCasesDataGridView);
             panelDownloadNewTestCases.Controls.Add(MetadataProgressBar);
             panelDownloadNewTestCases.Location = new Point(10, 40);
             panelDownloadNewTestCases.Margin = new Padding(3, 2, 3, 2);
@@ -507,24 +505,54 @@
             DownloadTestCasesButton.Name = "DownloadTestCasesButton";
             DownloadTestCasesButton.Size = new Size(220, 22);
             DownloadTestCasesButton.TabIndex = 3;
-            DownloadTestCasesButton.Text = "Download selected metadata files";
+            DownloadTestCasesButton.Text = "Download selected test cases";
             DownloadTestCasesButton.UseVisualStyleBackColor = true;
             DownloadTestCasesButton.Click += DownloadTestCasesButton_Click;
             // 
-            // MetadataDataGridView
+            // NewTestCasesDataGridView
             // 
-            MetadataDataGridView.AllowUserToAddRows = false;
-            MetadataDataGridView.AllowUserToDeleteRows = false;
-            MetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            MetadataDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            MetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, Issue });
-            MetadataDataGridView.Location = new Point(11, 44);
-            MetadataDataGridView.Margin = new Padding(3, 2, 3, 2);
-            MetadataDataGridView.Name = "MetadataDataGridView";
-            MetadataDataGridView.RowHeadersVisible = false;
-            MetadataDataGridView.RowHeadersWidth = 51;
-            MetadataDataGridView.Size = new Size(647, 218);
-            MetadataDataGridView.TabIndex = 2;
+            NewTestCasesDataGridView.AllowUserToAddRows = false;
+            NewTestCasesDataGridView.AllowUserToDeleteRows = false;
+            NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, Issue });
+            NewTestCasesDataGridView.Location = new Point(11, 44);
+            NewTestCasesDataGridView.Margin = new Padding(3, 2, 3, 2);
+            NewTestCasesDataGridView.Name = "NewTestCasesDataGridView";
+            NewTestCasesDataGridView.RowHeadersVisible = false;
+            NewTestCasesDataGridView.RowHeadersWidth = 51;
+            NewTestCasesDataGridView.Size = new Size(647, 218);
+            NewTestCasesDataGridView.TabIndex = 2;
+            // 
+            // MetadataSelect
+            // 
+            MetadataSelect.HeaderText = "Select";
+            MetadataSelect.MinimumWidth = 6;
+            MetadataSelect.Name = "MetadataSelect";
+            MetadataSelect.Width = 50;
+            // 
+            // MetadataID
+            // 
+            MetadataID.HeaderText = "ID";
+            MetadataID.MinimumWidth = 6;
+            MetadataID.Name = "MetadataID";
+            MetadataID.ReadOnly = true;
+            MetadataID.Width = 50;
+            // 
+            // MetadataName
+            // 
+            MetadataName.HeaderText = "Name";
+            MetadataName.MinimumWidth = 6;
+            MetadataName.Name = "MetadataName";
+            MetadataName.ReadOnly = true;
+            MetadataName.Width = 400;
+            // 
+            // Issue
+            // 
+            Issue.HeaderText = "Issue";
+            Issue.Name = "Issue";
+            Issue.ReadOnly = true;
+            Issue.Width = 200;
             // 
             // MetadataProgressBar
             // 
@@ -578,48 +606,18 @@
             label7.TabIndex = 0;
             label7.Text = "Done!";
             // 
-            // MetadataSelect
-            // 
-            MetadataSelect.HeaderText = "Select";
-            MetadataSelect.MinimumWidth = 6;
-            MetadataSelect.Name = "MetadataSelect";
-            MetadataSelect.Width = 50;
-            // 
-            // MetadataID
-            // 
-            MetadataID.HeaderText = "ID";
-            MetadataID.MinimumWidth = 6;
-            MetadataID.Name = "MetadataID";
-            MetadataID.ReadOnly = true;
-            MetadataID.Width = 50;
-            // 
-            // MetadataName
-            // 
-            MetadataName.HeaderText = "Name";
-            MetadataName.MinimumWidth = 6;
-            MetadataName.Name = "MetadataName";
-            MetadataName.ReadOnly = true;
-            MetadataName.Width = 400;
-            // 
-            // Issue
-            // 
-            Issue.HeaderText = "Issue";
-            Issue.Name = "Issue";
-            Issue.ReadOnly = true;
-            Issue.Width = 200;
-            // 
             // Updater
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 415);
             Controls.Add(panelDownloadNewTestCases);
-            Controls.Add(panelSendNewTestCases);
+            Controls.Add(panelDownloadChangedMetadata);
+            Controls.Add(panelHandleDifferences);
+            Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
             Controls.Add(panelSelectProject);
-            Controls.Add(panelHandleDifferences);
-            Controls.Add(panelDone);
             Controls.Add(FeedbackTextBox);
             Controls.Add(StepProgressBar);
             Controls.Add(StepTextBox);
@@ -631,14 +629,14 @@
             Text = "Updater";
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();
-            panelSendNewTestCases.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).EndInit();
+            panelDownloadChangedMetadata.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)ChangedMetadataDataGridView).EndInit();
             panelSelectProject.ResumeLayout(false);
             panelSelectProject.PerformLayout();
             panelSelectRepo.ResumeLayout(false);
             panelSelectRepo.PerformLayout();
             panelDownloadNewTestCases.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)MetadataDataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).EndInit();
             panelHandleDifferences.ResumeLayout(false);
             panelHandleDifferences.PerformLayout();
             panelDone.ResumeLayout(false);
@@ -675,7 +673,7 @@
 
         private Panel panelDownloadNewTestCases;
 
-        private Panel panelSendNewTestCases;
+        private Panel panelDownloadChangedMetadata;
 
         private Panel panelHandleDifferences;
         private Label label6;
@@ -703,20 +701,20 @@
         public TextBox FolderTextBox;
         private Button BrowseFileSystemButton;
         public ProgressBar MetadataProgressBar;
-        public DataGridView MetadataDataGridView;
+        public DataGridView NewTestCasesDataGridView;
         private Button DownloadTestCasesButton;
         private Button ClearAllButton;
         private Button SelectAllButton;
         private Button RescanButton;
-        private ProgressBar NewTestCaseProgressBar;
-        private Button UploadNewTestCasesButton;
-        private Button ClearAllNewTestCasesButton;
-        private Button SelectAllNewTestCasesButton;
+        private ProgressBar ChangedMetadataProgressBar;
+        private Button DownloadChangedMetadataButton;
+        private Button ClearAllChangedMetadataButton;
+        private Button SelectAllChangedMetadataButton;
         private DataGridViewCheckBoxColumn NewTestCaseSelect;
         private DataGridViewTextBoxColumn NewTestCaseId;
         private DataGridViewTextBoxColumn NewTestCaseName;
         private DataGridViewTextBoxColumn NewTestCaseNotes;
-        public DataGridView NewTestCasesDataGridView;
+        public DataGridView ChangedMetadataDataGridView;
         private DataGridViewCheckBoxColumn MetadataSelect;
         private DataGridViewTextBoxColumn MetadataID;
         private DataGridViewTextBoxColumn MetadataName;

@@ -12,7 +12,7 @@ namespace Updater5
             StepSelectRepo = new(panelSelectRepo, Data, this);
             StepDownloadNewTestCases = new(panelDownloadNewTestCases, Data, this);
             StepHandleDifferences = new(panelHandleDifferences, Data, this);
-            StepDownloadChangedMetadata = new StepDownloadChangedMetadata(panelSendNewTestCases, Data, this);
+            StepDownloadChangedMetadata = new (panelDownloadChangedMetadata, Data, this);
             StepDone = new(panelDone, Data, this);
 
             StepLogin.PrevStepCode = null;
@@ -131,16 +131,19 @@ namespace Updater5
             StepDownloadNewTestCases.RescanButton_Click();
         }
 
-        private void SelectAllNewTestCasesButton_Click(object sender, EventArgs e)
+        private void SelectAllChangedMetadataButton_Click(object sender, EventArgs e)
         {
+            StepDownloadChangedMetadata.SelectAllChangedMetadataButton_Click();
         }
 
-        private void ClearAllNewTestCasesButton_Click(object sender, EventArgs e)
+        private void ClearAllChangedMetadataButton_Click(object sender, EventArgs e)
         {
+            StepDownloadChangedMetadata.ClearAllChangedMetadataButton_Click();
         }
 
-        private void UploadNewStepsButton_Click(object sender, EventArgs e)
+        private void DownloadChangedMetadataButton_Click(object sender, EventArgs e)
         {
+            StepDownloadChangedMetadata.DownloadMetadataButton_Click();
         }
     }
 }

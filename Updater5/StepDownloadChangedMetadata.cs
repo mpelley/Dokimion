@@ -32,48 +32,27 @@ namespace Updater5
 
         public override void Activate()
         {
-            Form.FeedbackTextBox.Text = "Looking for new test cases.";
+            Form.FeedbackTextBox.Text = "Checking for changed metadata files.";
             Form.FeedbackTextBox.Refresh();
 
-            List<string> newTestCases = new();
             string repo = Data.GetRepoFolder();
-            foreach (string path in Directory.EnumerateFiles(repo, "*.txt"))
+            Form.ChangedMetadataDataGridView.Rows.Clear();
+            foreach (string id in Data.TestCases.Keys)
             {
-                string id = Path.GetFileNameWithoutExtension(path);
-                if (false == Data.TestCases.ContainsKey(id))
-                {
-                    newTestCases.Add(id);
-                }
-            }
-
-            Form.NewTestCasesDataGridView.Rows.Clear();
-            foreach (string id in newTestCases)
-            {
+                TestCase tc = Data.TestCases[id];
                 string metadataPath = Path.Combine(repo, id + ".JSON");
                 if (File.Exists(metadataPath))
                 {
-                    string json = File.ReadAllText(metadataPath);
-                    Metadata? md = JsonConvert.DeserializeObject<Metadata>(json);
-                    if (md == null)
+                    string fileJson = File.ReadAllText(metadataPath);
+                    string dokJson = tc.ExtractMetadata().PrettyPrint();
+                    if (fileJson != dokJson)
                     {
-                        int index = Form.NewTestCasesDataGridView.Rows.Add([false, id, "<unknown>", $"Cannot decode {metadataPath}"]);
-                        Form.NewTestCasesDataGridView.Rows[index].Cells[0].ReadOnly = true;
-                    }
-                    else if (string.IsNullOrEmpty(md.id) || string.IsNullOrEmpty(md.name))
-                    {
-                        int index = Form.NewTestCasesDataGridView.Rows.Add([false, id, md.name, $"{metadataPath} appears to be incomplete"]);
-                        Form.NewTestCasesDataGridView.Rows[index].Cells[0].ReadOnly = true;
-                    }
-                    else
-                    {
-                        int index = Form.NewTestCasesDataGridView.Rows.Add([false, id, md.name, ""]);
-                        Form.NewTestCasesDataGridView.Rows[index].Cells[0].ReadOnly = false;
+                        Form.ChangedMetadataDataGridView.Rows.Add([false, id, tc.name, $"Different"]);
                     }
                 }
                 else
                 {
-                    int index = Form.NewTestCasesDataGridView.Rows.Add([false, id, "<unknown>", $"{metadataPath} is missing!"]);
-                    Form.NewTestCasesDataGridView.Rows[index].Cells[0].ReadOnly = true;
+                    Form.ChangedMetadataDataGridView.Rows.Add([false, id, tc.name, "Missing"]);
                 }
             }
 
@@ -82,9 +61,9 @@ namespace Updater5
             Form.NextButton.Enabled = true;
         }
 
-        public void SelectAllNewTestCasesButton_Click()
+        public void SelectAllChangedMetadataButton_Click()
         {
-            var rows = Form.NewTestCasesDataGridView.Rows;
+            var rows = Form.ChangedMetadataDataGridView.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
@@ -95,9 +74,9 @@ namespace Updater5
             }
         }
 
-        public void ClearAllNewTestCasesButton_Click()
+        public void ClearAllChangedMetadataButton_Click()
         {
-            var rows = Form.NewTestCasesDataGridView.Rows;
+            var rows = Form.ChangedMetadataDataGridView.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
@@ -108,9 +87,9 @@ namespace Updater5
             }
         }
 
-        public void UploadNewTestCasesButton_Click()
+        public void DownloadMetadataButton_Click()
         {
-            var rows = Form.NewTestCasesDataGridView.Rows;
+            var rows = Form.ChangedMetadataDataGridView.Rows;
             int numSelectedRows = 0;
             for (int i = 0; i < rows.Count; i++)
             {
@@ -120,7 +99,7 @@ namespace Updater5
                     numSelectedRows++;
                 }
             }
-            Form.FeedbackTextBox.Text = $"We will upload {numSelectedRows} test cases to Dokimion.";
+            Form.FeedbackTextBox.Text = $"We will download {numSelectedRows} metadata files from Dokimion.";
             Form.FeedbackTextBox.Refresh();
 
             string repo = Data.GetRepoFolder();
@@ -132,20 +111,19 @@ namespace Updater5
                     continue;
                 }
                 string id = (string)rows[i].Cells[1].Value;
-                string metadataPath = Path.Combine(repo, id + ".JSON");
-                string json = File.ReadAllText(metadataPath);
-                TestCase? tc = JsonConvert.DeserializeObject<TestCase>(json);
-                if (tc == null)
+                string path = Path.Combine(repo, id + ".JSON");
+                TestCase testCase = Data.TestCases[id];
+                Metadata metadata = testCase.ExtractMetadata();
+                string json = metadata.PrettyPrint();
+                try
                 {
-                    Form.FeedbackTextBox.Text = $"Can't decode {metadataPath}";
+                    File.WriteAllText(path, json);
+                }
+                catch (Exception ex)
+                {
+                    Form.FeedbackTextBox.Text += $"\r\nCannot write {path} because {ex.Message}";
                     return;
                 }
-                string stepPath = Path.Combine(repo, id + ".txt");
-                string stepText = File.ReadAllText(stepPath);
-                Step step = new();
-                step.action = stepText;
-                tc.steps.Add(step);
-                ;
             }
             Form.FeedbackTextBox.Text += "\r\nDone.";
 

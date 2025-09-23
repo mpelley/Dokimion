@@ -93,7 +93,7 @@ namespace Updater5
             Form.MetadataProgressBar.Value = 0;
             Form.MetadataProgressBar.Step = 1;
 
-            Form.MetadataDataGridView.Rows.Clear();
+            Form.NewTestCasesDataGridView.Rows.Clear();
             string repo = Data.GetRepoFolder();
             foreach (var tc in Data.TestCases.Values)
             {
@@ -102,15 +102,15 @@ namespace Updater5
                 {
                     if (File.Exists(Path.Combine(repo, id + ".txt")))
                     {
-                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "Text step file already exists!"]);
+                        Form.NewTestCasesDataGridView.Rows.Add([false, id, tc.name, "Text step file already exists!"]);
                     }
                     if (File.Exists(Path.Combine(repo, id + ".html")))
                     {
-                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, "HTML step file already exists!"]);
+                        Form.NewTestCasesDataGridView.Rows.Add([false, id, tc.name, "HTML step file already exists!"]);
                     }
                     else
                     {
-                        Form.MetadataDataGridView.Rows.Add([false, id, tc.name, ""]);
+                        Form.NewTestCasesDataGridView.Rows.Add([false, id, tc.name, ""]);
                     }
                 }
             }
@@ -119,7 +119,7 @@ namespace Updater5
         public void DownloadTestCasesButton_Click()
         {
             int numSelected = 0;
-            var rows = Form.MetadataDataGridView.Rows;
+            var rows = Form.NewTestCasesDataGridView.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
@@ -208,7 +208,7 @@ namespace Updater5
 
         public void SelectAllButton_Click()
         {
-            var rows = Form.MetadataDataGridView.Rows;
+            var rows = Form.NewTestCasesDataGridView.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
@@ -218,7 +218,7 @@ namespace Updater5
 
         public void ClearAllButton_Click()
         {
-            var rows = Form.MetadataDataGridView.Rows;
+            var rows = Form.NewTestCasesDataGridView.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
