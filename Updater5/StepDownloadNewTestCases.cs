@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Dokimion;
+using Newtonsoft.Json;
 
 namespace Updater5
 {
@@ -13,12 +14,12 @@ namespace Updater5
     {
         public StepDownloadNewTestCases(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
-            StepName = "Download Metadata";
+            StepName = "Download new test cases";
         }
 
         public override void Init()
-		{
-		}
+        {
+        }
 
         public override StepCode? Prev()
         {
@@ -84,7 +85,7 @@ namespace Updater5
 
         private void CompareTestCases(Project project)
         {
-            Form.FeedbackTextBox.Text += $"\r\nVerifying that {Data.TestCases.Count} test cases exist in {Data.GetRepoFolder}.";
+            Form.FeedbackTextBox.Text += $"\r\nVerifying that {Data.TestCases.Count} test cases exist in {Data.GetRepoFolder()}.";
             Form.FeedbackTextBox.Refresh();
 
             Form.MetadataProgressBar.Minimum = 0;
@@ -157,7 +158,7 @@ namespace Updater5
                 {
                     Metadata md = tc.ExtractMetadata();
                     string json = md.PrettyPrint();
-                    string path = Path.Combine(repo, tc.id + ".JSON");
+                    string path = Path.Combine(repo, id + ".JSON");
                     try
                     {
                         File.WriteAllText(path, json);
@@ -167,6 +168,35 @@ namespace Updater5
                         Form.FeedbackTextBox.Text += $"\r\nError {ex.Message}";
                         return;
                     }
+
+                    if ((File.Exists(Path.Combine(repo, id + ".txt"))) || (File.Exists(Path.Combine(repo, id + ".html"))))
+                    {
+                        Form.FeedbackTextBox.Text = $"\r\nNot saving step data for {id} because it already exists.";
+                    }
+                    else
+                    {
+                        string action = "";
+                        path = Path.Combine(repo, id + ".html");
+                        try
+                        {
+                            action = tc.steps[0].action;
+                        }
+                        catch
+                        {
+                            path = Path.Combine(repo, id + ".txt");
+                        }
+
+                        try
+                        {
+                            File.WriteAllText(path, action);
+                        }
+                        catch (Exception ex)
+                        {
+                            Form.FeedbackTextBox.Text += $"\r\nError writing step data for id {id} {ex.Message}";
+                            return;
+                        }
+                    }
+
                 }
                 Form.MetadataProgressBar.PerformStep();
             }

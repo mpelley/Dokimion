@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Updater5
 {
-    public class StepSendNewTestCases : StepCode
+    public class StepDownloadChangedMetadata : StepCode
     {
-        public StepSendNewTestCases(Panel panel, Data data, Updater form) : base(panel, data, form)
+        public StepDownloadChangedMetadata(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
-            StepName = "Send New Test Cases";
+            StepName = "Download changed metadata";
         }
 
         public override void Init()

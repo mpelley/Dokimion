@@ -12,6 +12,7 @@ namespace Updater5
             StepSelectRepo = new(panelSelectRepo, Data, this);
             StepDownloadNewTestCases = new(panelDownloadNewTestCases, Data, this);
             StepHandleDifferences = new(panelHandleDifferences, Data, this);
+            StepDownloadChangedMetadata = new StepDownloadChangedMetadata(panelSendNewTestCases, Data, this);
             StepDone = new(panelDone, Data, this);
 
             StepLogin.PrevStepCode = null;
@@ -23,8 +24,10 @@ namespace Updater5
             StepDownloadNewTestCases.PrevStepCode = StepSelectRepo;
             StepDownloadNewTestCases.NextStepCode = StepHandleDifferences;
             StepHandleDifferences.PrevStepCode = StepDownloadNewTestCases;
-            StepHandleDifferences.NextStepCode = StepDone;
-            StepDone.PrevStepCode = StepHandleDifferences;
+            StepHandleDifferences.NextStepCode = StepDownloadChangedMetadata;
+            StepDownloadChangedMetadata.PrevStepCode = StepHandleDifferences;
+            StepDownloadChangedMetadata.NextStepCode = StepDone;
+            StepDone.PrevStepCode = StepDownloadChangedMetadata;
             StepDone.NextStepCode = null;
 
             ProjectsListBox.DisplayMember = "Name";
@@ -36,7 +39,7 @@ namespace Updater5
             ActiveStepCode.Activate();
 
             StepProgressBar.Minimum = 0;
-            StepProgressBar.Maximum = 5;
+            StepProgressBar.Maximum = 6;
             StepProgressBar.Value = 0;
         }
 

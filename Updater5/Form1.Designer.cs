@@ -661,6 +661,7 @@
         private StepSelectRepo StepSelectRepo;
         private StepDownloadNewTestCases StepDownloadNewTestCases;
         private StepHandleDifferences StepHandleDifferences;
+        private StepDownloadChangedMetadata StepDownloadChangedMetadata;
         private StepDone StepDone;
 
         private StepCode ActiveStepCode;
