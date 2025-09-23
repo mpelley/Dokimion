@@ -11,9 +11,12 @@ namespace Updater5
 {
     public class StepDownloadChangedMetadata : StepCode
     {
+        Dictionary<string, string> MetadataFromFiles;
+
         public StepDownloadChangedMetadata(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
             StepName = "Download changed metadata";
+            MetadataFromFiles = new Dictionary<string, string>();
         }
 
         public override void Init()
@@ -33,7 +36,7 @@ namespace Updater5
         public override void Activate()
         {
             Form.FeedbackTextBox.Text = "Checking for changed metadata files.";
-            Form.FeedbackTextBox.Refresh();
+            //Form.FeedbackTextBox.Refresh();
 
             string repo = Data.GetRepoFolder();
             Form.ChangedMetadataDataGridView.Rows.Clear();
@@ -44,6 +47,7 @@ namespace Updater5
                 if (File.Exists(metadataPath))
                 {
                     string fileJson = File.ReadAllText(metadataPath);
+                    MetadataFromFiles.Add(id, fileJson);
                     string dokJson = tc.ExtractMetadata().PrettyPrint();
                     if (fileJson != dokJson)
                     {
@@ -56,7 +60,10 @@ namespace Updater5
                 }
             }
 
-            Form.FeedbackTextBox.Text = "\r\nDone.";
+            Form.ChangedMetadataDiffViewer.OldTextHeader = "From Repo";
+            Form.ChangedMetadataDiffViewer.NewTextHeader = "From Dokimion";
+
+            Form.FeedbackTextBox.Text += "\r\nDone.";
             Form.PrevButton.Enabled = true;
             Form.NextButton.Enabled = true;
         }
@@ -100,7 +107,7 @@ namespace Updater5
                 }
             }
             Form.FeedbackTextBox.Text = $"We will download {numSelectedRows} metadata files from Dokimion.";
-            Form.FeedbackTextBox.Refresh();
+            //Form.FeedbackTextBox.Refresh();
 
             string repo = Data.GetRepoFolder();
             for (int i = 0; i < rows.Count; i++)
@@ -127,6 +134,21 @@ namespace Updater5
             }
             Form.FeedbackTextBox.Text += "\r\nDone.";
 
+        }
+
+        public void ChangedMetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+
+            string? id = Form.ChangedMetadataDataGridView.Rows[e.RowIndex].Cells[1].Value.ToString();
+            if (id == null)
+            {
+                Form.FeedbackTextBox.Text = $"ID is missing for row {e.RowIndex}";
+            }
+            else
+            {
+                Form.ChangedMetadataDiffViewer.OldText = MetadataFromFiles[id];
+                Form.ChangedMetadataDiffViewer.NewText = Data.TestCases[id].ExtractMetadata().PrettyPrint();
+            }
         }
     }
 }

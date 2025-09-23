@@ -12,7 +12,7 @@ namespace Updater5
             StepSelectRepo = new(panelSelectRepo, Data, this);
             StepDownloadNewTestCases = new(panelDownloadNewTestCases, Data, this);
             StepHandleDifferences = new(panelHandleDifferences, Data, this);
-            StepDownloadChangedMetadata = new (panelDownloadChangedMetadata, Data, this);
+            StepDownloadChangedMetadata = new(panelDownloadChangedMetadata, Data, this);
             StepDone = new(panelDone, Data, this);
 
             StepLogin.PrevStepCode = null;
@@ -144,6 +144,11 @@ namespace Updater5
         private void DownloadChangedMetadataButton_Click(object sender, EventArgs e)
         {
             StepDownloadChangedMetadata.DownloadMetadataButton_Click();
+        }
+
+        private void ChangedMetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            StepDownloadChangedMetadata.ChangedMetadataDataGridView_RowHeaderMouseClick(sender, e);
         }
     }
 }

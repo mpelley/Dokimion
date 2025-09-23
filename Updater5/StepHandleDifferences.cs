@@ -29,6 +29,7 @@ namespace Updater5
 
         public override void Activate()
         {
+            Form.FeedbackTextBox.Text = "";
             Form.PrevButton.Enabled = true;
             Form.NextButton.Enabled = true;
         }

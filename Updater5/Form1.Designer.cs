@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
@@ -45,6 +46,7 @@
             PasswordTextBox = new TextBox();
             UserNameTextBox = new TextBox();
             panelDownloadChangedMetadata = new Panel();
+            ChangedMetadataDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
             ChangedMetadataProgressBar = new ProgressBar();
             DownloadChangedMetadataButton = new Button();
             ClearAllChangedMetadataButton = new Button();
@@ -261,17 +263,62 @@
             // panelDownloadChangedMetadata
             // 
             panelDownloadChangedMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDiffViewer);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataProgressBar);
             panelDownloadChangedMetadata.Controls.Add(DownloadChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(ClearAllChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(SelectAllChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDataGridView);
-            panelDownloadChangedMetadata.Location = new Point(0, 0);
+            panelDownloadChangedMetadata.Location = new Point(10, 40);
             panelDownloadChangedMetadata.Margin = new Padding(3, 2, 3, 2);
             panelDownloadChangedMetadata.Name = "panelDownloadChangedMetadata";
             panelDownloadChangedMetadata.Size = new Size(663, 292);
             panelDownloadChangedMetadata.TabIndex = 0;
             panelDownloadChangedMetadata.Visible = false;
+            // 
+            // ChangedMetadataDiffViewer
+            // 
+            ChangedMetadataDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
+            ChangedMetadataDiffViewer.BorderWidth = new Padding(0);
+            ChangedMetadataDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
+            ChangedMetadataDiffViewer.CollapseUnchangedSectionsToggleTitle = "_Collapse unchanged sections";
+            ChangedMetadataDiffViewer.ContextLinesMenuItemsTitle = "_Lines for context";
+            ChangedMetadataDiffViewer.DeletedBackColor = Color.FromArgb(64, 216, 32, 32);
+            ChangedMetadataDiffViewer.DeletedForeColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.FontFamilyNames = "Segoe UI";
+            ChangedMetadataDiffViewer.FontSize = 12D;
+            ChangedMetadataDiffViewer.FontStretch = System.Windows.FontStretch.FromOpenTypeStretch(5);
+            ChangedMetadataDiffViewer.FontWeight = 400;
+            ChangedMetadataDiffViewer.HeaderBackColor = Color.FromArgb(12, 128, 128, 128);
+            ChangedMetadataDiffViewer.HeaderForeColor = Color.FromArgb(128, 128, 128);
+            ChangedMetadataDiffViewer.HeaderHeight = 0D;
+            ChangedMetadataDiffViewer.IgnoreCase = false;
+            ChangedMetadataDiffViewer.IgnoreUnchanged = false;
+            ChangedMetadataDiffViewer.IgnoreWhiteSpace = true;
+            ChangedMetadataDiffViewer.ImaginaryBackColor = Color.FromArgb(24, 128, 128, 128);
+            ChangedMetadataDiffViewer.InlineModeToggleTitle = "_Unified view";
+            ChangedMetadataDiffViewer.InsertedBackColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.InsertedForeColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.IsFontItalic = false;
+            ChangedMetadataDiffViewer.IsSideBySide = true;
+            ChangedMetadataDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
+            ChangedMetadataDiffViewer.LineNumberWidth = 60;
+            ChangedMetadataDiffViewer.LinesContext = 1;
+            ChangedMetadataDiffViewer.Location = new Point(0, 128);
+            ChangedMetadataDiffViewer.Name = "ChangedMetadataDiffViewer";
+            ChangedMetadataDiffViewer.NewText = null;
+            ChangedMetadataDiffViewer.NewTextHeader = null;
+            ChangedMetadataDiffViewer.OldText = null;
+            ChangedMetadataDiffViewer.OldTextHeader = null;
+            ChangedMetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
+            ChangedMetadataDiffViewer.Size = new Size(658, 132);
+            ChangedMetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
+            ChangedMetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
+            ChangedMetadataDiffViewer.SplitterBorderWidth = new Padding(0);
+            ChangedMetadataDiffViewer.SplitterWidth = 5D;
+            ChangedMetadataDiffViewer.TabIndex = 5;
+            ChangedMetadataDiffViewer.UnchangedBackColor = Color.FromArgb(0, 0, 0, 0);
+            ChangedMetadataDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
             // 
             // ChangedMetadataProgressBar
             // 
@@ -321,13 +368,23 @@
             ChangedMetadataDataGridView.AllowUserToAddRows = false;
             ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
             ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
             ChangedMetadataDataGridView.Location = new Point(3, 32);
             ChangedMetadataDataGridView.Margin = new Padding(3, 2, 3, 2);
             ChangedMetadataDataGridView.Name = "ChangedMetadataDataGridView";
             ChangedMetadataDataGridView.RowHeadersWidth = 51;
-            ChangedMetadataDataGridView.Size = new Size(655, 228);
+            ChangedMetadataDataGridView.Size = new Size(655, 96);
             ChangedMetadataDataGridView.TabIndex = 0;
+            ChangedMetadataDataGridView.CellMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
+            ChangedMetadataDataGridView.RowHeaderMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
             // 
             // NewTestCaseSelect
             // 
@@ -611,8 +668,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 415);
-            Controls.Add(panelDownloadNewTestCases);
             Controls.Add(panelDownloadChangedMetadata);
+            Controls.Add(panelDownloadNewTestCases);
             Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
@@ -719,5 +776,6 @@
         private DataGridViewTextBoxColumn MetadataID;
         private DataGridViewTextBoxColumn MetadataName;
         private DataGridViewTextBoxColumn Issue;
+        public DiffPlex.WindowsForms.Controls.DiffViewer ChangedMetadataDiffViewer;
     }
 }
