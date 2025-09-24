@@ -28,7 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
@@ -76,7 +77,16 @@
             Issue = new DataGridViewTextBoxColumn();
             MetadataProgressBar = new ProgressBar();
             panelHandleDifferences = new Panel();
-            label6 = new Label();
+            HandleDiffDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
+            HandleDiffProgressBar = new ProgressBar();
+            UploadDiffToDokimionButton = new Button();
+            HandleDiffClearAllButton = new Button();
+            HandleDiffSelectAllButton = new Button();
+            HandleDiffDataGridView = new DataGridView();
+            dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
+            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
             panelDone = new Panel();
             label7 = new Label();
             panelLogin.SuspendLayout();
@@ -87,6 +97,7 @@
             panelDownloadNewTestCases.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).BeginInit();
             panelHandleDifferences.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)HandleDiffDataGridView).BeginInit();
             panelDone.SuspendLayout();
             SuspendLayout();
             // 
@@ -368,14 +379,14 @@
             ChangedMetadataDataGridView.AllowUserToAddRows = false;
             ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
             ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
             ChangedMetadataDataGridView.Location = new Point(3, 32);
             ChangedMetadataDataGridView.Margin = new Padding(3, 2, 3, 2);
@@ -624,7 +635,12 @@
             // panelHandleDifferences
             // 
             panelHandleDifferences.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelHandleDifferences.Controls.Add(label6);
+            panelHandleDifferences.Controls.Add(HandleDiffDiffViewer);
+            panelHandleDifferences.Controls.Add(HandleDiffProgressBar);
+            panelHandleDifferences.Controls.Add(UploadDiffToDokimionButton);
+            panelHandleDifferences.Controls.Add(HandleDiffClearAllButton);
+            panelHandleDifferences.Controls.Add(HandleDiffSelectAllButton);
+            panelHandleDifferences.Controls.Add(HandleDiffDataGridView);
             panelHandleDifferences.Location = new Point(10, 40);
             panelHandleDifferences.Margin = new Padding(3, 2, 3, 2);
             panelHandleDifferences.Name = "panelHandleDifferences";
@@ -632,14 +648,141 @@
             panelHandleDifferences.TabIndex = 0;
             panelHandleDifferences.Visible = false;
             // 
-            // label6
+            // HandleDiffDiffViewer
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(14, 13);
-            label6.Name = "label6";
-            label6.Size = new Size(38, 15);
-            label6.TabIndex = 0;
-            label6.Text = "label6";
+            HandleDiffDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
+            HandleDiffDiffViewer.BorderWidth = new Padding(0);
+            HandleDiffDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
+            HandleDiffDiffViewer.CollapseUnchangedSectionsToggleTitle = "_Collapse unchanged sections";
+            HandleDiffDiffViewer.ContextLinesMenuItemsTitle = "_Lines for context";
+            HandleDiffDiffViewer.DeletedBackColor = Color.FromArgb(64, 216, 32, 32);
+            HandleDiffDiffViewer.DeletedForeColor = Color.FromArgb(0, 0, 0);
+            HandleDiffDiffViewer.FontFamilyNames = "Segoe UI";
+            HandleDiffDiffViewer.FontSize = 12D;
+            HandleDiffDiffViewer.FontStretch = System.Windows.FontStretch.FromOpenTypeStretch(5);
+            HandleDiffDiffViewer.FontWeight = 400;
+            HandleDiffDiffViewer.HeaderBackColor = Color.FromArgb(12, 128, 128, 128);
+            HandleDiffDiffViewer.HeaderForeColor = Color.FromArgb(128, 128, 128);
+            HandleDiffDiffViewer.HeaderHeight = 0D;
+            HandleDiffDiffViewer.IgnoreCase = false;
+            HandleDiffDiffViewer.IgnoreUnchanged = false;
+            HandleDiffDiffViewer.IgnoreWhiteSpace = true;
+            HandleDiffDiffViewer.ImaginaryBackColor = Color.FromArgb(24, 128, 128, 128);
+            HandleDiffDiffViewer.InlineModeToggleTitle = "_Unified view";
+            HandleDiffDiffViewer.InsertedBackColor = Color.FromArgb(0, 0, 0);
+            HandleDiffDiffViewer.InsertedForeColor = Color.FromArgb(0, 0, 0);
+            HandleDiffDiffViewer.IsFontItalic = false;
+            HandleDiffDiffViewer.IsSideBySide = true;
+            HandleDiffDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
+            HandleDiffDiffViewer.LineNumberWidth = 60;
+            HandleDiffDiffViewer.LinesContext = 1;
+            HandleDiffDiffViewer.Location = new Point(2, 127);
+            HandleDiffDiffViewer.Name = "HandleDiffDiffViewer";
+            HandleDiffDiffViewer.NewText = null;
+            HandleDiffDiffViewer.NewTextHeader = null;
+            HandleDiffDiffViewer.OldText = null;
+            HandleDiffDiffViewer.OldTextHeader = null;
+            HandleDiffDiffViewer.SideBySideModeToggleTitle = "_Split view";
+            HandleDiffDiffViewer.Size = new Size(658, 132);
+            HandleDiffDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
+            HandleDiffDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
+            HandleDiffDiffViewer.SplitterBorderWidth = new Padding(0);
+            HandleDiffDiffViewer.SplitterWidth = 5D;
+            HandleDiffDiffViewer.TabIndex = 11;
+            HandleDiffDiffViewer.UnchangedBackColor = Color.FromArgb(0, 0, 0, 0);
+            HandleDiffDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
+            // 
+            // HandleDiffProgressBar
+            // 
+            HandleDiffProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            HandleDiffProgressBar.Location = new Point(301, 264);
+            HandleDiffProgressBar.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffProgressBar.Name = "HandleDiffProgressBar";
+            HandleDiffProgressBar.Size = new Size(359, 22);
+            HandleDiffProgressBar.TabIndex = 10;
+            // 
+            // UploadDiffToDokimionButton
+            // 
+            UploadDiffToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            UploadDiffToDokimionButton.Location = new Point(10, 265);
+            UploadDiffToDokimionButton.Margin = new Padding(3, 2, 3, 2);
+            UploadDiffToDokimionButton.Name = "UploadDiffToDokimionButton";
+            UploadDiffToDokimionButton.Size = new Size(271, 22);
+            UploadDiffToDokimionButton.TabIndex = 9;
+            UploadDiffToDokimionButton.Text = "Upload Selected Test Cases to Dokimion";
+            UploadDiffToDokimionButton.UseVisualStyleBackColor = true;
+            // 
+            // HandleDiffClearAllButton
+            // 
+            HandleDiffClearAllButton.Location = new Point(93, 5);
+            HandleDiffClearAllButton.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffClearAllButton.Name = "HandleDiffClearAllButton";
+            HandleDiffClearAllButton.Size = new Size(82, 22);
+            HandleDiffClearAllButton.TabIndex = 8;
+            HandleDiffClearAllButton.Text = "Clear All";
+            HandleDiffClearAllButton.UseVisualStyleBackColor = true;
+            // 
+            // HandleDiffSelectAllButton
+            // 
+            HandleDiffSelectAllButton.Location = new Point(6, 5);
+            HandleDiffSelectAllButton.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffSelectAllButton.Name = "HandleDiffSelectAllButton";
+            HandleDiffSelectAllButton.Size = new Size(82, 22);
+            HandleDiffSelectAllButton.TabIndex = 7;
+            HandleDiffSelectAllButton.Text = "Select All";
+            HandleDiffSelectAllButton.UseVisualStyleBackColor = true;
+            // 
+            // HandleDiffDataGridView
+            // 
+            HandleDiffDataGridView.AllowUserToAddRows = false;
+            HandleDiffDataGridView.AllowUserToDeleteRows = false;
+            HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = SystemColors.Control;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
+            HandleDiffDataGridView.Location = new Point(5, 31);
+            HandleDiffDataGridView.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffDataGridView.Name = "HandleDiffDataGridView";
+            HandleDiffDataGridView.RowHeadersWidth = 51;
+            HandleDiffDataGridView.Size = new Size(655, 96);
+            HandleDiffDataGridView.TabIndex = 6;
+            // 
+            // dataGridViewCheckBoxColumn1
+            // 
+            dataGridViewCheckBoxColumn1.HeaderText = "Select";
+            dataGridViewCheckBoxColumn1.MinimumWidth = 6;
+            dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
+            dataGridViewCheckBoxColumn1.Width = 50;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewTextBoxColumn1.HeaderText = "ID";
+            dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            dataGridViewTextBoxColumn1.ReadOnly = true;
+            dataGridViewTextBoxColumn1.Width = 50;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.HeaderText = "Name";
+            dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            dataGridViewTextBoxColumn2.ReadOnly = true;
+            dataGridViewTextBoxColumn2.Width = 200;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            dataGridViewTextBoxColumn3.HeaderText = "Notes";
+            dataGridViewTextBoxColumn3.MinimumWidth = 6;
+            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            dataGridViewTextBoxColumn3.ReadOnly = true;
+            dataGridViewTextBoxColumn3.Width = 200;
             // 
             // panelDone
             // 
@@ -668,9 +811,9 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 415);
+            Controls.Add(panelHandleDifferences);
             Controls.Add(panelDownloadChangedMetadata);
             Controls.Add(panelDownloadNewTestCases);
-            Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
@@ -695,7 +838,7 @@
             panelDownloadNewTestCases.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).EndInit();
             panelHandleDifferences.ResumeLayout(false);
-            panelHandleDifferences.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)HandleDiffDataGridView).EndInit();
             panelDone.ResumeLayout(false);
             panelDone.PerformLayout();
             ResumeLayout(false);
@@ -733,7 +876,6 @@
         private Panel panelDownloadChangedMetadata;
 
         private Panel panelHandleDifferences;
-        private Label label6;
 
         private Panel panelDone;
         private Label label7;
@@ -763,7 +905,7 @@
         private Button ClearAllButton;
         private Button SelectAllButton;
         private Button RescanButton;
-        private ProgressBar ChangedMetadataProgressBar;
+        public ProgressBar ChangedMetadataProgressBar;
         private Button DownloadChangedMetadataButton;
         private Button ClearAllChangedMetadataButton;
         private Button SelectAllChangedMetadataButton;
@@ -777,5 +919,15 @@
         private DataGridViewTextBoxColumn MetadataName;
         private DataGridViewTextBoxColumn Issue;
         public DiffPlex.WindowsForms.Controls.DiffViewer ChangedMetadataDiffViewer;
+        public DiffPlex.WindowsForms.Controls.DiffViewer HandleDiffDiffViewer;
+        public ProgressBar HandleDiffProgressBar;
+        private Button UploadDiffToDokimionButton;
+        private Button HandleDiffClearAllButton;
+        private Button HandleDiffSelectAllButton;
+        public DataGridView HandleDiffDataGridView;
+        private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
     }
 }

@@ -104,7 +104,7 @@ namespace Updater5
                     {
                         Form.NewTestCasesDataGridView.Rows.Add([false, id, tc.name, "Text step file already exists!"]);
                     }
-                    if (File.Exists(Path.Combine(repo, id + ".html")))
+                    else if (File.Exists(Path.Combine(repo, id + ".html")))
                     {
                         Form.NewTestCasesDataGridView.Rows.Add([false, id, tc.name, "HTML step file already exists!"]);
                     }
