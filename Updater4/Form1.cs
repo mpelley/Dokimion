@@ -574,7 +574,7 @@ namespace Updater4
                         if (id != null)
                         {
                             Log.Information($"Sending test case {id} for project \"{project.name}\" to Dokimion");
-                            switch (m_Dokimion.UploadTestCaseToProject(folderPath, id, project))
+                            switch (m_Dokimion.UploadXmlTestCaseToProject(folderPath, id, project))
                             {
                                 case UploadStatus.Updated:
                                     testcasesChanged++;

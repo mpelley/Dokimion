@@ -150,5 +150,21 @@ namespace Updater5
         {
             StepDownloadChangedMetadata.ChangedMetadataDataGridView_RowHeaderMouseClick(sender, e);
         }
+
+        private void HandleDiffSelectAllButton_Click(object sender, EventArgs e)
+        {
+            StepHandleDifferences.HandleDiffSelectAllButton_Click();
+        }
+
+        private void HandleDiffClearAllButton_Click(object sender, EventArgs e)
+        {
+            StepHandleDifferences.HandleDiffClearAllButton_Click();
+        }
+
+        private void UploadDiffToDokimionButton_Click(object sender, EventArgs e)
+        {
+            StepHandleDifferences.UploadDiffToDokimionButton_Click();
+        }
+
     }
 }

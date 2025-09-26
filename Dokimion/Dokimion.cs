@@ -1083,7 +1083,7 @@ namespace Dokimion
             return false;
         }
 
-        public UploadStatus UploadTestCaseToProject(string folderPath, string testcaseId, Project project)
+        public UploadStatus UploadXmlTestCaseToProject(string folderPath, string testcaseId, Project project)
         {
             string filename = Path.Combine(folderPath, testcaseId + ".xml");
             UploadStatus resp = UploadXmlFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);

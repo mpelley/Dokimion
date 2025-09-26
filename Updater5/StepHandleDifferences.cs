@@ -1,4 +1,5 @@
 ﻿using Dokimion;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace Updater5
                     }
                     if (fileStep != dokStep)
                     {
-                        Form.HandleDiffDataGridView.Rows.Add(false, id, tc.name, "Different");
+                        Form.HandleDiffDataGridView.Rows.Add(false, id, tc.name, "File is different from Dokimion");
                     }
                 }
                 else
@@ -83,5 +84,131 @@ namespace Updater5
             Form.PrevButton.Enabled = true;
             Form.NextButton.Enabled = true;
         }
+
+        public void HandleDiffSelectAllButton_Click()
+        {
+            var rows = Form.HandleDiffDataGridView.Rows;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
+                selectCell.Value = true;
+            }
+        }
+
+        public void HandleDiffClearAllButton_Click()
+        {
+            var rows = Form.HandleDiffDataGridView.Rows;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
+                selectCell.Value = false;
+            }
+        }
+
+        public void UploadDiffToDokimionButton_Click()
+        {
+            int numSelected = 0;
+            var rows = Form.HandleDiffDataGridView.Rows;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
+                if ((bool)selectCell.Value == true)
+                {
+                    numSelected++;
+                }
+            }
+
+            if (numSelected == 0)
+            {
+                Form.FeedbackTextBox.Text = "Select some test cases to upload and try again.";
+                return;
+            }
+
+            Form.FeedbackTextBox.Text = $"Uploading {numSelected} test cases from files to Dokimion.";
+            Form.FeedbackTextBox.Refresh();
+
+            Form.HandleDiffProgressBar.Minimum = 0;
+            Form.HandleDiffProgressBar.Maximum = numSelected;
+            Form.HandleDiffProgressBar.Value = 0;
+            Form.HandleDiffProgressBar.Step = 1;
+
+            string repo = Data.GetRepoFolder();
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
+                if ((bool)selectCell.Value == false)
+                {
+                    continue;
+                }
+                string id = (string)rows[i].Cells[1].Value;
+                string path = Path.Combine(repo, id + ".JSON");
+                string json;
+                try
+                {
+                    json = File.ReadAllText(path);
+                }
+                catch (Exception ex)
+                {
+                    Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
+                    Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
+                    return;
+                }
+                TestCaseForUpload? testCase = JsonConvert.DeserializeObject<TestCase>(json);
+                if (testCase == null)
+                {
+                    Form.FeedbackTextBox.Text = $"Cannot deserialize {path}.";
+                    return;
+                }
+                string action = "";
+                path = Path.Combine(repo, id + ".txt");
+                if (File.Exists(path))
+                {
+                    try
+                    {
+                        action = File.ReadAllText(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
+                        Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
+                        return;
+                    }
+                }
+                else
+                {
+                    path = Path.Combine(repo, id + ".html");
+                    if (File.Exists(path))
+                    {
+                        try
+                        {
+                            action = File.ReadAllText(path);
+                        }
+                        catch (Exception ex)
+                        {
+                            Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
+                            Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
+                        Form.FeedbackTextBox.Text += $"\r\na .txt or .html file with the step needs to exist.";
+                        return;
+                    }
+                }
+                testCase.steps = new();
+                Step step = new Step();
+                step.action = action;
+                testCase.steps.Add(step);
+                //Data.Dokimion.UploadTestCaseToProject();
+
+                Form.HandleDiffProgressBar.PerformStep();
+                Form.HandleDiffProgressBar.Refresh();
+            }
+            Form.FeedbackTextBox.Text += "\r\nDone!";
+        }
+
     }
 }

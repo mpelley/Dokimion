@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
@@ -104,10 +104,9 @@
             // PrevButton
             // 
             PrevButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            PrevButton.Location = new Point(10, 384);
-            PrevButton.Margin = new Padding(3, 2, 3, 2);
+            PrevButton.Location = new Point(11, 512);
             PrevButton.Name = "PrevButton";
-            PrevButton.Size = new Size(82, 22);
+            PrevButton.Size = new Size(94, 29);
             PrevButton.TabIndex = 0;
             PrevButton.Text = "Prev";
             PrevButton.UseVisualStyleBackColor = true;
@@ -116,10 +115,9 @@
             // NextButton
             // 
             NextButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            NextButton.Location = new Point(120, 384);
-            NextButton.Margin = new Padding(3, 2, 3, 2);
+            NextButton.Location = new Point(137, 512);
             NextButton.Name = "NextButton";
-            NextButton.Size = new Size(82, 22);
+            NextButton.Size = new Size(94, 29);
             NextButton.TabIndex = 1;
             NextButton.Text = "Next";
             NextButton.UseVisualStyleBackColor = true;
@@ -128,10 +126,9 @@
             // QuitButton
             // 
             QuitButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            QuitButton.Location = new Point(592, 384);
-            QuitButton.Margin = new Padding(3, 2, 3, 2);
+            QuitButton.Location = new Point(677, 512);
             QuitButton.Name = "QuitButton";
-            QuitButton.Size = new Size(82, 22);
+            QuitButton.Size = new Size(94, 29);
             QuitButton.TabIndex = 2;
             QuitButton.Text = "Quit";
             QuitButton.UseVisualStyleBackColor = true;
@@ -139,31 +136,28 @@
             // 
             // StepTextBox
             // 
-            StepTextBox.Location = new Point(10, 9);
-            StepTextBox.Margin = new Padding(3, 2, 3, 2);
+            StepTextBox.Location = new Point(11, 12);
             StepTextBox.Name = "StepTextBox";
             StepTextBox.ReadOnly = true;
-            StepTextBox.Size = new Size(295, 23);
+            StepTextBox.Size = new Size(337, 27);
             StepTextBox.TabIndex = 3;
             // 
             // StepProgressBar
             // 
-            StepProgressBar.Location = new Point(341, 9);
-            StepProgressBar.Margin = new Padding(3, 2, 3, 2);
+            StepProgressBar.Location = new Point(390, 12);
             StepProgressBar.Name = "StepProgressBar";
-            StepProgressBar.Size = new Size(332, 22);
+            StepProgressBar.Size = new Size(379, 29);
             StepProgressBar.TabIndex = 4;
             // 
             // FeedbackTextBox
             // 
             FeedbackTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            FeedbackTextBox.Location = new Point(10, 337);
-            FeedbackTextBox.Margin = new Padding(3, 2, 3, 2);
+            FeedbackTextBox.Location = new Point(11, 449);
             FeedbackTextBox.Multiline = true;
             FeedbackTextBox.Name = "FeedbackTextBox";
             FeedbackTextBox.ReadOnly = true;
             FeedbackTextBox.ScrollBars = ScrollBars.Vertical;
-            FeedbackTextBox.Size = new Size(664, 44);
+            FeedbackTextBox.Size = new Size(758, 57);
             FeedbackTextBox.TabIndex = 5;
             // 
             // panelLogin
@@ -178,36 +172,33 @@
             panelLogin.Controls.Add(LoginButton);
             panelLogin.Controls.Add(PasswordTextBox);
             panelLogin.Controls.Add(UserNameTextBox);
-            panelLogin.Location = new Point(10, 40);
-            panelLogin.Margin = new Padding(3, 2, 3, 2);
+            panelLogin.Location = new Point(11, 53);
             panelLogin.Name = "panelLogin";
-            panelLogin.Size = new Size(663, 292);
+            panelLogin.Size = new Size(758, 389);
             panelLogin.TabIndex = 0;
             // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(123, 104);
+            label8.Location = new Point(141, 139);
             label8.Name = "label8";
-            label8.Size = new Size(87, 15);
+            label8.Size = new Size(110, 20);
             label8.TabIndex = 29;
             label8.Text = "Server Address:";
             // 
             // UrlTextBox
             // 
-            UrlTextBox.Location = new Point(225, 101);
-            UrlTextBox.Margin = new Padding(3, 2, 3, 2);
+            UrlTextBox.Location = new Point(257, 135);
             UrlTextBox.Name = "UrlTextBox";
-            UrlTextBox.Size = new Size(406, 23);
+            UrlTextBox.Size = new Size(463, 27);
             UrlTextBox.TabIndex = 22;
             // 
             // UseHttpsCheckBox
             // 
             UseHttpsCheckBox.AutoSize = true;
-            UseHttpsCheckBox.Location = new Point(38, 102);
-            UseHttpsCheckBox.Margin = new Padding(3, 2, 3, 2);
+            UseHttpsCheckBox.Location = new Point(43, 136);
             UseHttpsCheckBox.Name = "UseHttpsCheckBox";
-            UseHttpsCheckBox.Size = new Size(75, 19);
+            UseHttpsCheckBox.Size = new Size(92, 24);
             UseHttpsCheckBox.TabIndex = 21;
             UseHttpsCheckBox.Text = "Use https";
             UseHttpsCheckBox.UseVisualStyleBackColor = true;
@@ -215,10 +206,9 @@
             // ShowPasswordCheckBox
             // 
             ShowPasswordCheckBox.AutoSize = true;
-            ShowPasswordCheckBox.Location = new Point(574, 128);
-            ShowPasswordCheckBox.Margin = new Padding(3, 2, 3, 2);
+            ShowPasswordCheckBox.Location = new Point(656, 171);
             ShowPasswordCheckBox.Name = "ShowPasswordCheckBox";
-            ShowPasswordCheckBox.Size = new Size(55, 19);
+            ShowPasswordCheckBox.Size = new Size(67, 24);
             ShowPasswordCheckBox.TabIndex = 28;
             ShowPasswordCheckBox.Text = "Show";
             ShowPasswordCheckBox.UseVisualStyleBackColor = true;
@@ -227,28 +217,27 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(310, 128);
+            label9.Location = new Point(354, 171);
             label9.Name = "label9";
-            label9.Size = new Size(60, 15);
+            label9.Size = new Size(73, 20);
             label9.TabIndex = 26;
             label9.Text = "Password:";
             // 
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(31, 130);
+            label10.Location = new Point(35, 173);
             label10.Name = "label10";
-            label10.Size = new Size(66, 15);
+            label10.Size = new Size(82, 20);
             label10.TabIndex = 24;
             label10.Text = "User name:";
             // 
             // LoginButton
             // 
             LoginButton.DialogResult = DialogResult.OK;
-            LoginButton.Location = new Point(43, 160);
-            LoginButton.Margin = new Padding(3, 2, 3, 2);
+            LoginButton.Location = new Point(49, 213);
             LoginButton.Name = "LoginButton";
-            LoginButton.Size = new Size(80, 29);
+            LoginButton.Size = new Size(91, 39);
             LoginButton.TabIndex = 27;
             LoginButton.Text = "Login";
             LoginButton.UseVisualStyleBackColor = true;
@@ -256,19 +245,17 @@
             // 
             // PasswordTextBox
             // 
-            PasswordTextBox.Location = new Point(377, 128);
-            PasswordTextBox.Margin = new Padding(3, 2, 3, 2);
+            PasswordTextBox.Location = new Point(431, 171);
             PasswordTextBox.Name = "PasswordTextBox";
             PasswordTextBox.PasswordChar = '*';
-            PasswordTextBox.Size = new Size(183, 23);
+            PasswordTextBox.Size = new Size(209, 27);
             PasswordTextBox.TabIndex = 25;
             // 
             // UserNameTextBox
             // 
-            UserNameTextBox.Location = new Point(105, 126);
-            UserNameTextBox.Margin = new Padding(3, 2, 3, 2);
+            UserNameTextBox.Location = new Point(120, 168);
             UserNameTextBox.Name = "UserNameTextBox";
-            UserNameTextBox.Size = new Size(197, 23);
+            UserNameTextBox.Size = new Size(225, 27);
             UserNameTextBox.TabIndex = 23;
             // 
             // panelDownloadChangedMetadata
@@ -280,10 +267,9 @@
             panelDownloadChangedMetadata.Controls.Add(ClearAllChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(SelectAllChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDataGridView);
-            panelDownloadChangedMetadata.Location = new Point(10, 40);
-            panelDownloadChangedMetadata.Margin = new Padding(3, 2, 3, 2);
+            panelDownloadChangedMetadata.Location = new Point(11, 53);
             panelDownloadChangedMetadata.Name = "panelDownloadChangedMetadata";
-            panelDownloadChangedMetadata.Size = new Size(663, 292);
+            panelDownloadChangedMetadata.Size = new Size(758, 389);
             panelDownloadChangedMetadata.TabIndex = 0;
             panelDownloadChangedMetadata.Visible = false;
             // 
@@ -315,14 +301,15 @@
             ChangedMetadataDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
             ChangedMetadataDiffViewer.LineNumberWidth = 60;
             ChangedMetadataDiffViewer.LinesContext = 1;
-            ChangedMetadataDiffViewer.Location = new Point(0, 128);
+            ChangedMetadataDiffViewer.Location = new Point(0, 171);
+            ChangedMetadataDiffViewer.Margin = new Padding(3, 4, 3, 4);
             ChangedMetadataDiffViewer.Name = "ChangedMetadataDiffViewer";
             ChangedMetadataDiffViewer.NewText = null;
             ChangedMetadataDiffViewer.NewTextHeader = null;
             ChangedMetadataDiffViewer.OldText = null;
             ChangedMetadataDiffViewer.OldTextHeader = null;
             ChangedMetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
-            ChangedMetadataDiffViewer.Size = new Size(658, 132);
+            ChangedMetadataDiffViewer.Size = new Size(752, 176);
             ChangedMetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
             ChangedMetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             ChangedMetadataDiffViewer.SplitterBorderWidth = new Padding(0);
@@ -334,19 +321,17 @@
             // ChangedMetadataProgressBar
             // 
             ChangedMetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            ChangedMetadataProgressBar.Location = new Point(299, 265);
-            ChangedMetadataProgressBar.Margin = new Padding(3, 2, 3, 2);
+            ChangedMetadataProgressBar.Location = new Point(342, 353);
             ChangedMetadataProgressBar.Name = "ChangedMetadataProgressBar";
-            ChangedMetadataProgressBar.Size = new Size(359, 22);
+            ChangedMetadataProgressBar.Size = new Size(410, 29);
             ChangedMetadataProgressBar.TabIndex = 4;
             // 
             // DownloadChangedMetadataButton
             // 
             DownloadChangedMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DownloadChangedMetadataButton.Location = new Point(8, 266);
-            DownloadChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            DownloadChangedMetadataButton.Location = new Point(9, 355);
             DownloadChangedMetadataButton.Name = "DownloadChangedMetadataButton";
-            DownloadChangedMetadataButton.Size = new Size(271, 22);
+            DownloadChangedMetadataButton.Size = new Size(310, 29);
             DownloadChangedMetadataButton.TabIndex = 3;
             DownloadChangedMetadataButton.Text = "Download Selected Metadata from Dokimion";
             DownloadChangedMetadataButton.UseVisualStyleBackColor = true;
@@ -354,10 +339,9 @@
             // 
             // ClearAllChangedMetadataButton
             // 
-            ClearAllChangedMetadataButton.Location = new Point(91, 6);
-            ClearAllChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            ClearAllChangedMetadataButton.Location = new Point(104, 8);
             ClearAllChangedMetadataButton.Name = "ClearAllChangedMetadataButton";
-            ClearAllChangedMetadataButton.Size = new Size(82, 22);
+            ClearAllChangedMetadataButton.Size = new Size(94, 29);
             ClearAllChangedMetadataButton.TabIndex = 2;
             ClearAllChangedMetadataButton.Text = "Clear All";
             ClearAllChangedMetadataButton.UseVisualStyleBackColor = true;
@@ -365,10 +349,9 @@
             // 
             // SelectAllChangedMetadataButton
             // 
-            SelectAllChangedMetadataButton.Location = new Point(4, 6);
-            SelectAllChangedMetadataButton.Margin = new Padding(3, 2, 3, 2);
+            SelectAllChangedMetadataButton.Location = new Point(5, 8);
             SelectAllChangedMetadataButton.Name = "SelectAllChangedMetadataButton";
-            SelectAllChangedMetadataButton.Size = new Size(82, 22);
+            SelectAllChangedMetadataButton.Size = new Size(94, 29);
             SelectAllChangedMetadataButton.TabIndex = 1;
             SelectAllChangedMetadataButton.Text = "Select All";
             SelectAllChangedMetadataButton.UseVisualStyleBackColor = true;
@@ -379,20 +362,20 @@
             ChangedMetadataDataGridView.AllowUserToAddRows = false;
             ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
             ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = SystemColors.Control;
+            dataGridViewCellStyle7.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle7.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
+            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            ChangedMetadataDataGridView.ColumnHeadersHeight = 29;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
-            ChangedMetadataDataGridView.Location = new Point(3, 32);
-            ChangedMetadataDataGridView.Margin = new Padding(3, 2, 3, 2);
+            ChangedMetadataDataGridView.Location = new Point(3, 43);
             ChangedMetadataDataGridView.Name = "ChangedMetadataDataGridView";
             ChangedMetadataDataGridView.RowHeadersWidth = 51;
-            ChangedMetadataDataGridView.Size = new Size(655, 96);
+            ChangedMetadataDataGridView.Size = new Size(749, 128);
             ChangedMetadataDataGridView.TabIndex = 0;
             ChangedMetadataDataGridView.CellMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
             ChangedMetadataDataGridView.RowHeaderMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
@@ -433,10 +416,9 @@
             panelSelectProject.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelSelectProject.Controls.Add(ProjectsListBox);
             panelSelectProject.Controls.Add(label2);
-            panelSelectProject.Location = new Point(10, 40);
-            panelSelectProject.Margin = new Padding(3, 2, 3, 2);
+            panelSelectProject.Location = new Point(11, 53);
             panelSelectProject.Name = "panelSelectProject";
-            panelSelectProject.Size = new Size(663, 292);
+            panelSelectProject.Size = new Size(758, 389);
             panelSelectProject.TabIndex = 0;
             panelSelectProject.Visible = false;
             // 
@@ -444,20 +426,18 @@
             // 
             ProjectsListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ProjectsListBox.FormattingEnabled = true;
-            ProjectsListBox.ItemHeight = 15;
-            ProjectsListBox.Location = new Point(14, 44);
-            ProjectsListBox.Margin = new Padding(3, 2, 3, 2);
+            ProjectsListBox.Location = new Point(16, 59);
             ProjectsListBox.Name = "ProjectsListBox";
-            ProjectsListBox.Size = new Size(644, 244);
+            ProjectsListBox.Size = new Size(735, 324);
             ProjectsListBox.TabIndex = 32;
             ProjectsListBox.SelectedIndexChanged += ProjectsListBox_SelectedIndexChanged;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(14, 13);
+            label2.Location = new Point(16, 17);
             label2.Name = "label2";
-            label2.Size = new Size(187, 15);
+            label2.Size = new Size(235, 20);
             label2.TabIndex = 0;
             label2.Text = "Select One Project from Dokimion";
             // 
@@ -468,20 +448,18 @@
             panelSelectRepo.Controls.Add(FolderTextBox);
             panelSelectRepo.Controls.Add(BrowseFileSystemButton);
             panelSelectRepo.Controls.Add(label3);
-            panelSelectRepo.Location = new Point(10, 40);
-            panelSelectRepo.Margin = new Padding(3, 2, 3, 2);
+            panelSelectRepo.Location = new Point(11, 53);
             panelSelectRepo.Name = "panelSelectRepo";
-            panelSelectRepo.Size = new Size(663, 292);
+            panelSelectRepo.Size = new Size(758, 389);
             panelSelectRepo.TabIndex = 0;
             panelSelectRepo.Visible = false;
             // 
             // FolderForAllProjectsCheckBox
             // 
             FolderForAllProjectsCheckBox.AutoSize = true;
-            FolderForAllProjectsCheckBox.Location = new Point(124, 78);
-            FolderForAllProjectsCheckBox.Margin = new Padding(3, 2, 3, 2);
+            FolderForAllProjectsCheckBox.Location = new Point(142, 104);
             FolderForAllProjectsCheckBox.Name = "FolderForAllProjectsCheckBox";
-            FolderForAllProjectsCheckBox.Size = new Size(329, 19);
+            FolderForAllProjectsCheckBox.Size = new Size(415, 24);
             FolderForAllProjectsCheckBox.TabIndex = 5;
             FolderForAllProjectsCheckBox.Text = "Use one folder for all projects, each project in a subfolder.";
             FolderForAllProjectsCheckBox.UseVisualStyleBackColor = true;
@@ -489,19 +467,17 @@
             // FolderTextBox
             // 
             FolderTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            FolderTextBox.Location = new Point(37, 102);
-            FolderTextBox.Margin = new Padding(3, 2, 3, 2);
+            FolderTextBox.Location = new Point(42, 136);
             FolderTextBox.Name = "FolderTextBox";
-            FolderTextBox.Size = new Size(622, 23);
+            FolderTextBox.Size = new Size(710, 27);
             FolderTextBox.TabIndex = 4;
             FolderTextBox.TextChanged += FolderTextBox_TextChanged;
             // 
             // BrowseFileSystemButton
             // 
-            BrowseFileSystemButton.Location = new Point(37, 76);
-            BrowseFileSystemButton.Margin = new Padding(3, 2, 3, 2);
+            BrowseFileSystemButton.Location = new Point(42, 101);
             BrowseFileSystemButton.Name = "BrowseFileSystemButton";
-            BrowseFileSystemButton.Size = new Size(82, 22);
+            BrowseFileSystemButton.Size = new Size(94, 29);
             BrowseFileSystemButton.TabIndex = 3;
             BrowseFileSystemButton.Text = "Browse...";
             BrowseFileSystemButton.UseVisualStyleBackColor = true;
@@ -510,9 +486,9 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(31, 44);
+            label3.Location = new Point(35, 59);
             label3.Name = "label3";
-            label3.Size = new Size(232, 15);
+            label3.Size = new Size(295, 20);
             label3.TabIndex = 0;
             label3.Text = "Select the folder holding the repo or repos.";
             // 
@@ -525,19 +501,17 @@
             panelDownloadNewTestCases.Controls.Add(DownloadTestCasesButton);
             panelDownloadNewTestCases.Controls.Add(NewTestCasesDataGridView);
             panelDownloadNewTestCases.Controls.Add(MetadataProgressBar);
-            panelDownloadNewTestCases.Location = new Point(10, 40);
-            panelDownloadNewTestCases.Margin = new Padding(3, 2, 3, 2);
+            panelDownloadNewTestCases.Location = new Point(11, 53);
             panelDownloadNewTestCases.Name = "panelDownloadNewTestCases";
-            panelDownloadNewTestCases.Size = new Size(663, 292);
+            panelDownloadNewTestCases.Size = new Size(758, 389);
             panelDownloadNewTestCases.TabIndex = 0;
             panelDownloadNewTestCases.Visible = false;
             // 
             // RescanButton
             // 
-            RescanButton.Location = new Point(221, 16);
-            RescanButton.Margin = new Padding(3, 2, 3, 2);
+            RescanButton.Location = new Point(253, 21);
             RescanButton.Name = "RescanButton";
-            RescanButton.Size = new Size(115, 22);
+            RescanButton.Size = new Size(131, 29);
             RescanButton.TabIndex = 7;
             RescanButton.Text = "Rescan test cases";
             RescanButton.UseVisualStyleBackColor = true;
@@ -545,10 +519,9 @@
             // 
             // ClearAllButton
             // 
-            ClearAllButton.Location = new Point(118, 15);
-            ClearAllButton.Margin = new Padding(3, 2, 3, 2);
+            ClearAllButton.Location = new Point(135, 20);
             ClearAllButton.Name = "ClearAllButton";
-            ClearAllButton.Size = new Size(82, 22);
+            ClearAllButton.Size = new Size(94, 29);
             ClearAllButton.TabIndex = 6;
             ClearAllButton.Text = "Clear All";
             ClearAllButton.UseVisualStyleBackColor = true;
@@ -556,10 +529,9 @@
             // 
             // SelectAllButton
             // 
-            SelectAllButton.Location = new Point(14, 16);
-            SelectAllButton.Margin = new Padding(3, 2, 3, 2);
+            SelectAllButton.Location = new Point(16, 21);
             SelectAllButton.Name = "SelectAllButton";
-            SelectAllButton.Size = new Size(82, 22);
+            SelectAllButton.Size = new Size(94, 29);
             SelectAllButton.TabIndex = 5;
             SelectAllButton.Text = "Select All";
             SelectAllButton.UseVisualStyleBackColor = true;
@@ -568,10 +540,9 @@
             // DownloadTestCasesButton
             // 
             DownloadTestCasesButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DownloadTestCasesButton.Location = new Point(12, 266);
-            DownloadTestCasesButton.Margin = new Padding(3, 2, 3, 2);
+            DownloadTestCasesButton.Location = new Point(14, 355);
             DownloadTestCasesButton.Name = "DownloadTestCasesButton";
-            DownloadTestCasesButton.Size = new Size(220, 22);
+            DownloadTestCasesButton.Size = new Size(251, 29);
             DownloadTestCasesButton.TabIndex = 3;
             DownloadTestCasesButton.Text = "Download selected test cases";
             DownloadTestCasesButton.UseVisualStyleBackColor = true;
@@ -584,12 +555,11 @@
             NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, Issue });
-            NewTestCasesDataGridView.Location = new Point(11, 44);
-            NewTestCasesDataGridView.Margin = new Padding(3, 2, 3, 2);
+            NewTestCasesDataGridView.Location = new Point(13, 59);
             NewTestCasesDataGridView.Name = "NewTestCasesDataGridView";
             NewTestCasesDataGridView.RowHeadersVisible = false;
             NewTestCasesDataGridView.RowHeadersWidth = 51;
-            NewTestCasesDataGridView.Size = new Size(647, 218);
+            NewTestCasesDataGridView.Size = new Size(739, 291);
             NewTestCasesDataGridView.TabIndex = 2;
             // 
             // MetadataSelect
@@ -618,6 +588,7 @@
             // Issue
             // 
             Issue.HeaderText = "Issue";
+            Issue.MinimumWidth = 6;
             Issue.Name = "Issue";
             Issue.ReadOnly = true;
             Issue.Width = 200;
@@ -625,10 +596,9 @@
             // MetadataProgressBar
             // 
             MetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            MetadataProgressBar.Location = new Point(243, 265);
-            MetadataProgressBar.Margin = new Padding(3, 2, 3, 2);
+            MetadataProgressBar.Location = new Point(278, 353);
             MetadataProgressBar.Name = "MetadataProgressBar";
-            MetadataProgressBar.Size = new Size(415, 22);
+            MetadataProgressBar.Size = new Size(474, 29);
             MetadataProgressBar.Style = ProgressBarStyle.Continuous;
             MetadataProgressBar.TabIndex = 1;
             // 
@@ -641,10 +611,9 @@
             panelHandleDifferences.Controls.Add(HandleDiffClearAllButton);
             panelHandleDifferences.Controls.Add(HandleDiffSelectAllButton);
             panelHandleDifferences.Controls.Add(HandleDiffDataGridView);
-            panelHandleDifferences.Location = new Point(10, 40);
-            panelHandleDifferences.Margin = new Padding(3, 2, 3, 2);
+            panelHandleDifferences.Location = new Point(11, 53);
             panelHandleDifferences.Name = "panelHandleDifferences";
-            panelHandleDifferences.Size = new Size(663, 292);
+            panelHandleDifferences.Size = new Size(758, 389);
             panelHandleDifferences.TabIndex = 0;
             panelHandleDifferences.Visible = false;
             // 
@@ -676,14 +645,15 @@
             HandleDiffDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
             HandleDiffDiffViewer.LineNumberWidth = 60;
             HandleDiffDiffViewer.LinesContext = 1;
-            HandleDiffDiffViewer.Location = new Point(2, 127);
+            HandleDiffDiffViewer.Location = new Point(2, 169);
+            HandleDiffDiffViewer.Margin = new Padding(3, 4, 3, 4);
             HandleDiffDiffViewer.Name = "HandleDiffDiffViewer";
             HandleDiffDiffViewer.NewText = null;
             HandleDiffDiffViewer.NewTextHeader = null;
             HandleDiffDiffViewer.OldText = null;
             HandleDiffDiffViewer.OldTextHeader = null;
             HandleDiffDiffViewer.SideBySideModeToggleTitle = "_Split view";
-            HandleDiffDiffViewer.Size = new Size(658, 132);
+            HandleDiffDiffViewer.Size = new Size(752, 176);
             HandleDiffDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
             HandleDiffDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             HandleDiffDiffViewer.SplitterBorderWidth = new Padding(0);
@@ -695,62 +665,61 @@
             // HandleDiffProgressBar
             // 
             HandleDiffProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            HandleDiffProgressBar.Location = new Point(301, 264);
-            HandleDiffProgressBar.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffProgressBar.Location = new Point(344, 352);
             HandleDiffProgressBar.Name = "HandleDiffProgressBar";
-            HandleDiffProgressBar.Size = new Size(359, 22);
+            HandleDiffProgressBar.Size = new Size(410, 29);
             HandleDiffProgressBar.TabIndex = 10;
             // 
             // UploadDiffToDokimionButton
             // 
             UploadDiffToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            UploadDiffToDokimionButton.Location = new Point(10, 265);
-            UploadDiffToDokimionButton.Margin = new Padding(3, 2, 3, 2);
+            UploadDiffToDokimionButton.Location = new Point(11, 353);
             UploadDiffToDokimionButton.Name = "UploadDiffToDokimionButton";
-            UploadDiffToDokimionButton.Size = new Size(271, 22);
+            UploadDiffToDokimionButton.Size = new Size(310, 29);
             UploadDiffToDokimionButton.TabIndex = 9;
             UploadDiffToDokimionButton.Text = "Upload Selected Test Cases to Dokimion";
             UploadDiffToDokimionButton.UseVisualStyleBackColor = true;
+            UploadDiffToDokimionButton.Click += UploadDiffToDokimionButton_Click;
             // 
             // HandleDiffClearAllButton
             // 
-            HandleDiffClearAllButton.Location = new Point(93, 5);
-            HandleDiffClearAllButton.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffClearAllButton.Location = new Point(106, 7);
             HandleDiffClearAllButton.Name = "HandleDiffClearAllButton";
-            HandleDiffClearAllButton.Size = new Size(82, 22);
+            HandleDiffClearAllButton.Size = new Size(94, 29);
             HandleDiffClearAllButton.TabIndex = 8;
             HandleDiffClearAllButton.Text = "Clear All";
             HandleDiffClearAllButton.UseVisualStyleBackColor = true;
+            HandleDiffClearAllButton.Click += HandleDiffClearAllButton_Click;
             // 
             // HandleDiffSelectAllButton
             // 
-            HandleDiffSelectAllButton.Location = new Point(6, 5);
-            HandleDiffSelectAllButton.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffSelectAllButton.Location = new Point(7, 7);
             HandleDiffSelectAllButton.Name = "HandleDiffSelectAllButton";
-            HandleDiffSelectAllButton.Size = new Size(82, 22);
+            HandleDiffSelectAllButton.Size = new Size(94, 29);
             HandleDiffSelectAllButton.TabIndex = 7;
             HandleDiffSelectAllButton.Text = "Select All";
             HandleDiffSelectAllButton.UseVisualStyleBackColor = true;
+            HandleDiffSelectAllButton.Click += HandleDiffSelectAllButton_Click;
             // 
             // HandleDiffDataGridView
             // 
             HandleDiffDataGridView.AllowUserToAddRows = false;
             HandleDiffDataGridView.AllowUserToDeleteRows = false;
             HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Control;
-            dataGridViewCellStyle4.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = SystemColors.Control;
+            dataGridViewCellStyle8.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            HandleDiffDataGridView.ColumnHeadersHeight = 29;
             HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
-            HandleDiffDataGridView.Location = new Point(5, 31);
-            HandleDiffDataGridView.Margin = new Padding(3, 2, 3, 2);
+            HandleDiffDataGridView.Location = new Point(6, 41);
             HandleDiffDataGridView.Name = "HandleDiffDataGridView";
             HandleDiffDataGridView.RowHeadersWidth = 51;
-            HandleDiffDataGridView.Size = new Size(655, 96);
+            HandleDiffDataGridView.Size = new Size(749, 128);
             HandleDiffDataGridView.TabIndex = 6;
             // 
             // dataGridViewCheckBoxColumn1
@@ -788,10 +757,9 @@
             // 
             panelDone.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelDone.Controls.Add(label7);
-            panelDone.Location = new Point(10, 40);
-            panelDone.Margin = new Padding(3, 2, 3, 2);
+            panelDone.Location = new Point(11, 53);
             panelDone.Name = "panelDone";
-            panelDone.Size = new Size(663, 292);
+            panelDone.Size = new Size(758, 389);
             panelDone.TabIndex = 0;
             panelDone.Visible = false;
             // 
@@ -800,17 +768,17 @@
             label7.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 16F);
-            label7.Location = new Point(258, 124);
+            label7.Location = new Point(295, 165);
             label7.Name = "label7";
-            label7.Size = new Size(71, 30);
+            label7.Size = new Size(89, 37);
             label7.TabIndex = 0;
             label7.Text = "Done!";
             // 
             // Updater
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 415);
+            ClientSize = new Size(782, 553);
             Controls.Add(panelHandleDifferences);
             Controls.Add(panelDownloadChangedMetadata);
             Controls.Add(panelDownloadNewTestCases);
@@ -824,7 +792,6 @@
             Controls.Add(QuitButton);
             Controls.Add(NextButton);
             Controls.Add(PrevButton);
-            Margin = new Padding(3, 2, 3, 2);
             Name = "Updater";
             Text = "Updater";
             panelLogin.ResumeLayout(false);
