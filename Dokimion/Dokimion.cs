@@ -1,9 +1,9 @@
 ﻿using MimeMapping;
-
-using System.Text;
-using System.Xml;
 using Newtonsoft.Json;
 using Serilog;
+using System.IO;
+using System.Text;
+using System.Xml;
 
 // See https://github.com/greatbit/quack/wiki for the API specifications
 
@@ -47,15 +47,12 @@ namespace Dokimion
         public string name = "";
     }
 
-    public class Project
+    public class Project : ProjectForUpload
     {
-        public string description = "";
-        public string[] readWriteUsers = { "" };
-        public string id = "";
-        public string name = "";
         public bool deleted;
         public Dictionary<string, string> attributes = new Dictionary<string, string>();
 
+        [JsonIgnoreAttribute]
         public string Name
         {
             get { return name; }
@@ -764,18 +761,43 @@ namespace Dokimion
             return GetTestCaseAsObject(url);
         }
 
-        public bool DownloadTestcase(string testcaseId, Project project, string folderPath)
+        public bool DownloadTestCaseAsJson(string testcaseId, Project project, string folderPath)
         {
-            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testcaseId;
-
             // Get the test case from Dokimion
+            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testcaseId;
             TestCase? testcase = GetTestCaseAsObject(url);
             if (testcase == null)
             {
                 return false;
             }
 
-            // Generate the XML format for this testcaseFromDokimion
+            // Generate the JSON format for this testcase
+            Metadata metadata = testcase.ExtractMetadata();
+            string json = metadata.PrettyPrint() ;
+
+            // Save the json of the test case:
+            if (false == SaveTestCase(testcaseId, folderPath, json, ".JSON"))
+            {
+                return false;
+            }
+
+            // Save any attachments:
+            bool success = SaveAllAttachments(project, folderPath, testcase);
+
+            return success;
+        }
+
+        public bool DownloadTestCaseAsXml(string testcaseId, Project project, string folderPath)
+        {
+            // Get the test case from Dokimion
+            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testcaseId;
+            TestCase? testcase = GetTestCaseAsObject(url);
+            if (testcase == null)
+            {
+                return false;
+            }
+
+            // Generate the XML format for this testcase
             string xml = GenerateXml(testcase, project);
             if (string.IsNullOrEmpty(xml))
             {
@@ -783,12 +805,19 @@ namespace Dokimion
             }
 
             // Save the xml of the test case:
-            if (false == SaveTestCase(testcaseId, folderPath, xml))
+            if (false == SaveTestCase(testcaseId, folderPath, xml, ".xml"))
             {
                 return false;
             }
 
             // Save any attachments:
+            bool success = SaveAllAttachments(project, folderPath, testcase);
+
+            return success;
+        }
+
+        private bool SaveAllAttachments(Project project, string folderPath, TestCase testcase)
+        {
             foreach (var attachment in testcase.attachments)
             {
                 byte[]? fileContent = GetAttachment(project.id, testcase.id, attachment.id);
@@ -797,7 +826,7 @@ namespace Dokimion
                     return false;
                 }
 
-                string filename = $"{testcaseId}_{attachment.title}";
+                string filename = $"{testcase.id}_{attachment.title}";
                 if (false == SaveAttachment(filename, folderPath, fileContent))
                 {
                     return false;
@@ -957,7 +986,7 @@ namespace Dokimion
             return encoding.GetString(bytes, 0, bytes.Length);
         }
 
-        private bool SaveTestCase(string testcaseId, string folderPath, string xml)
+        private bool SaveTestCase(string testcaseId, string folderPath, string xml, string extension)
         {
             // Create the folder for this project if it does not exist
             if (false == Directory.Exists(folderPath))
@@ -978,7 +1007,7 @@ namespace Dokimion
             }
 
             // Save the file in the repo folder
-            string path = Path.Combine(folderPath, testcaseId + ".xml");
+            string path = Path.Combine(folderPath, testcaseId + extension);
             try
             {
                 File.WriteAllText(path, xml);
@@ -1086,14 +1115,15 @@ namespace Dokimion
         public UploadStatus UploadXmlTestCaseToProject(string folderPath, string testcaseId, Project project)
         {
             string filename = Path.Combine(folderPath, testcaseId + ".xml");
-            UploadStatus resp = UploadXmlFileToProjectIfDifferent(filename, project, out TestCaseForUpload? uploaded);
-            if (uploaded == null)
+            TestCaseForUpload? extracted = TestCaseObjectFromXml(filename, project);
+            if (extracted == null)
             {
                 return UploadStatus.Error;
             }
-            bool updated = resp == UploadStatus.Updated;
+            UploadStatus resp = UploadTestCaseObjectToProjectIfDifferent( project, extracted);
+            bool updated = (resp == UploadStatus.Updated);
 
-            UploadStatus attResp = UploadAttachments(folderPath, uploaded, project);
+            UploadStatus attResp = UploadAttachments(folderPath, extracted, project);
             switch (attResp)
             {
                 case UploadStatus.Error:
@@ -1109,7 +1139,7 @@ namespace Dokimion
             }
             if (updated)
             {
-                if (false == DownloadTestcase(testcaseId, project, folderPath))
+                if (false == DownloadTestCaseAsXml(testcaseId, project, folderPath))
                 {
                     // DownloadTestcase sets Error
                     return UploadStatus.Error;
@@ -1118,9 +1148,90 @@ namespace Dokimion
             return attResp;
         }
 
-        public UploadStatus UploadXmlFileToProjectIfDifferent(string path, Project project, out TestCaseForUpload? uploaded)
+        public UploadStatus UploadTestCaseObjectToProject(string folderPath, TestCaseForUpload testCase, Project project)
         {
-            uploaded = null;
+            UploadStatus resp = UploadTestCaseObjectToProjectIfDifferent(project, testCase);
+
+            bool updated = (resp == UploadStatus.Updated);
+
+            UploadStatus attResp = UploadAttachments(folderPath, testCase, project);
+            switch (attResp)
+            {
+                case UploadStatus.Error:
+                    return UploadStatus.Error;
+                case UploadStatus.NoChange:
+                    attResp = resp;
+                    break;
+                case UploadStatus.Updated:
+                    updated = true;
+                    break;
+                default:
+                    return UploadStatus.Error;
+            }
+            if (updated)
+            {
+                if (false == DownloadTestCaseAsJson(testCase.id, project, folderPath))
+                {
+                    // DownloadTestcase sets Error
+                    return UploadStatus.Error;
+                }
+            }
+            return attResp;
+        }
+
+        public UploadStatus UploadTestCaseObjectToProjectIfDifferent(Project project, TestCaseForUpload? testCaseToUpload)
+        {
+            if (testCaseToUpload == null)
+            {
+                return UploadStatus.Error;
+            }
+
+            // Download the TestCase from Dokimion
+            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testCaseToUpload.id;
+            TestCase? testcaseFromDokimion = GetTestCaseAsObject(url);
+
+            bool changed = true;
+            bool overwrite = false;
+            long lastModifiedTimeFromDokimion = 0;
+            int extractedId = int.Parse(testCaseToUpload.id);
+            if (testcaseFromDokimion == null)
+            {
+                // We are uploading a missing test case, so create test cases up to that number so we can then replace it
+                // Keep the last one created so we know its timestamp.
+                UploadStatus status = CreateFillerTestCases(project, extractedId, ref testcaseFromDokimion);
+                if (status == UploadStatus.Error)
+                {
+                    return status;
+                }
+                if (testcaseFromDokimion == null)
+                {
+                    return UploadStatus.Error;
+                }
+                // Pretend we are up to date with Dokimion
+                testCaseToUpload.lastModifiedTime = testcaseFromDokimion.lastModifiedTime;
+            }
+            else
+            {
+                // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
+                changed = IsTestCaseChanged(testcaseFromDokimion, testCaseToUpload);
+                // Automatically overwrite our dummy test cases and deleted test cases:
+                if ((testcaseFromDokimion.name == "<<empty>>") || (testcaseFromDokimion.deleted == true))
+                {
+                    overwrite = true;
+                }
+            }
+            lastModifiedTimeFromDokimion = testcaseFromDokimion.lastModifiedTime;
+
+            // If different, write tc TestCase to server.
+            if (changed)
+            {
+                return UploadTestCaseToProjectWithRetries(project, testCaseToUpload, lastModifiedTimeFromDokimion, overwrite);
+            }
+            return UploadStatus.NoChange;
+        }
+
+        private TestCaseForUpload? TestCaseObjectFromXml(string path, Project project)
+        {
             // Read text from XML file.
             string xmlText = "";
             try
@@ -1129,8 +1240,8 @@ namespace Dokimion
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
-                return UploadStatus.Error;
+                Error = $"Cannot read file at {path} because: {ex.Message}";
+                return null;
             }
 
             // Create XmlDocument.
@@ -1141,83 +1252,58 @@ namespace Dokimion
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
-                return UploadStatus.Error;
+                Error = $"Cannot parse XML file at {path} because: {ex.Message}";
+                return null;
             }
 
             // Extract info from XmlDocument to an instance of TestCase.
             TestCaseForUpload? extracted = XmlToObject(xmlDoc, path, project);
             if (extracted == null)
             {
-                Error = $"Cannot convert XML file {path} to a test case object";
-                return UploadStatus.Error;
+                Error += $"\r\nCannot convert XML file {path} to a test case object";
+                return null;
             }
-            uploaded = extracted;
 
-            // Download the TestCase from Dokimion
-            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + extracted.id;
-            TestCase? testcaseFromDokimion = GetTestCaseAsObject(url);
-            bool changed = true;
-            bool overwrite = false;
-            long lastModifiedTimeFromDokimion = 0;
-            int extractedId = int.Parse(extracted.id);
-            int testCaseId = 0;
-            if (testcaseFromDokimion == null)
+            return extracted;
+        }
+
+        private UploadStatus CreateFillerTestCases(Project project, int extractedId, ref TestCase? fromDokimion)
+        {
+            // Define an empty test case
+            TestCaseForUpload testCaseForUpload = new TestCaseForUpload();
+            testCaseForUpload.name = "<<empty>>";
+            string json = JsonConvert.SerializeObject(testCaseForUpload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase";
+            int testCaseId;
+            fromDokimion = new();
+            do
             {
-                // We are uploading a missing test case, so create test cases up to that number so we can then replace it
-                TestCaseForUpload tc = new TestCaseForUpload();
-                tc.name = "<<empty>>";
-                string json = JsonConvert.SerializeObject(tc);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                url = BaseDokimionApiUrl() + "/" + project.id + "/testcase";
-                TestCase? testcase;
-                do
+                try
                 {
-                    try
+                    var resp = m_Client.PostAsync(url, content).Result;
+                    if (false == resp.IsSuccessStatusCode)
                     {
-                        var resp = m_Client.PostAsync(url, content).Result;
-                        if (false == resp.IsSuccessStatusCode)
-                        {
-                            Error = $"Error {resp.ReasonPhrase} when trying to create an empty test case.";
-                            return UploadStatus.Error;
-                        }
-                        string responseContent = resp.Content.ReadAsStringAsync().Result;
-                        // Deserialize response into our TestCase object
-                        testcase = JsonConvert.DeserializeObject<TestCase>(responseContent);
-                        if (testcase == null)
-                        {
-                            Error = "Cannot decode: \r\n" + responseContent;
-                            return UploadStatus.Error;
-                        }
-                        testCaseId = int.Parse(testcase.id);
-                        lastModifiedTimeFromDokimion = testcase.lastModifiedTime;
-                        extracted.lastModifiedTime = lastModifiedTimeFromDokimion;
-                    }
-                    catch (Exception ex)
-                    {
-                        Error = $"Exception thrown when trying to create an empty test case:\n{ex.Message}";
+                        Error = $"Error {resp.ReasonPhrase} when trying to create an empty test case.";
                         return UploadStatus.Error;
                     }
-                } while (testCaseId < extractedId);
-            }
-            else
-            {
-                lastModifiedTimeFromDokimion = testcaseFromDokimion.lastModifiedTime;
-                // Compare selected contents of the tc TestCase to the TestCase read from Dokimion.
-                changed = IsTestCaseChanged(testcaseFromDokimion, extracted);
-                // Automatically overwrite our dummy test cases and deleted test cases:
-                if ((testcaseFromDokimion.name == "<<empty>>") || (testcaseFromDokimion.deleted == true))
-                {
-                    overwrite = true;
+                    string responseContent = resp.Content.ReadAsStringAsync().Result;
+                    // Deserialize response into a TestCase object
+                    fromDokimion = JsonConvert.DeserializeObject<TestCase>(responseContent);
+                    if (fromDokimion == null)
+                    {
+                        Error = "Cannot decode: \r\n" + responseContent;
+                        return UploadStatus.Error;
+                    }
+                    testCaseId = int.Parse(fromDokimion.id);
                 }
-            }
-
-            // If different, write tc TestCase to server.
-            if (changed)
-            {
-                return UploadTestCaseToProjectWithRetries(path, project, extracted, lastModifiedTimeFromDokimion, overwrite);
-            }
-            return UploadStatus.NoChange;
+                catch (Exception ex)
+                {
+                    Error = $"Exception thrown when trying to create an empty test case:\n{ex.Message}";
+                    return UploadStatus.Error;
+                }
+            } while (testCaseId < extractedId);
+            return UploadStatus.Updated;
         }
 
         UploadStatus UploadAttachments(string folderPath, TestCaseForUpload testcase, Project project)
@@ -1328,15 +1414,13 @@ namespace Dokimion
             return didUpload ? UploadStatus.Updated : UploadStatus.NoChange;
         }
 
-        private UploadStatus UploadTestCaseToProjectWithRetries(string filename, Project project, TestCaseForUpload extracted, long lastModifiedTimeFromDokimion, bool overwrite)
+        private UploadStatus UploadTestCaseToProjectWithRetries(Project project, TestCaseForUpload extracted, long lastModifiedTimeFromDokimion, bool overwrite)
         {
             DialogResult answer = UploadTestCaseObject(extracted, project, overwrite);
             switch (answer)
             {
                 case DialogResult.OK:
-                    // "OK" is processed further down in this function
-                    // to eliminate duplicate code
-                    break;
+                    return UploadStatus.Updated;
 
                 case DialogResult.TryAgain:
                     // Use the time from what is currently in Dokimion so it will be accepted:
@@ -1357,14 +1441,6 @@ namespace Dokimion
             switch (answer)
             {
                 case DialogResult.OK:
-                    // Download the test case again so that we get the latest timestamp
-                    FileInfo? fi = new FileInfo(filename);
-                    string? folderPath = fi.DirectoryName;
-                    if (folderPath == null)
-                    {
-                        Error = "Cannot get folder name from " + filename;
-                        return UploadStatus.Error;
-                    }
                     return UploadStatus.Updated;
                 case DialogResult.TryAgain:
                     // The retry didn't work, so return an error

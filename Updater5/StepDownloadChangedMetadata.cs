@@ -38,7 +38,20 @@ namespace Updater5
             Form.FeedbackTextBox.Text = "Checking for changed metadata files.";
             //Form.FeedbackTextBox.Refresh();
 
+            CompareMetadata();
+
+            Form.ChangedMetadataDiffViewer.OldTextHeader = "From Repo";
+            Form.ChangedMetadataDiffViewer.NewTextHeader = "From Dokimion";
+
+            Form.FeedbackTextBox.Text += "\r\nDone.";
+            Form.PrevButton.Enabled = true;
+            Form.NextButton.Enabled = true;
+        }
+
+        private void CompareMetadata()
+        {
             string repo = Data.GetRepoFolder();
+            MetadataFromFiles.Clear();
             Form.ChangedMetadataDataGridView.Rows.Clear();
             foreach (string id in Data.TestCases.Keys)
             {
@@ -59,13 +72,6 @@ namespace Updater5
                     Form.ChangedMetadataDataGridView.Rows.Add([false, id, tc.name, "Missing"]);
                 }
             }
-
-            Form.ChangedMetadataDiffViewer.OldTextHeader = "From Repo";
-            Form.ChangedMetadataDiffViewer.NewTextHeader = "From Dokimion";
-
-            Form.FeedbackTextBox.Text += "\r\nDone.";
-            Form.PrevButton.Enabled = true;
-            Form.NextButton.Enabled = true;
         }
 
         public void SelectAllChangedMetadataButton_Click()
@@ -132,6 +138,8 @@ namespace Updater5
                     return;
                 }
             }
+
+            CompareMetadata();
             Form.FeedbackTextBox.Text += "\r\nDone.";
 
         }
@@ -146,8 +154,22 @@ namespace Updater5
             }
             else
             {
-                Form.ChangedMetadataDiffViewer.OldText = MetadataFromFiles[id];
-                Form.ChangedMetadataDiffViewer.NewText = Data.TestCases[id].ExtractMetadata().PrettyPrint();
+                if (MetadataFromFiles.ContainsKey(id))
+                {
+                    Form.ChangedMetadataDiffViewer.OldText = MetadataFromFiles[id];
+                }
+                else
+                {
+                    Form.ChangedMetadataDiffViewer.OldText = "";
+                }
+                try
+                {
+                    Form.ChangedMetadataDiffViewer.NewText = Data.TestCases[id].ExtractMetadata().PrettyPrint();
+                }
+                catch
+                {
+                    Form.ChangedMetadataDiffViewer.NewText = "";
+                }
             }
         }
     }

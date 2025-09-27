@@ -52,10 +52,9 @@ namespace Updater5
 
         private void GetDokimionTestCases(Project project)
         {
-            string projectId = project.id;
             Form.FeedbackTextBox.Text = "Getting list of test cases from Dokimion";
             Form.FeedbackTextBox.Refresh();
-            List<TestCaseShort>? testcases = Data.Dokimion.GetTestCaseSummariesForProject(projectId);
+            List<TestCaseShort>? testcases = Data.Dokimion.GetTestCaseSummariesForProject(project.id);
 
             if (testcases == null)
             {

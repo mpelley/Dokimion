@@ -494,7 +494,7 @@ namespace Updater4
                         if (id != null)
                         {
                             Log.Information($"Downloading test case {id} for project \"{project.name}\" to {folderPath}");
-                            if (false == m_Dokimion.DownloadTestcase(id, project, folderPath))
+                            if (false == m_Dokimion.DownloadTestCaseAsXml(id, project, folderPath))
                             {
                                 Log.Error($"Error: {m_Dokimion.Error}");
                                 StatusTextBox.Text += "\r\n" + m_Dokimion.Error;

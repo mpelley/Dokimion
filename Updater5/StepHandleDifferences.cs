@@ -32,8 +32,21 @@ namespace Updater5
         public override void Activate()
         {
             Form.FeedbackTextBox.Text = "Comparing Test Cases";
-            Form.HandleDiffDataGridView.Rows.Clear();
+            bool ok = CompareAllTestCases();
+            if (!ok)
+            {
+                return;
+            }
+
+            Form.FeedbackTextBox.Text += "\r\nDone.";
+            Form.PrevButton.Enabled = true;
+            Form.NextButton.Enabled = true;
+        }
+
+        private bool CompareAllTestCases()
+        {
             string repo = Data.GetRepoFolder();
+            Form.HandleDiffDataGridView.Rows.Clear();
             IEnumerable<string> files = Directory.EnumerateFiles(repo, "*.json");
             foreach (string jsonFileName in files)
             {
@@ -56,8 +69,8 @@ namespace Updater5
                     }
                     catch (Exception ex)
                     {
-                        Form.FeedbackTextBox.Text += $"Cannot read file {stepFileName} because \r\n{ex.Message}";
-                        return;
+                        Form.FeedbackTextBox.Text += $"\r\nCannot read file {stepFileName} because \r\n{ex.Message}";
+                        return false;
                     }
                     TestCase tc = Data.TestCases[id];
                     string dokStep = "";
@@ -80,9 +93,7 @@ namespace Updater5
                 }
             }
 
-            Form.FeedbackTextBox.Text += "Done.";
-            Form.PrevButton.Enabled = true;
-            Form.NextButton.Enabled = true;
+            return true;
         }
 
         public void HandleDiffSelectAllButton_Click()
@@ -134,6 +145,7 @@ namespace Updater5
 
             string repo = Data.GetRepoFolder();
 
+            int testcasesChanged = 0;
             for (int i = 0; i < rows.Count; i++)
             {
                 DataGridViewCheckBoxCell selectCell = (DataGridViewCheckBoxCell)rows[i].Cells[0];
@@ -202,12 +214,48 @@ namespace Updater5
                 Step step = new Step();
                 step.action = action;
                 testCase.steps.Add(step);
-                //Data.Dokimion.UploadTestCaseToProject();
+                bool abort = false;
+                UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project);
+                switch (status)
+                {
+                    case UploadStatus.Updated:
+                        testcasesChanged++;
+                        // If it is a new test case, add it to the Data.TestCases list
+                        // so it is there next time we do the comparison of test cases.
+                        TestCase? newTestCase = Data.Dokimion.GetTestCaseAsObject(testCase.id, Data.Project);
+                        if (newTestCase != null)
+                        {
+                            if (Data.TestCases.ContainsKey(testCase.id))
+                            {
+                                Data.TestCases[testCase.id] = newTestCase;
+                            }
+                            else
+                            {
+                                Data.TestCases.Add(testCase.id, newTestCase);
+                            }
+                        }
+                        break;
+                    case UploadStatus.Error:
+                        Form.FeedbackTextBox.Text = Data.Dokimion.Error;
+                        break;
+                    case UploadStatus.NotChanged:
+                        break;
+                    case UploadStatus.NoChange:
+                        break;
+                    case UploadStatus.Aborted:
+                        abort = true;
+                        break;
+                }
+                if (abort)
+                {
+                    break;
+                }
 
                 Form.HandleDiffProgressBar.PerformStep();
                 Form.HandleDiffProgressBar.Refresh();
             }
-            Form.FeedbackTextBox.Text += "\r\nDone!";
+            CompareAllTestCases();
+            Form.FeedbackTextBox.Text += $"\r\n{testcasesChanged} test cases were uploaded to Dokimion.";
         }
 
     }
