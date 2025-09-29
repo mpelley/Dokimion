@@ -149,6 +149,72 @@ namespace Dokimion
         {
             return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
+
+        public Metadata() { }
+
+        public Metadata(HumanMetadata hmd)
+        {
+            this.id = hmd.id;
+            this.name = hmd.name;
+            this.automated = hmd.automated;
+            this.broken = hmd.broken;
+            this.launchBroken = hmd.launchBroken;
+            this.locked = hmd.locked;
+            this.description = hmd.description;
+            this.preconditions = hmd.preconditions;
+            this.createdBy = hmd.createdBy;
+            this.attributes = new (hmd.attributes);
+            this.attachments = new (hmd.attachments);
+
+            DateTime timestamp = DateTime.Parse(hmd.lastModifiedTime);
+            DateTime baseTimestamp = DateTime.Parse("January 1, 1970");
+            TimeSpan duration = timestamp - baseTimestamp;
+            this.lastModifiedTime = duration.Milliseconds;
+
+            timestamp = DateTime.Parse(hmd.createdTime);
+            duration = timestamp - baseTimestamp;
+            this.createdTime = duration.Milliseconds;
+
+        }
+    }
+
+    public class HumanMetadata : TestCaseShort
+    {
+        // This is TestCase minus the steps member
+        public string description = "";
+        public string preconditions = "";
+        public string lastModifiedTime = "";
+        public string createdBy = "";
+        public string createdTime = "";
+        public string lastModifiedBy = "";
+
+        public string PrettyPrint()
+        {
+            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+        }
+
+        public HumanMetadata(Metadata metadata)
+        {
+            this.id = metadata.id;
+            this.name = metadata.name;
+            this.automated = metadata.automated;
+            this.broken = metadata.broken;
+            this.launchBroken = metadata.launchBroken;
+            this.locked = metadata.locked;
+            this.description = metadata.description;
+            this.preconditions = metadata.preconditions;
+            this.createdBy = metadata.createdBy;
+            this.attributes = new(metadata.attributes);
+            this.attachments = new(metadata.attachments);
+
+            DateTime timestamp = DateTime.Parse("January 1, 1970");
+            timestamp += TimeSpan.FromMilliseconds(metadata.lastModifiedTime);
+            this.lastModifiedTime = timestamp.ToString("R");
+
+            timestamp = DateTime.Parse("January 1, 1970");
+            timestamp += TimeSpan.FromMilliseconds(metadata.createdTime);
+            this.createdTime = timestamp.ToString("R");
+        }
     }
 
 

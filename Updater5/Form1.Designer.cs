@@ -28,13 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
             StepTextBox = new TextBox();
-            StepProgressBar = new ProgressBar();
             FeedbackTextBox = new TextBox();
             panelLogin = new Panel();
             label8 = new Label();
@@ -77,6 +76,7 @@
             Issue = new DataGridViewTextBoxColumn();
             MetadataProgressBar = new ProgressBar();
             panelHandleDifferences = new Panel();
+            HandleDiffRescanTestCasesButton = new Button();
             HandleDiffDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
             HandleDiffProgressBar = new ProgressBar();
             UploadDiffToDokimionButton = new Button();
@@ -141,13 +141,6 @@
             StepTextBox.ReadOnly = true;
             StepTextBox.Size = new Size(337, 27);
             StepTextBox.TabIndex = 3;
-            // 
-            // StepProgressBar
-            // 
-            StepProgressBar.Location = new Point(390, 12);
-            StepProgressBar.Name = "StepProgressBar";
-            StepProgressBar.Size = new Size(379, 29);
-            StepProgressBar.TabIndex = 4;
             // 
             // FeedbackTextBox
             // 
@@ -275,6 +268,7 @@
             // 
             // ChangedMetadataDiffViewer
             // 
+            ChangedMetadataDiffViewer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ChangedMetadataDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
             ChangedMetadataDiffViewer.BorderWidth = new Padding(0);
             ChangedMetadataDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
@@ -362,14 +356,14 @@
             ChangedMetadataDataGridView.AllowUserToAddRows = false;
             ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
             ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             ChangedMetadataDataGridView.ColumnHeadersHeight = 29;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
             ChangedMetadataDataGridView.Location = new Point(3, 43);
@@ -605,6 +599,7 @@
             // panelHandleDifferences
             // 
             panelHandleDifferences.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelHandleDifferences.Controls.Add(HandleDiffRescanTestCasesButton);
             panelHandleDifferences.Controls.Add(HandleDiffDiffViewer);
             panelHandleDifferences.Controls.Add(HandleDiffProgressBar);
             panelHandleDifferences.Controls.Add(UploadDiffToDokimionButton);
@@ -617,8 +612,19 @@
             panelHandleDifferences.TabIndex = 0;
             panelHandleDifferences.Visible = false;
             // 
+            // HandleDiffRescanTestCasesButton
+            // 
+            HandleDiffRescanTestCasesButton.Location = new Point(206, 7);
+            HandleDiffRescanTestCasesButton.Name = "HandleDiffRescanTestCasesButton";
+            HandleDiffRescanTestCasesButton.Size = new Size(152, 29);
+            HandleDiffRescanTestCasesButton.TabIndex = 12;
+            HandleDiffRescanTestCasesButton.Text = "Rescan Test Cases";
+            HandleDiffRescanTestCasesButton.UseVisualStyleBackColor = true;
+            HandleDiffRescanTestCasesButton.Click += HandleDiffRescanTestCasesButton_Click;
+            // 
             // HandleDiffDiffViewer
             // 
+            HandleDiffDiffViewer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             HandleDiffDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
             HandleDiffDiffViewer.BorderWidth = new Padding(0);
             HandleDiffDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
@@ -706,14 +712,14 @@
             HandleDiffDataGridView.AllowUserToAddRows = false;
             HandleDiffDataGridView.AllowUserToDeleteRows = false;
             HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = SystemColors.Control;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             HandleDiffDataGridView.ColumnHeadersHeight = 29;
             HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
             HandleDiffDataGridView.Location = new Point(6, 41);
@@ -780,15 +786,14 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 553);
+            Controls.Add(panelHandleDifferences);
             Controls.Add(panelDownloadNewTestCases);
             Controls.Add(panelDownloadChangedMetadata);
-            Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
             Controls.Add(panelSelectProject);
             Controls.Add(FeedbackTextBox);
-            Controls.Add(StepProgressBar);
             Controls.Add(StepTextBox);
             Controls.Add(QuitButton);
             Controls.Add(NextButton);
@@ -819,7 +824,6 @@
         public Button NextButton;
         private Button QuitButton;
         private TextBox StepTextBox;
-        private ProgressBar StepProgressBar;
         public TextBox FeedbackTextBox;
 
         private StepLogin StepLogin;
@@ -897,5 +901,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private Button HandleDiffRescanTestCasesButton;
     }
 }

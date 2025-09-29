@@ -38,31 +38,18 @@ namespace Updater5
             FeedbackTextBox.Text = "";
             ActiveStepCode.Activate();
 
-            StepProgressBar.Minimum = 0;
-            StepProgressBar.Maximum = 6;
-            StepProgressBar.Value = 0;
         }
 
         private void PrevButton_Click(object sender, EventArgs e)
         {
             StepCode? newPanelCode = ActiveStepCode.Prev();
-            bool swapped = SwapSteps(newPanelCode);
-            if (swapped)
-            {
-                StepProgressBar.Value -= 1;
-                StepProgressBar.Refresh();
-            }
+            SwapSteps(newPanelCode);
         }
 
         private void NextButton_Click(object sender, EventArgs e)
         {
             StepCode? newPanelCode = ActiveStepCode.Next();
-            bool swapped = SwapSteps(newPanelCode);
-            if (swapped)
-            {
-                StepProgressBar.Value += 1;
-                StepProgressBar.Refresh();
-            }
+            SwapSteps(newPanelCode);
         }
 
         private bool SwapSteps(StepCode? newStepCode)
@@ -169,6 +156,11 @@ namespace Updater5
         private void HandleDiffDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             StepHandleDifferences.HandleDiffDataGridView_CellClick(sender, e);
+        }
+
+        private void HandleDiffRescanTestCasesButton_Click(object sender, EventArgs e)
+        {
+            StepHandleDifferences.HandleDiffRescanTestCasesButton_Click(sender, e);
         }
     }
 }

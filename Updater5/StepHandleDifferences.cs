@@ -1,5 +1,6 @@
 ﻿using Dokimion;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,12 @@ namespace Updater5
 {
     public class StepHandleDifferences : StepCode
     {
-        Dictionary<string, string> TestCasesFromFiles;
+        Dictionary<string, string> TestCaseActionsFromFiles;
 
         public StepHandleDifferences(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
             StepName = "Handle Differences";
-            TestCasesFromFiles = new();
+            TestCaseActionsFromFiles = new();
         }
 
         public override void Init()
@@ -24,25 +25,31 @@ namespace Updater5
 
         public override StepCode? Prev()
         {
+            Form.HandleDiffDiffViewer.OldText = "";
+            Form.HandleDiffDiffViewer.NewText = "";
             return PrevStepCode;
         }
 
         public override StepCode? Next()
         {
+            Form.HandleDiffDiffViewer.OldText = "";
+            Form.HandleDiffDiffViewer.NewText = "";
             return NextStepCode;
         }
 
         public override void Activate()
         {
             Form.FeedbackTextBox.Text = "Comparing Test Cases";
+            Form.HandleDiffDiffViewer.OldTextHeader = "From Dokimion";
+            Form.HandleDiffDiffViewer.NewTextHeader = "From Repo";
+            Form.HandleDiffDiffViewer.OldText = "";
+            Form.HandleDiffDiffViewer.NewText = "";
+
             bool ok = CompareAllTestCases();
             if (!ok)
             {
                 return;
             }
-
-            Form.HandleDiffDiffViewer.OldTextHeader = "From Dokimion";
-            Form.HandleDiffDiffViewer.NewTextHeader = "From Repo";
 
             Form.FeedbackTextBox.Text += "\r\nDone.";
             Form.PrevButton.Enabled = true;
@@ -53,7 +60,7 @@ namespace Updater5
         {
             string repo = Data.GetRepoFolder();
             Form.HandleDiffDataGridView.Rows.Clear();
-            TestCasesFromFiles.Clear();
+            TestCaseActionsFromFiles.Clear();
             IEnumerable<string> files = Directory.EnumerateFiles(repo, "*.json");
             foreach (string jsonFileName in files)
             {
@@ -61,25 +68,47 @@ namespace Updater5
                 if (Data.TestCases.ContainsKey(id))
                 {
                     string stepFileName = Path.Combine(repo, id + ".txt");
-                    string fileStep;
-                    if (false == File.Exists(stepFileName))
+                    string fileStep = "";
+                    if (File.Exists(stepFileName))
+                    {
+                        string[] textLines;
+                        try
+                        {
+                            textLines = File.ReadAllLines(stepFileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Form.FeedbackTextBox.Text += $"\r\nCannot read file {stepFileName} because \r\n{ex.Message}";
+                            return false;
+                        }
+
+                        for (int line = 0; line < textLines.Length; line++)
+                        {
+                            fileStep += textLines[line] + "<br>\r\n";
+                        }
+                    }
+                    else
                     {
                         stepFileName = Path.Combine(repo, id + ".html");
+                        if (File.Exists(stepFileName))
+                        {
+                            try
+                            {
+                                fileStep = File.ReadAllText(stepFileName);
+                            }
+                            catch (Exception ex)
+                            {
+                                Form.FeedbackTextBox.Text += $"\r\nCannot read file {stepFileName} because \r\n{ex.Message}";
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
-                    if (false == File.Exists(stepFileName))
-                    {
-                        continue;
-                    }
-                    try
-                    {
-                        fileStep = File.ReadAllText(stepFileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Form.FeedbackTextBox.Text += $"\r\nCannot read file {stepFileName} because \r\n{ex.Message}";
-                        return false;
-                    }
-                    TestCasesFromFiles.Add(id, fileStep);
+
+                    TestCaseActionsFromFiles.Add(id, fileStep);
 
                     TestCase tc = Data.TestCases[id];
                     string dokStep = "";
@@ -175,49 +204,32 @@ namespace Updater5
                     Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
                     return;
                 }
-                TestCaseForUpload? testCase = JsonConvert.DeserializeObject<TestCase>(json);
-                if (testCase == null)
+
+                // A convoluted means to populate a TestCaseForUpload from the human-readable metadata file...
+                HumanMetadata? hmd = JsonConvert.DeserializeObject<HumanMetadata>(json);
+                if (hmd == null)
                 {
                     Form.FeedbackTextBox.Text = $"Cannot deserialize {path}.";
                     return;
                 }
-                string action = "";
-                path = Path.Combine(repo, id + ".txt");
-                if (File.Exists(path))
+                Metadata md = new(hmd);
+                json = JsonConvert.SerializeObject(md);
+                TestCaseForUpload? testCase = JsonConvert.DeserializeObject<TestCaseForUpload>(json);
+                if (testCase == null)
                 {
-                    try
-                    {
-                        action = File.ReadAllText(path);
-                    }
-                    catch (Exception ex)
-                    {
-                        Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
-                        Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
-                        return;
-                    }
+                    Form.FeedbackTextBox.Text = $"Cannot de-reserialized {path}.";
+                    return;
                 }
-                else
+
+                string action = "";
+                try
                 {
-                    path = Path.Combine(repo, id + ".html");
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            action = File.ReadAllText(path);
-                        }
-                        catch (Exception ex)
-                        {
-                            Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
-                            Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
-                        Form.FeedbackTextBox.Text += $"\r\na .txt or .html file with the step needs to exist.";
-                        return;
-                    }
+                    action = TestCaseActionsFromFiles[id];
+                }
+                catch (Exception ex)
+                {
+                    Form.FeedbackTextBox.Text = $"Cannot get pre-loaded action from file for ID {id} because: \r\n{ex.Message}.";
+                    return;
                 }
                 testCase.steps = new();
                 Step step = new Step();
@@ -263,6 +275,8 @@ namespace Updater5
                 Form.HandleDiffProgressBar.PerformStep();
                 Form.HandleDiffProgressBar.Refresh();
             }
+            Form.HandleDiffDiffViewer.OldText = "";
+            Form.HandleDiffDiffViewer.NewText = "";
             CompareAllTestCases();
             Form.FeedbackTextBox.Text += $"\r\n{testcasesChanged} test cases were uploaded to Dokimion.";
         }
@@ -284,9 +298,9 @@ namespace Updater5
                 {
                     Form.HandleDiffDiffViewer.OldText = "";
                 }
-                if (TestCasesFromFiles.ContainsKey(id))
+                if (TestCaseActionsFromFiles.ContainsKey(id))
                 {
-                    Form.HandleDiffDiffViewer.NewText = TestCasesFromFiles[id];
+                    Form.HandleDiffDiffViewer.NewText = TestCaseActionsFromFiles[id];
                 }
                 else
                 {
@@ -294,5 +308,11 @@ namespace Updater5
                 }
             }
         }
+
+        public void HandleDiffRescanTestCasesButton_Click(object sender, EventArgs e)
+        {
+            CompareAllTestCases();
+        }
+
     }
 }

@@ -36,12 +36,13 @@ namespace Updater5
         public override void Activate()
         {
             Form.FeedbackTextBox.Text = "Checking for changed metadata files.";
-            //Form.FeedbackTextBox.Refresh();
 
             CompareMetadata();
 
             Form.ChangedMetadataDiffViewer.OldTextHeader = "From Repo";
             Form.ChangedMetadataDiffViewer.NewTextHeader = "From Dokimion";
+            Form.ChangedMetadataDiffViewer.OldText = "";
+            Form.ChangedMetadataDiffViewer.NewText = "";
 
             Form.FeedbackTextBox.Text += "\r\nDone.";
             Form.PrevButton.Enabled = true;
@@ -61,7 +62,11 @@ namespace Updater5
                 {
                     string fileJson = File.ReadAllText(metadataPath);
                     MetadataFromFiles.Add(id, fileJson);
-                    string dokJson = tc.ExtractMetadata().PrettyPrint();
+
+                    Metadata md = tc.ExtractMetadata();
+                    HumanMetadata hmd = new(md);
+                    string dokJson = hmd.PrettyPrint();
+
                     if (fileJson != dokJson)
                     {
                         Form.ChangedMetadataDataGridView.Rows.Add([false, id, tc.name, $"Different"]);
@@ -127,7 +132,8 @@ namespace Updater5
                 string path = Path.Combine(repo, id + ".JSON");
                 TestCase testCase = Data.TestCases[id];
                 Metadata metadata = testCase.ExtractMetadata();
-                string json = metadata.PrettyPrint();
+                HumanMetadata hmd = new(metadata);
+                string json = hmd.PrettyPrint();
                 try
                 {
                     File.WriteAllText(path, json);
@@ -164,7 +170,9 @@ namespace Updater5
                 }
                 try
                 {
-                    Form.ChangedMetadataDiffViewer.NewText = Data.TestCases[id].ExtractMetadata().PrettyPrint();
+                    Metadata md = Data.TestCases[id].ExtractMetadata();
+                    HumanMetadata hmd = new(md);
+                    Form.ChangedMetadataDiffViewer.NewText = hmd.PrettyPrint();
                 }
                 catch
                 {

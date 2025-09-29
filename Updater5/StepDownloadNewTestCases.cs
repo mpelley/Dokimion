@@ -156,7 +156,8 @@ namespace Updater5
                 if (tc != null)
                 {
                     Metadata md = tc.ExtractMetadata();
-                    string json = md.PrettyPrint();
+                    HumanMetadata hmd = new(md);
+                    string json = hmd.PrettyPrint();
                     string path = Path.Combine(repo, id + ".JSON");
                     try
                     {
@@ -182,7 +183,7 @@ namespace Updater5
                         }
                         catch
                         {
-                            path = Path.Combine(repo, id + ".txt");
+                            ;   // Save an empty step if there isn't anything to save.
                         }
 
                         try
