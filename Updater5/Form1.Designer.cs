@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
@@ -362,14 +362,14 @@
             ChangedMetadataDataGridView.AllowUserToAddRows = false;
             ChangedMetadataDataGridView.AllowUserToDeleteRows = false;
             ChangedMetadataDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = SystemColors.Control;
-            dataGridViewCellStyle7.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle7.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
-            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             ChangedMetadataDataGridView.ColumnHeadersHeight = 29;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
             ChangedMetadataDataGridView.Location = new Point(3, 43);
@@ -675,7 +675,7 @@
             UploadDiffToDokimionButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             UploadDiffToDokimionButton.Location = new Point(11, 353);
             UploadDiffToDokimionButton.Name = "UploadDiffToDokimionButton";
-            UploadDiffToDokimionButton.Size = new Size(310, 29);
+            UploadDiffToDokimionButton.Size = new Size(327, 29);
             UploadDiffToDokimionButton.TabIndex = 9;
             UploadDiffToDokimionButton.Text = "Upload Selected Test Cases to Dokimion";
             UploadDiffToDokimionButton.UseVisualStyleBackColor = true;
@@ -706,14 +706,14 @@
             HandleDiffDataGridView.AllowUserToAddRows = false;
             HandleDiffDataGridView.AllowUserToDeleteRows = false;
             HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = SystemColors.Control;
-            dataGridViewCellStyle8.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
-            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             HandleDiffDataGridView.ColumnHeadersHeight = 29;
             HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
             HandleDiffDataGridView.Location = new Point(6, 41);
@@ -721,6 +721,7 @@
             HandleDiffDataGridView.RowHeadersWidth = 51;
             HandleDiffDataGridView.Size = new Size(749, 128);
             HandleDiffDataGridView.TabIndex = 6;
+            HandleDiffDataGridView.CellClick += HandleDiffDataGridView_CellClick;
             // 
             // dataGridViewCheckBoxColumn1
             // 
@@ -779,9 +780,9 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 553);
-            Controls.Add(panelHandleDifferences);
-            Controls.Add(panelDownloadChangedMetadata);
             Controls.Add(panelDownloadNewTestCases);
+            Controls.Add(panelDownloadChangedMetadata);
+            Controls.Add(panelHandleDifferences);
             Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);

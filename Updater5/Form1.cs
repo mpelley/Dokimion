@@ -166,5 +166,9 @@ namespace Updater5
             StepHandleDifferences.UploadDiffToDokimionButton_Click();
         }
 
+        private void HandleDiffDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            StepHandleDifferences.HandleDiffDataGridView_CellClick(sender, e);
+        }
     }
 }

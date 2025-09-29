@@ -10,9 +10,12 @@ namespace Updater5
 {
     public class StepHandleDifferences : StepCode
     {
+        Dictionary<string, string> TestCasesFromFiles;
+
         public StepHandleDifferences(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
             StepName = "Handle Differences";
+            TestCasesFromFiles = new();
         }
 
         public override void Init()
@@ -38,6 +41,9 @@ namespace Updater5
                 return;
             }
 
+            Form.HandleDiffDiffViewer.OldTextHeader = "From Dokimion";
+            Form.HandleDiffDiffViewer.NewTextHeader = "From Repo";
+
             Form.FeedbackTextBox.Text += "\r\nDone.";
             Form.PrevButton.Enabled = true;
             Form.NextButton.Enabled = true;
@@ -47,6 +53,7 @@ namespace Updater5
         {
             string repo = Data.GetRepoFolder();
             Form.HandleDiffDataGridView.Rows.Clear();
+            TestCasesFromFiles.Clear();
             IEnumerable<string> files = Directory.EnumerateFiles(repo, "*.json");
             foreach (string jsonFileName in files)
             {
@@ -72,6 +79,8 @@ namespace Updater5
                         Form.FeedbackTextBox.Text += $"\r\nCannot read file {stepFileName} because \r\n{ex.Message}";
                         return false;
                     }
+                    TestCasesFromFiles.Add(id, fileStep);
+
                     TestCase tc = Data.TestCases[id];
                     string dokStep = "";
                     try
@@ -258,5 +267,32 @@ namespace Updater5
             Form.FeedbackTextBox.Text += $"\r\n{testcasesChanged} test cases were uploaded to Dokimion.";
         }
 
+        public void HandleDiffDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            string? id = Form.HandleDiffDataGridView.Rows[e.RowIndex].Cells[1].Value.ToString();
+            if (id == null)
+            {
+                Form.FeedbackTextBox.Text = $"ID is missing for row {e.RowIndex}";
+            }
+            else
+            {
+                try
+                {
+                    Form.HandleDiffDiffViewer.OldText = Data.TestCases[id].steps[0].action;
+                }
+                catch
+                {
+                    Form.HandleDiffDiffViewer.OldText = "";
+                }
+                if (TestCasesFromFiles.ContainsKey(id))
+                {
+                    Form.HandleDiffDiffViewer.NewText = TestCasesFromFiles[id];
+                }
+                else
+                {
+                    Form.HandleDiffDiffViewer.NewText = "";
+                }
+            }
+        }
     }
 }
