@@ -236,7 +236,7 @@ namespace Updater5
                 step.action = action;
                 testCase.steps.Add(step);
                 bool abort = false;
-                UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project);
+                UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project, Data.ProjectAttributes);
                 switch (status)
                 {
                     case UploadStatus.Updated:

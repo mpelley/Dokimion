@@ -157,7 +157,7 @@ namespace Updater5
                 {
                     Metadata md = tc.ExtractMetadata();
                     HumanMetadata hmd = new(md);
-                    string json = hmd.PrettyPrint();
+                    string json = hmd.PrettyPrint(Data.ProjectAttributes);
                     string path = Path.Combine(repo, id + ".JSON");
                     try
                     {

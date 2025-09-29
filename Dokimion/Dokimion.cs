@@ -145,11 +145,6 @@ namespace Dokimion
         public Int64 createdTime;
         public string lastModifiedBy = "";
 
-        public string PrettyPrint()
-        {
-            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        }
-
         public Metadata() { }
 
         public Metadata(HumanMetadata hmd)
@@ -188,9 +183,14 @@ namespace Dokimion
         public string createdTime = "";
         public string lastModifiedBy = "";
 
-        public string PrettyPrint()
+        public string PrettyPrint(Dictionary<string, string> attributeNames)
         {
-            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            string json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            foreach (var pair in attributeNames)
+            {
+                json = json.Replace(pair.Key, pair.Value);
+            }
+            return json;
         }
 
         public HumanMetadata(Metadata metadata)
@@ -827,7 +827,7 @@ namespace Dokimion
             return GetTestCaseAsObject(url);
         }
 
-        public bool DownloadTestCaseAsJson(string testcaseId, Project project, string folderPath)
+        public bool DownloadTestCaseAsJson(string testcaseId, Project project, string folderPath, Dictionary<string, string> attributeNames)
         {
             // Get the test case from Dokimion
             string url = BaseDokimionApiUrl() + "/" + project.id + "/testcase/" + testcaseId;
@@ -839,7 +839,8 @@ namespace Dokimion
 
             // Generate the JSON format for this testcase
             Metadata metadata = testcase.ExtractMetadata();
-            string json = metadata.PrettyPrint() ;
+            HumanMetadata hmd = new(metadata);
+            string json = hmd.PrettyPrint(attributeNames);
 
             // Save the json of the test case:
             if (false == SaveTestCase(testcaseId, folderPath, json, ".JSON"))
@@ -1214,7 +1215,7 @@ namespace Dokimion
             return attResp;
         }
 
-        public UploadStatus UploadTestCaseObjectToProject(string folderPath, TestCaseForUpload testCase, Project project)
+        public UploadStatus UploadTestCaseObjectToProject(string folderPath, TestCaseForUpload testCase, Project project, Dictionary<string, string> attributeNames)
         {
             UploadStatus resp = UploadTestCaseObjectToProjectIfDifferent(project, testCase);
 
@@ -1236,7 +1237,7 @@ namespace Dokimion
             }
             if (updated)
             {
-                if (false == DownloadTestCaseAsJson(testCase.id, project, folderPath))
+                if (false == DownloadTestCaseAsJson(testCase.id, project, folderPath, attributeNames))
                 {
                     // DownloadTestcase sets Error
                     return UploadStatus.Error;

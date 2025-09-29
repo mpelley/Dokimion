@@ -28,13 +28,15 @@ namespace Updater5
         public Settings Settings;
         // The string is the test case ID:
         public Dictionary<string, TestCase> TestCases;
+        public Dictionary<string, string> ProjectAttributes;
 
         public Data()
         {
             Dokimion = new("", false);
             Settings = new();
-            TestCases = new Dictionary<string, TestCase>();
+            TestCases = new();
             Project = new();
+            ProjectAttributes = new();
         }
 
         public string? GetSettings()
