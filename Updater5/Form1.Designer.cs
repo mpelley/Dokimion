@@ -689,6 +689,7 @@
             HandleDiffDataGridView.RowHeadersWidth = 51;
             HandleDiffDataGridView.Size = new Size(754, 128);
             HandleDiffDataGridView.TabIndex = 12;
+            HandleDiffDataGridView.CellClick += HandleDiffDataGridView_CellClick;
             // 
             // dataGridViewCheckBoxColumn1
             // 

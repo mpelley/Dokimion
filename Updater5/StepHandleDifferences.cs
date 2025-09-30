@@ -65,6 +65,10 @@ namespace Updater5
             foreach (string jsonFileName in files)
             {
                 string id = Path.GetFileNameWithoutExtension(jsonFileName);
+                if (id == "project")
+                {
+                    continue;
+                }
                 if (Data.TestCases.ContainsKey(id))
                 {
                     string stepFileName = Path.Combine(repo, id + ".txt");
@@ -212,7 +216,8 @@ namespace Updater5
                     Form.FeedbackTextBox.Text = $"Cannot deserialize {path}.";
                     return;
                 }
-                Metadata md = new(hmd);
+                Metadata md = (Metadata)hmd;
+                ReplaceAttributeNamesWithNumbers(ref md);
                 json = JsonConvert.SerializeObject(md);
                 TestCaseForUpload? testCase = JsonConvert.DeserializeObject<TestCaseForUpload>(json);
                 if (testCase == null)
@@ -236,7 +241,7 @@ namespace Updater5
                 step.action = action;
                 testCase.steps.Add(step);
                 bool abort = false;
-                UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project, Data.ProjectAttributes);
+                UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project, Data.Project.attributes);
                 switch (status)
                 {
                     case UploadStatus.Updated:
@@ -279,6 +284,17 @@ namespace Updater5
             Form.HandleDiffDiffViewer.NewText = "";
             CompareAllTestCases();
             Form.FeedbackTextBox.Text += $"\r\n{testcasesChanged} test cases were uploaded to Dokimion.";
+        }
+
+        private void ReplaceAttributeNamesWithNumbers(ref Metadata md)
+        {
+            Dictionary<string, string[]> newAttributes = new();
+            foreach (var attr in md.attributes)
+            {
+                var map = Data.Project.attributes.Where((a) => a.Value == attr.Key);
+                newAttributes.Add(map.First().Key, attr.Value);
+            }
+            md.attributes = newAttributes;
         }
 
         public void HandleDiffDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)

@@ -42,12 +42,28 @@ namespace Updater5
                 Form.PrevButton.Enabled = true;
                 return;
             }
+
+            SaveProjectInfo();
             GetDokimionTestCases(project);
             CompareTestCases(project);
             Form.FeedbackTextBox.Text += $"\r\nDone.";
 
             Form.PrevButton.Enabled = true;
             Form.NextButton.Enabled = true;
+        }
+
+        private void SaveProjectInfo()
+        {
+            string repo = Data.GetRepoFolder();
+            if (repo != null)
+            {
+                string path = Path.Combine(repo, "project.json");
+                string? json = JsonConvert.SerializeObject(Data.Project, Newtonsoft.Json.Formatting.Indented);
+                if (json != null)
+                {
+                    File.WriteAllText(path, json);
+                }
+            }
         }
 
         private void GetDokimionTestCases(Project project)
@@ -157,7 +173,7 @@ namespace Updater5
                 {
                     Metadata md = tc.ExtractMetadata();
                     HumanMetadata hmd = new(md);
-                    string json = hmd.PrettyPrint(Data.ProjectAttributes);
+                    string json = hmd.PrettyPrint(Data.Project.attributes);
                     string path = Path.Combine(repo, id + ".JSON");
                     try
                     {

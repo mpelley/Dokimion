@@ -28,7 +28,6 @@ namespace Updater5
         public Settings Settings;
         // The string is the test case ID:
         public Dictionary<string, TestCase> TestCases;
-        public Dictionary<string, string> ProjectAttributes;
 
         public Data()
         {
@@ -36,7 +35,6 @@ namespace Updater5
             Settings = new();
             TestCases = new();
             Project = new();
-            ProjectAttributes = new();
         }
 
         public string? GetSettings()

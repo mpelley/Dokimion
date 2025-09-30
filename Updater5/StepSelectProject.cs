@@ -28,7 +28,6 @@ namespace Updater5
             if (project != null)
             {
                 Data.Project = project;
-                Data.ProjectAttributes = Data.Dokimion.GetAttributesForProject(project.id);
                 return NextStepCode;
             }
             return null;

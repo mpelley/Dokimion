@@ -69,7 +69,7 @@ namespace Updater5
 
                     Metadata md = tc.ExtractMetadata();
                     HumanMetadata hmd = new(md);
-                    string dokJson = hmd.PrettyPrint(Data.ProjectAttributes);
+                    string dokJson = hmd.PrettyPrint(Data.Project.attributes);
 
                     if (fileJson != dokJson)
                     {
@@ -137,7 +137,7 @@ namespace Updater5
                 TestCase testCase = Data.TestCases[id];
                 Metadata metadata = testCase.ExtractMetadata();
                 HumanMetadata hmd = new(metadata);
-                string json = hmd.PrettyPrint(Data.ProjectAttributes);
+                string json = hmd.PrettyPrint(Data.Project.attributes);
                 try
                 {
                     File.WriteAllText(path, json);
@@ -177,7 +177,7 @@ namespace Updater5
                 {
                     Metadata md = Data.TestCases[id].ExtractMetadata();
                     HumanMetadata hmd = new(md);
-                    Form.ChangedMetadataDiffViewer.NewText = hmd.PrettyPrint(Data.ProjectAttributes);
+                    Form.ChangedMetadataDiffViewer.NewText = hmd.PrettyPrint(Data.Project.attributes);
                 }
                 catch
                 {
