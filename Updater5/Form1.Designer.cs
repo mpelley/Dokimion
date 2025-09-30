@@ -46,6 +46,7 @@
             PasswordTextBox = new TextBox();
             UserNameTextBox = new TextBox();
             panelDownloadChangedMetadata = new Panel();
+            DownloadMetadataRescanButton = new Button();
             splitContainer1 = new SplitContainer();
             ChangedMetadataDataGridView = new DataGridView();
             NewTestCaseSelect = new DataGridViewCheckBoxColumn();
@@ -264,6 +265,7 @@
             // panelDownloadChangedMetadata
             // 
             panelDownloadChangedMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelDownloadChangedMetadata.Controls.Add(DownloadMetadataRescanButton);
             panelDownloadChangedMetadata.Controls.Add(splitContainer1);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataProgressBar);
             panelDownloadChangedMetadata.Controls.Add(DownloadChangedMetadataButton);
@@ -274,6 +276,16 @@
             panelDownloadChangedMetadata.Size = new Size(758, 389);
             panelDownloadChangedMetadata.TabIndex = 0;
             panelDownloadChangedMetadata.Visible = false;
+            // 
+            // DownloadMetadataRescanButton
+            // 
+            DownloadMetadataRescanButton.Location = new Point(217, 8);
+            DownloadMetadataRescanButton.Name = "DownloadMetadataRescanButton";
+            DownloadMetadataRescanButton.Size = new Size(94, 29);
+            DownloadMetadataRescanButton.TabIndex = 6;
+            DownloadMetadataRescanButton.Text = "Rescan";
+            DownloadMetadataRescanButton.UseVisualStyleBackColor = true;
+            DownloadMetadataRescanButton.Click += DownloadMetadataRescanButton_Click;
             // 
             // splitContainer1
             // 
@@ -314,6 +326,7 @@
             ChangedMetadataDataGridView.RowHeadersWidth = 51;
             ChangedMetadataDataGridView.Size = new Size(754, 128);
             ChangedMetadataDataGridView.TabIndex = 6;
+            ChangedMetadataDataGridView.CellClick += ChangedMetadataDataGridView_CellClick;
             // 
             // NewTestCaseSelect
             // 
@@ -955,5 +968,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         public DiffPlex.WindowsForms.Controls.DiffViewer HandleDiffDiffViewer;
+        private Button DownloadMetadataRescanButton;
     }
 }

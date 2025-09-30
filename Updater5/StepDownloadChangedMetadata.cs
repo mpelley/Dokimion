@@ -25,11 +25,15 @@ namespace Updater5
 
         public override StepCode? Prev()
         {
+            Form.ChangedMetadataDiffViewer.OldText = "";
+            Form.ChangedMetadataDiffViewer.NewText = "";
             return PrevStepCode;
         }
 
         public override StepCode? Next()
         {
+            Form.ChangedMetadataDiffViewer.OldText = "";
+            Form.ChangedMetadataDiffViewer.NewText = "";
             return NextStepCode;
         }
 
@@ -145,14 +149,15 @@ namespace Updater5
                 }
             }
 
+            Form.ChangedMetadataDiffViewer.OldText = "";
+            Form.ChangedMetadataDiffViewer.NewText = "";
             CompareMetadata();
             Form.FeedbackTextBox.Text += "\r\nDone.";
 
         }
 
-        public void ChangedMetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        public void ChangedMetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellEventArgs e)
         {
-
             string? id = Form.ChangedMetadataDataGridView.Rows[e.RowIndex].Cells[1].Value.ToString();
             if (id == null)
             {
@@ -180,5 +185,46 @@ namespace Updater5
                 }
             }
         }
+
+
+        public void GetDokimionTestCases()
+        {
+            Form.FeedbackTextBox.Text = "Getting list of test cases from Dokimion";
+            Form.FeedbackTextBox.Refresh();
+            List<TestCaseShort>? testcases = Data.Dokimion.GetTestCaseSummariesForProject(Data.Project.id);
+
+            if (testcases == null)
+            {
+                Form.FeedbackTextBox.Text = Data.Dokimion.Error;
+            }
+            else
+            {
+                Form.FeedbackTextBox.Text += $"\r\nGetting {testcases.Count} test cases from Dokimion.";
+                Form.FeedbackTextBox.Refresh();
+                Form.MetadataProgressBar.Minimum = 0;
+                Form.MetadataProgressBar.Maximum = testcases.Count;
+                Form.MetadataProgressBar.Value = 0;
+                Form.MetadataProgressBar.Step = 1;
+                Data.TestCases.Clear();
+                foreach (TestCaseShort shortTestCase in testcases)
+                {
+                    TestCase? testCase = Data.Dokimion.GetTestCaseAsObject(shortTestCase.id, Data.Project);
+                    if (testCase != null)
+                    {
+                        Data.TestCases.Add(shortTestCase.id, testCase);
+                    }
+                    Form.MetadataProgressBar.PerformStep();
+                }
+
+            }
+        }
+
+
+        public void DownloadMetadataRescanButton_Click()
+        {
+            GetDokimionTestCases();
+            CompareMetadata();
+        }
+
     }
 }

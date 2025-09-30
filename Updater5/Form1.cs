@@ -133,11 +133,6 @@ namespace Updater5
             StepDownloadChangedMetadata.DownloadMetadataButton_Click();
         }
 
-        private void ChangedMetadataDataGridView_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            StepDownloadChangedMetadata.ChangedMetadataDataGridView_RowHeaderMouseClick(sender, e);
-        }
-
         private void HandleDiffSelectAllButton_Click(object sender, EventArgs e)
         {
             StepHandleDifferences.HandleDiffSelectAllButton_Click();
@@ -161,6 +156,16 @@ namespace Updater5
         private void HandleDiffRescanTestCasesButton_Click(object sender, EventArgs e)
         {
             StepHandleDifferences.HandleDiffRescanTestCasesButton_Click(sender, e);
+        }
+
+        private void DownloadMetadataRescanButton_Click(object sender, EventArgs e)
+        {
+            StepDownloadChangedMetadata.DownloadMetadataRescanButton_Click();
+        }
+
+        private void ChangedMetadataDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            StepDownloadChangedMetadata.ChangedMetadataDataGridView_RowHeaderMouseClick(sender, e);
         }
     }
 }
