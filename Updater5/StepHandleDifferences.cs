@@ -15,7 +15,7 @@ namespace Updater5
 
         public StepHandleDifferences(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
-            StepName = "Handle Differences";
+            StepName = "Upload Changed Test Case Steps";
             TestCaseActionsFromFiles = new();
         }
 

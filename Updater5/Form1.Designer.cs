@@ -46,16 +46,17 @@
             PasswordTextBox = new TextBox();
             UserNameTextBox = new TextBox();
             panelDownloadChangedMetadata = new Panel();
-            ChangedMetadataDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
-            ChangedMetadataProgressBar = new ProgressBar();
-            DownloadChangedMetadataButton = new Button();
-            ClearAllChangedMetadataButton = new Button();
-            SelectAllChangedMetadataButton = new Button();
+            splitContainer1 = new SplitContainer();
             ChangedMetadataDataGridView = new DataGridView();
             NewTestCaseSelect = new DataGridViewCheckBoxColumn();
             NewTestCaseId = new DataGridViewTextBoxColumn();
             NewTestCaseName = new DataGridViewTextBoxColumn();
             NewTestCaseNotes = new DataGridViewTextBoxColumn();
+            ChangedMetadataDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
+            ChangedMetadataProgressBar = new ProgressBar();
+            DownloadChangedMetadataButton = new Button();
+            ClearAllChangedMetadataButton = new Button();
+            SelectAllChangedMetadataButton = new Button();
             panelSelectProject = new Panel();
             ProjectsListBox = new ListBox();
             label2 = new Label();
@@ -76,27 +77,36 @@
             Issue = new DataGridViewTextBoxColumn();
             MetadataProgressBar = new ProgressBar();
             panelHandleDifferences = new Panel();
-            HandleDiffRescanTestCasesButton = new Button();
-            HandleDiffDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
-            HandleDiffProgressBar = new ProgressBar();
-            UploadDiffToDokimionButton = new Button();
-            HandleDiffClearAllButton = new Button();
-            HandleDiffSelectAllButton = new Button();
+            splitContainer2 = new SplitContainer();
             HandleDiffDataGridView = new DataGridView();
             dataGridViewCheckBoxColumn1 = new DataGridViewCheckBoxColumn();
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
+            HandleDiffDiffViewer = new DiffPlex.WindowsForms.Controls.DiffViewer();
+            HandleDiffRescanTestCasesButton = new Button();
+            HandleDiffProgressBar = new ProgressBar();
+            UploadDiffToDokimionButton = new Button();
+            HandleDiffClearAllButton = new Button();
+            HandleDiffSelectAllButton = new Button();
             panelDone = new Panel();
             label7 = new Label();
             panelLogin.SuspendLayout();
             panelDownloadChangedMetadata.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ChangedMetadataDataGridView).BeginInit();
             panelSelectProject.SuspendLayout();
             panelSelectRepo.SuspendLayout();
             panelDownloadNewTestCases.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).BeginInit();
             panelHandleDifferences.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer2).BeginInit();
+            splitContainer2.Panel1.SuspendLayout();
+            splitContainer2.Panel2.SuspendLayout();
+            splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HandleDiffDataGridView).BeginInit();
             panelDone.SuspendLayout();
             SuspendLayout();
@@ -254,102 +264,34 @@
             // panelDownloadChangedMetadata
             // 
             panelDownloadChangedMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDiffViewer);
+            panelDownloadChangedMetadata.Controls.Add(splitContainer1);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataProgressBar);
             panelDownloadChangedMetadata.Controls.Add(DownloadChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(ClearAllChangedMetadataButton);
             panelDownloadChangedMetadata.Controls.Add(SelectAllChangedMetadataButton);
-            panelDownloadChangedMetadata.Controls.Add(ChangedMetadataDataGridView);
             panelDownloadChangedMetadata.Location = new Point(11, 53);
             panelDownloadChangedMetadata.Name = "panelDownloadChangedMetadata";
             panelDownloadChangedMetadata.Size = new Size(758, 389);
             panelDownloadChangedMetadata.TabIndex = 0;
             panelDownloadChangedMetadata.Visible = false;
             // 
-            // ChangedMetadataDiffViewer
+            // splitContainer1
             // 
-            ChangedMetadataDiffViewer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            ChangedMetadataDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
-            ChangedMetadataDiffViewer.BorderWidth = new Padding(0);
-            ChangedMetadataDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
-            ChangedMetadataDiffViewer.CollapseUnchangedSectionsToggleTitle = "_Collapse unchanged sections";
-            ChangedMetadataDiffViewer.ContextLinesMenuItemsTitle = "_Lines for context";
-            ChangedMetadataDiffViewer.DeletedBackColor = Color.FromArgb(64, 216, 32, 32);
-            ChangedMetadataDiffViewer.DeletedForeColor = Color.FromArgb(0, 0, 0);
-            ChangedMetadataDiffViewer.FontFamilyNames = "Segoe UI";
-            ChangedMetadataDiffViewer.FontSize = 12D;
-            ChangedMetadataDiffViewer.FontStretch = System.Windows.FontStretch.FromOpenTypeStretch(5);
-            ChangedMetadataDiffViewer.FontWeight = 400;
-            ChangedMetadataDiffViewer.HeaderBackColor = Color.FromArgb(12, 128, 128, 128);
-            ChangedMetadataDiffViewer.HeaderForeColor = Color.FromArgb(128, 128, 128);
-            ChangedMetadataDiffViewer.HeaderHeight = 0D;
-            ChangedMetadataDiffViewer.IgnoreCase = false;
-            ChangedMetadataDiffViewer.IgnoreUnchanged = false;
-            ChangedMetadataDiffViewer.IgnoreWhiteSpace = true;
-            ChangedMetadataDiffViewer.ImaginaryBackColor = Color.FromArgb(24, 128, 128, 128);
-            ChangedMetadataDiffViewer.InlineModeToggleTitle = "_Unified view";
-            ChangedMetadataDiffViewer.InsertedBackColor = Color.FromArgb(0, 0, 0);
-            ChangedMetadataDiffViewer.InsertedForeColor = Color.FromArgb(0, 0, 0);
-            ChangedMetadataDiffViewer.IsFontItalic = false;
-            ChangedMetadataDiffViewer.IsSideBySide = true;
-            ChangedMetadataDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
-            ChangedMetadataDiffViewer.LineNumberWidth = 60;
-            ChangedMetadataDiffViewer.LinesContext = 1;
-            ChangedMetadataDiffViewer.Location = new Point(0, 171);
-            ChangedMetadataDiffViewer.Margin = new Padding(3, 4, 3, 4);
-            ChangedMetadataDiffViewer.Name = "ChangedMetadataDiffViewer";
-            ChangedMetadataDiffViewer.NewText = null;
-            ChangedMetadataDiffViewer.NewTextHeader = null;
-            ChangedMetadataDiffViewer.OldText = null;
-            ChangedMetadataDiffViewer.OldTextHeader = null;
-            ChangedMetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
-            ChangedMetadataDiffViewer.Size = new Size(752, 176);
-            ChangedMetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
-            ChangedMetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
-            ChangedMetadataDiffViewer.SplitterBorderWidth = new Padding(0);
-            ChangedMetadataDiffViewer.SplitterWidth = 5D;
-            ChangedMetadataDiffViewer.TabIndex = 5;
-            ChangedMetadataDiffViewer.UnchangedBackColor = Color.FromArgb(0, 0, 0, 0);
-            ChangedMetadataDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
+            splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer1.Location = new Point(1, 40);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
             // 
-            // ChangedMetadataProgressBar
+            // splitContainer1.Panel1
             // 
-            ChangedMetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            ChangedMetadataProgressBar.Location = new Point(342, 353);
-            ChangedMetadataProgressBar.Name = "ChangedMetadataProgressBar";
-            ChangedMetadataProgressBar.Size = new Size(410, 29);
-            ChangedMetadataProgressBar.TabIndex = 4;
+            splitContainer1.Panel1.Controls.Add(ChangedMetadataDataGridView);
             // 
-            // DownloadChangedMetadataButton
+            // splitContainer1.Panel2
             // 
-            DownloadChangedMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DownloadChangedMetadataButton.Location = new Point(9, 355);
-            DownloadChangedMetadataButton.Name = "DownloadChangedMetadataButton";
-            DownloadChangedMetadataButton.Size = new Size(310, 29);
-            DownloadChangedMetadataButton.TabIndex = 3;
-            DownloadChangedMetadataButton.Text = "Download Selected Metadata from Dokimion";
-            DownloadChangedMetadataButton.UseVisualStyleBackColor = true;
-            DownloadChangedMetadataButton.Click += DownloadChangedMetadataButton_Click;
-            // 
-            // ClearAllChangedMetadataButton
-            // 
-            ClearAllChangedMetadataButton.Location = new Point(104, 8);
-            ClearAllChangedMetadataButton.Name = "ClearAllChangedMetadataButton";
-            ClearAllChangedMetadataButton.Size = new Size(94, 29);
-            ClearAllChangedMetadataButton.TabIndex = 2;
-            ClearAllChangedMetadataButton.Text = "Clear All";
-            ClearAllChangedMetadataButton.UseVisualStyleBackColor = true;
-            ClearAllChangedMetadataButton.Click += ClearAllChangedMetadataButton_Click;
-            // 
-            // SelectAllChangedMetadataButton
-            // 
-            SelectAllChangedMetadataButton.Location = new Point(5, 8);
-            SelectAllChangedMetadataButton.Name = "SelectAllChangedMetadataButton";
-            SelectAllChangedMetadataButton.Size = new Size(94, 29);
-            SelectAllChangedMetadataButton.TabIndex = 1;
-            SelectAllChangedMetadataButton.Text = "Select All";
-            SelectAllChangedMetadataButton.UseVisualStyleBackColor = true;
-            SelectAllChangedMetadataButton.Click += SelectAllChangedMetadataButton_Click;
+            splitContainer1.Panel2.Controls.Add(ChangedMetadataDiffViewer);
+            splitContainer1.Size = new Size(757, 305);
+            splitContainer1.SplitterDistance = 130;
+            splitContainer1.TabIndex = 5;
             // 
             // ChangedMetadataDataGridView
             // 
@@ -366,13 +308,12 @@
             ChangedMetadataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             ChangedMetadataDataGridView.ColumnHeadersHeight = 29;
             ChangedMetadataDataGridView.Columns.AddRange(new DataGridViewColumn[] { NewTestCaseSelect, NewTestCaseId, NewTestCaseName, NewTestCaseNotes });
-            ChangedMetadataDataGridView.Location = new Point(3, 43);
+            ChangedMetadataDataGridView.Location = new Point(-1, -3);
             ChangedMetadataDataGridView.Name = "ChangedMetadataDataGridView";
+            ChangedMetadataDataGridView.RowHeadersVisible = false;
             ChangedMetadataDataGridView.RowHeadersWidth = 51;
-            ChangedMetadataDataGridView.Size = new Size(749, 128);
-            ChangedMetadataDataGridView.TabIndex = 0;
-            ChangedMetadataDataGridView.CellMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
-            ChangedMetadataDataGridView.RowHeaderMouseClick += ChangedMetadataDataGridView_RowHeaderMouseClick;
+            ChangedMetadataDataGridView.Size = new Size(754, 128);
+            ChangedMetadataDataGridView.TabIndex = 6;
             // 
             // NewTestCaseSelect
             // 
@@ -404,6 +345,91 @@
             NewTestCaseNotes.Name = "NewTestCaseNotes";
             NewTestCaseNotes.ReadOnly = true;
             NewTestCaseNotes.Width = 200;
+            // 
+            // ChangedMetadataDiffViewer
+            // 
+            ChangedMetadataDiffViewer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ChangedMetadataDiffViewer.BorderColor = Color.FromArgb(0, 0, 0, 0);
+            ChangedMetadataDiffViewer.BorderWidth = new Padding(0);
+            ChangedMetadataDiffViewer.ChangeTypeForeColor = Color.FromArgb(128, 128, 128);
+            ChangedMetadataDiffViewer.CollapseUnchangedSectionsToggleTitle = "_Collapse unchanged sections";
+            ChangedMetadataDiffViewer.ContextLinesMenuItemsTitle = "_Lines for context";
+            ChangedMetadataDiffViewer.DeletedBackColor = Color.FromArgb(64, 216, 32, 32);
+            ChangedMetadataDiffViewer.DeletedForeColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.FontFamilyNames = "Segoe UI";
+            ChangedMetadataDiffViewer.FontSize = 12D;
+            ChangedMetadataDiffViewer.FontStretch = System.Windows.FontStretch.FromOpenTypeStretch(5);
+            ChangedMetadataDiffViewer.FontWeight = 400;
+            ChangedMetadataDiffViewer.HeaderBackColor = Color.FromArgb(12, 128, 128, 128);
+            ChangedMetadataDiffViewer.HeaderForeColor = Color.FromArgb(128, 128, 128);
+            ChangedMetadataDiffViewer.HeaderHeight = 0D;
+            ChangedMetadataDiffViewer.IgnoreCase = false;
+            ChangedMetadataDiffViewer.IgnoreUnchanged = false;
+            ChangedMetadataDiffViewer.IgnoreWhiteSpace = true;
+            ChangedMetadataDiffViewer.ImaginaryBackColor = Color.FromArgb(24, 128, 128, 128);
+            ChangedMetadataDiffViewer.InlineModeToggleTitle = "_Unified view";
+            ChangedMetadataDiffViewer.InsertedBackColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.InsertedForeColor = Color.FromArgb(0, 0, 0);
+            ChangedMetadataDiffViewer.IsFontItalic = false;
+            ChangedMetadataDiffViewer.IsSideBySide = true;
+            ChangedMetadataDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
+            ChangedMetadataDiffViewer.LineNumberWidth = 60;
+            ChangedMetadataDiffViewer.LinesContext = 1;
+            ChangedMetadataDiffViewer.Location = new Point(5, 0);
+            ChangedMetadataDiffViewer.Margin = new Padding(3, 4, 3, 4);
+            ChangedMetadataDiffViewer.Name = "ChangedMetadataDiffViewer";
+            ChangedMetadataDiffViewer.NewText = null;
+            ChangedMetadataDiffViewer.NewTextHeader = null;
+            ChangedMetadataDiffViewer.OldText = null;
+            ChangedMetadataDiffViewer.OldTextHeader = null;
+            ChangedMetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
+            ChangedMetadataDiffViewer.Size = new Size(752, 176);
+            ChangedMetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
+            ChangedMetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
+            ChangedMetadataDiffViewer.SplitterBorderWidth = new Padding(0);
+            ChangedMetadataDiffViewer.SplitterWidth = 5D;
+            ChangedMetadataDiffViewer.TabIndex = 8;
+            ChangedMetadataDiffViewer.UnchangedBackColor = Color.FromArgb(0, 0, 0, 0);
+            ChangedMetadataDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
+            // 
+            // ChangedMetadataProgressBar
+            // 
+            ChangedMetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ChangedMetadataProgressBar.Location = new Point(364, 353);
+            ChangedMetadataProgressBar.Name = "ChangedMetadataProgressBar";
+            ChangedMetadataProgressBar.Size = new Size(388, 29);
+            ChangedMetadataProgressBar.TabIndex = 4;
+            // 
+            // DownloadChangedMetadataButton
+            // 
+            DownloadChangedMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            DownloadChangedMetadataButton.Location = new Point(9, 355);
+            DownloadChangedMetadataButton.Name = "DownloadChangedMetadataButton";
+            DownloadChangedMetadataButton.Size = new Size(349, 29);
+            DownloadChangedMetadataButton.TabIndex = 3;
+            DownloadChangedMetadataButton.Text = "Download Selected Metadata from Dokimion";
+            DownloadChangedMetadataButton.UseVisualStyleBackColor = true;
+            DownloadChangedMetadataButton.Click += DownloadChangedMetadataButton_Click;
+            // 
+            // ClearAllChangedMetadataButton
+            // 
+            ClearAllChangedMetadataButton.Location = new Point(104, 8);
+            ClearAllChangedMetadataButton.Name = "ClearAllChangedMetadataButton";
+            ClearAllChangedMetadataButton.Size = new Size(94, 29);
+            ClearAllChangedMetadataButton.TabIndex = 2;
+            ClearAllChangedMetadataButton.Text = "Clear All";
+            ClearAllChangedMetadataButton.UseVisualStyleBackColor = true;
+            ClearAllChangedMetadataButton.Click += ClearAllChangedMetadataButton_Click;
+            // 
+            // SelectAllChangedMetadataButton
+            // 
+            SelectAllChangedMetadataButton.Location = new Point(5, 8);
+            SelectAllChangedMetadataButton.Name = "SelectAllChangedMetadataButton";
+            SelectAllChangedMetadataButton.Size = new Size(94, 29);
+            SelectAllChangedMetadataButton.TabIndex = 1;
+            SelectAllChangedMetadataButton.Text = "Select All";
+            SelectAllChangedMetadataButton.UseVisualStyleBackColor = true;
+            SelectAllChangedMetadataButton.Click += SelectAllChangedMetadataButton_Click;
             // 
             // panelSelectProject
             // 
@@ -503,7 +529,7 @@
             // 
             // RescanButton
             // 
-            RescanButton.Location = new Point(253, 21);
+            RescanButton.Location = new Point(253, 8);
             RescanButton.Name = "RescanButton";
             RescanButton.Size = new Size(131, 29);
             RescanButton.TabIndex = 7;
@@ -513,7 +539,7 @@
             // 
             // ClearAllButton
             // 
-            ClearAllButton.Location = new Point(135, 20);
+            ClearAllButton.Location = new Point(126, 8);
             ClearAllButton.Name = "ClearAllButton";
             ClearAllButton.Size = new Size(94, 29);
             ClearAllButton.TabIndex = 6;
@@ -523,7 +549,7 @@
             // 
             // SelectAllButton
             // 
-            SelectAllButton.Location = new Point(16, 21);
+            SelectAllButton.Location = new Point(4, 7);
             SelectAllButton.Name = "SelectAllButton";
             SelectAllButton.Size = new Size(94, 29);
             SelectAllButton.TabIndex = 5;
@@ -549,11 +575,11 @@
             NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, Issue });
-            NewTestCasesDataGridView.Location = new Point(13, 59);
+            NewTestCasesDataGridView.Location = new Point(2, 43);
             NewTestCasesDataGridView.Name = "NewTestCasesDataGridView";
             NewTestCasesDataGridView.RowHeadersVisible = false;
             NewTestCasesDataGridView.RowHeadersWidth = 51;
-            NewTestCasesDataGridView.Size = new Size(739, 291);
+            NewTestCasesDataGridView.Size = new Size(750, 307);
             NewTestCasesDataGridView.TabIndex = 2;
             // 
             // MetadataSelect
@@ -599,28 +625,88 @@
             // panelHandleDifferences
             // 
             panelHandleDifferences.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelHandleDifferences.Controls.Add(splitContainer2);
             panelHandleDifferences.Controls.Add(HandleDiffRescanTestCasesButton);
-            panelHandleDifferences.Controls.Add(HandleDiffDiffViewer);
             panelHandleDifferences.Controls.Add(HandleDiffProgressBar);
             panelHandleDifferences.Controls.Add(UploadDiffToDokimionButton);
             panelHandleDifferences.Controls.Add(HandleDiffClearAllButton);
             panelHandleDifferences.Controls.Add(HandleDiffSelectAllButton);
-            panelHandleDifferences.Controls.Add(HandleDiffDataGridView);
             panelHandleDifferences.Location = new Point(11, 53);
             panelHandleDifferences.Name = "panelHandleDifferences";
             panelHandleDifferences.Size = new Size(758, 389);
             panelHandleDifferences.TabIndex = 0;
             panelHandleDifferences.Visible = false;
             // 
-            // HandleDiffRescanTestCasesButton
+            // splitContainer2
             // 
-            HandleDiffRescanTestCasesButton.Location = new Point(206, 7);
-            HandleDiffRescanTestCasesButton.Name = "HandleDiffRescanTestCasesButton";
-            HandleDiffRescanTestCasesButton.Size = new Size(152, 29);
-            HandleDiffRescanTestCasesButton.TabIndex = 12;
-            HandleDiffRescanTestCasesButton.Text = "Rescan Test Cases";
-            HandleDiffRescanTestCasesButton.UseVisualStyleBackColor = true;
-            HandleDiffRescanTestCasesButton.Click += HandleDiffRescanTestCasesButton_Click;
+            splitContainer2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer2.Location = new Point(1, 40);
+            splitContainer2.Name = "splitContainer2";
+            splitContainer2.Orientation = Orientation.Horizontal;
+            // 
+            // splitContainer2.Panel1
+            // 
+            splitContainer2.Panel1.Controls.Add(HandleDiffDataGridView);
+            // 
+            // splitContainer2.Panel2
+            // 
+            splitContainer2.Panel2.Controls.Add(HandleDiffDiffViewer);
+            splitContainer2.Size = new Size(757, 305);
+            splitContainer2.SplitterDistance = 130;
+            splitContainer2.TabIndex = 13;
+            // 
+            // HandleDiffDataGridView
+            // 
+            HandleDiffDataGridView.AllowUserToAddRows = false;
+            HandleDiffDataGridView.AllowUserToDeleteRows = false;
+            HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            HandleDiffDataGridView.ColumnHeadersHeight = 29;
+            HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
+            HandleDiffDataGridView.Location = new Point(-1, 0);
+            HandleDiffDataGridView.Name = "HandleDiffDataGridView";
+            HandleDiffDataGridView.RowHeadersVisible = false;
+            HandleDiffDataGridView.RowHeadersWidth = 51;
+            HandleDiffDataGridView.Size = new Size(754, 128);
+            HandleDiffDataGridView.TabIndex = 12;
+            // 
+            // dataGridViewCheckBoxColumn1
+            // 
+            dataGridViewCheckBoxColumn1.HeaderText = "Select";
+            dataGridViewCheckBoxColumn1.MinimumWidth = 6;
+            dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
+            dataGridViewCheckBoxColumn1.Width = 50;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewTextBoxColumn1.HeaderText = "ID";
+            dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            dataGridViewTextBoxColumn1.ReadOnly = true;
+            dataGridViewTextBoxColumn1.Width = 50;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.HeaderText = "Name";
+            dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            dataGridViewTextBoxColumn2.ReadOnly = true;
+            dataGridViewTextBoxColumn2.Width = 200;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            dataGridViewTextBoxColumn3.HeaderText = "Notes";
+            dataGridViewTextBoxColumn3.MinimumWidth = 6;
+            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            dataGridViewTextBoxColumn3.ReadOnly = true;
+            dataGridViewTextBoxColumn3.Width = 200;
             // 
             // HandleDiffDiffViewer
             // 
@@ -651,7 +737,7 @@
             HandleDiffDiffViewer.LineNumberForeColor = Color.FromArgb(64, 128, 160);
             HandleDiffDiffViewer.LineNumberWidth = 60;
             HandleDiffDiffViewer.LinesContext = 1;
-            HandleDiffDiffViewer.Location = new Point(2, 169);
+            HandleDiffDiffViewer.Location = new Point(2, -3);
             HandleDiffDiffViewer.Margin = new Padding(3, 4, 3, 4);
             HandleDiffDiffViewer.Name = "HandleDiffDiffViewer";
             HandleDiffDiffViewer.NewText = null;
@@ -664,9 +750,19 @@
             HandleDiffDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             HandleDiffDiffViewer.SplitterBorderWidth = new Padding(0);
             HandleDiffDiffViewer.SplitterWidth = 5D;
-            HandleDiffDiffViewer.TabIndex = 11;
+            HandleDiffDiffViewer.TabIndex = 14;
             HandleDiffDiffViewer.UnchangedBackColor = Color.FromArgb(0, 0, 0, 0);
             HandleDiffDiffViewer.UnchangedForeColor = Color.FromArgb(0, 0, 0);
+            // 
+            // HandleDiffRescanTestCasesButton
+            // 
+            HandleDiffRescanTestCasesButton.Location = new Point(206, 7);
+            HandleDiffRescanTestCasesButton.Name = "HandleDiffRescanTestCasesButton";
+            HandleDiffRescanTestCasesButton.Size = new Size(152, 29);
+            HandleDiffRescanTestCasesButton.TabIndex = 12;
+            HandleDiffRescanTestCasesButton.Text = "Rescan Test Cases";
+            HandleDiffRescanTestCasesButton.UseVisualStyleBackColor = true;
+            HandleDiffRescanTestCasesButton.Click += HandleDiffRescanTestCasesButton_Click;
             // 
             // HandleDiffProgressBar
             // 
@@ -707,59 +803,6 @@
             HandleDiffSelectAllButton.UseVisualStyleBackColor = true;
             HandleDiffSelectAllButton.Click += HandleDiffSelectAllButton_Click;
             // 
-            // HandleDiffDataGridView
-            // 
-            HandleDiffDataGridView.AllowUserToAddRows = false;
-            HandleDiffDataGridView.AllowUserToDeleteRows = false;
-            HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            HandleDiffDataGridView.ColumnHeadersHeight = 29;
-            HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
-            HandleDiffDataGridView.Location = new Point(6, 41);
-            HandleDiffDataGridView.Name = "HandleDiffDataGridView";
-            HandleDiffDataGridView.RowHeadersWidth = 51;
-            HandleDiffDataGridView.Size = new Size(749, 128);
-            HandleDiffDataGridView.TabIndex = 6;
-            HandleDiffDataGridView.CellClick += HandleDiffDataGridView_CellClick;
-            // 
-            // dataGridViewCheckBoxColumn1
-            // 
-            dataGridViewCheckBoxColumn1.HeaderText = "Select";
-            dataGridViewCheckBoxColumn1.MinimumWidth = 6;
-            dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
-            dataGridViewCheckBoxColumn1.Width = 50;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            dataGridViewTextBoxColumn1.HeaderText = "ID";
-            dataGridViewTextBoxColumn1.MinimumWidth = 6;
-            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            dataGridViewTextBoxColumn1.ReadOnly = true;
-            dataGridViewTextBoxColumn1.Width = 50;
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            dataGridViewTextBoxColumn2.HeaderText = "Name";
-            dataGridViewTextBoxColumn2.MinimumWidth = 6;
-            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            dataGridViewTextBoxColumn2.ReadOnly = true;
-            dataGridViewTextBoxColumn2.Width = 200;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            dataGridViewTextBoxColumn3.HeaderText = "Notes";
-            dataGridViewTextBoxColumn3.MinimumWidth = 6;
-            dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            dataGridViewTextBoxColumn3.ReadOnly = true;
-            dataGridViewTextBoxColumn3.Width = 200;
-            // 
             // panelDone
             // 
             panelDone.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -786,9 +829,9 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 553);
+            Controls.Add(panelDownloadChangedMetadata);
             Controls.Add(panelHandleDifferences);
             Controls.Add(panelDownloadNewTestCases);
-            Controls.Add(panelDownloadChangedMetadata);
             Controls.Add(panelDone);
             Controls.Add(panelSelectRepo);
             Controls.Add(panelLogin);
@@ -803,6 +846,10 @@
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();
             panelDownloadChangedMetadata.ResumeLayout(false);
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)ChangedMetadataDataGridView).EndInit();
             panelSelectProject.ResumeLayout(false);
             panelSelectProject.PerformLayout();
@@ -811,6 +858,10 @@
             panelDownloadNewTestCases.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)NewTestCasesDataGridView).EndInit();
             panelHandleDifferences.ResumeLayout(false);
+            splitContainer2.Panel1.ResumeLayout(false);
+            splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer2).EndInit();
+            splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)HandleDiffDataGridView).EndInit();
             panelDone.ResumeLayout(false);
             panelDone.PerformLayout();
@@ -881,26 +932,28 @@
         private Button DownloadChangedMetadataButton;
         private Button ClearAllChangedMetadataButton;
         private Button SelectAllChangedMetadataButton;
-        private DataGridViewCheckBoxColumn NewTestCaseSelect;
-        private DataGridViewTextBoxColumn NewTestCaseId;
-        private DataGridViewTextBoxColumn NewTestCaseName;
-        private DataGridViewTextBoxColumn NewTestCaseNotes;
-        public DataGridView ChangedMetadataDataGridView;
         private DataGridViewCheckBoxColumn MetadataSelect;
         private DataGridViewTextBoxColumn MetadataID;
         private DataGridViewTextBoxColumn MetadataName;
         private DataGridViewTextBoxColumn Issue;
-        public DiffPlex.WindowsForms.Controls.DiffViewer ChangedMetadataDiffViewer;
-        public DiffPlex.WindowsForms.Controls.DiffViewer HandleDiffDiffViewer;
         public ProgressBar HandleDiffProgressBar;
         private Button UploadDiffToDokimionButton;
         private Button HandleDiffClearAllButton;
         private Button HandleDiffSelectAllButton;
+        private Button HandleDiffRescanTestCasesButton;
+        private SplitContainer splitContainer1;
+        public DataGridView ChangedMetadataDataGridView;
+        private DataGridViewCheckBoxColumn NewTestCaseSelect;
+        private DataGridViewTextBoxColumn NewTestCaseId;
+        private DataGridViewTextBoxColumn NewTestCaseName;
+        private DataGridViewTextBoxColumn NewTestCaseNotes;
+        public DiffPlex.WindowsForms.Controls.DiffViewer ChangedMetadataDiffViewer;
+        private SplitContainer splitContainer2;
         public DataGridView HandleDiffDataGridView;
         private DataGridViewCheckBoxColumn dataGridViewCheckBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-        private Button HandleDiffRescanTestCasesButton;
+        public DiffPlex.WindowsForms.Controls.DiffViewer HandleDiffDiffViewer;
     }
 }
