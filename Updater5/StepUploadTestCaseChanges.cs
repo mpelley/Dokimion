@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Updater5
 {
-    public class StepHandleDifferences : StepCode
+    public class StepUploadTestCaseChanges : StepCode
     {
         Dictionary<string, string> TestCaseActionsFromFiles;
 
-        public StepHandleDifferences(Panel panel, Data data, Updater form) : base(panel, data, form)
+        public StepUploadTestCaseChanges(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
             StepName = "Upload Changed Test Case Steps";
             TestCaseActionsFromFiles = new();
@@ -196,36 +196,20 @@ namespace Updater5
                     continue;
                 }
                 string id = (string)rows[i].Cells[1].Value;
-                string path = Path.Combine(repo, id + ".JSON");
-                string json;
+
+                // Use the downloaded metadata from Dokimion:
+                TestCaseForUpload? testCase;
                 try
                 {
-                    json = File.ReadAllText(path);
+                    testCase = Data.TestCases[id];
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Form.FeedbackTextBox.Text = $"Cannot upload test case {id} to Dokimion because:";
-                    Form.FeedbackTextBox.Text += $"\r\n{ex.Message}.";
+                    Form.FeedbackTextBox.Text = $"Cannot recall downloaded metadata for ID {id}.";
                     return;
                 }
 
-                // A convoluted means to populate a TestCaseForUpload from the human-readable metadata file...
-                HumanMetadata? hmd = JsonConvert.DeserializeObject<HumanMetadata>(json);
-                if (hmd == null)
-                {
-                    Form.FeedbackTextBox.Text = $"Cannot deserialize {path}.";
-                    return;
-                }
-                Metadata md = (Metadata)hmd;
-                ReplaceAttributeNamesWithNumbers(ref md);
-                json = JsonConvert.SerializeObject(md);
-                TestCaseForUpload? testCase = JsonConvert.DeserializeObject<TestCaseForUpload>(json);
-                if (testCase == null)
-                {
-                    Form.FeedbackTextBox.Text = $"Cannot de-reserialized {path}.";
-                    return;
-                }
-
+                // Use the file from the repo for the step/action:
                 string action = "";
                 try
                 {
@@ -236,6 +220,7 @@ namespace Updater5
                     Form.FeedbackTextBox.Text = $"Cannot get pre-loaded action from file for ID {id} because: \r\n{ex.Message}.";
                     return;
                 }
+
                 testCase.steps = new();
                 Step step = new Step();
                 step.action = action;
@@ -246,11 +231,12 @@ namespace Updater5
                 {
                     case UploadStatus.Updated:
                         testcasesChanged++;
-                        // If it is a new test case, add it to the Data.TestCases list
-                        // so it is there next time we do the comparison of test cases.
+                        // Read the test case back, so we have an up-to-date version in our cache
                         TestCase? newTestCase = Data.Dokimion.GetTestCaseAsObject(testCase.id, Data.Project);
                         if (newTestCase != null)
                         {
+                            // If it is a new test case, add it to the Data.TestCases list
+                            // so it is there next time we do the comparison of test cases.
                             if (Data.TestCases.ContainsKey(testCase.id))
                             {
                                 Data.TestCases[testCase.id] = newTestCase;

@@ -30,6 +30,7 @@
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             PrevButton = new Button();
             NextButton = new Button();
             QuitButton = new Button();
@@ -147,10 +148,13 @@
             // 
             // StepTextBox
             // 
+            StepTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            StepTextBox.BorderStyle = BorderStyle.None;
+            StepTextBox.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             StepTextBox.Location = new Point(11, 12);
             StepTextBox.Name = "StepTextBox";
             StepTextBox.ReadOnly = true;
-            StepTextBox.Size = new Size(337, 27);
+            StepTextBox.Size = new Size(757, 27);
             StepTextBox.TabIndex = 3;
             // 
             // FeedbackTextBox
@@ -265,6 +269,7 @@
             // panelDownloadChangedMetadata
             // 
             panelDownloadChangedMetadata.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelDownloadChangedMetadata.BorderStyle = BorderStyle.FixedSingle;
             panelDownloadChangedMetadata.Controls.Add(DownloadMetadataRescanButton);
             panelDownloadChangedMetadata.Controls.Add(splitContainer1);
             panelDownloadChangedMetadata.Controls.Add(ChangedMetadataProgressBar);
@@ -301,8 +306,8 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(ChangedMetadataDiffViewer);
-            splitContainer1.Size = new Size(757, 305);
-            splitContainer1.SplitterDistance = 130;
+            splitContainer1.Size = new Size(755, 303);
+            splitContainer1.SplitterDistance = 129;
             splitContainer1.TabIndex = 5;
             // 
             // ChangedMetadataDataGridView
@@ -324,7 +329,7 @@
             ChangedMetadataDataGridView.Name = "ChangedMetadataDataGridView";
             ChangedMetadataDataGridView.RowHeadersVisible = false;
             ChangedMetadataDataGridView.RowHeadersWidth = 51;
-            ChangedMetadataDataGridView.Size = new Size(754, 128);
+            ChangedMetadataDataGridView.Size = new Size(752, 127);
             ChangedMetadataDataGridView.TabIndex = 6;
             ChangedMetadataDataGridView.CellClick += ChangedMetadataDataGridView_CellClick;
             // 
@@ -396,7 +401,7 @@
             ChangedMetadataDiffViewer.OldText = null;
             ChangedMetadataDiffViewer.OldTextHeader = null;
             ChangedMetadataDiffViewer.SideBySideModeToggleTitle = "_Split view";
-            ChangedMetadataDiffViewer.Size = new Size(752, 176);
+            ChangedMetadataDiffViewer.Size = new Size(750, 175);
             ChangedMetadataDiffViewer.SplitterBackColor = Color.FromArgb(64, 128, 128, 128);
             ChangedMetadataDiffViewer.SplitterBorderColor = Color.FromArgb(64, 128, 128, 128);
             ChangedMetadataDiffViewer.SplitterBorderWidth = new Padding(0);
@@ -408,15 +413,15 @@
             // ChangedMetadataProgressBar
             // 
             ChangedMetadataProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            ChangedMetadataProgressBar.Location = new Point(364, 353);
+            ChangedMetadataProgressBar.Location = new Point(364, 351);
             ChangedMetadataProgressBar.Name = "ChangedMetadataProgressBar";
-            ChangedMetadataProgressBar.Size = new Size(388, 29);
+            ChangedMetadataProgressBar.Size = new Size(386, 29);
             ChangedMetadataProgressBar.TabIndex = 4;
             // 
             // DownloadChangedMetadataButton
             // 
             DownloadChangedMetadataButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            DownloadChangedMetadataButton.Location = new Point(9, 355);
+            DownloadChangedMetadataButton.Location = new Point(9, 353);
             DownloadChangedMetadataButton.Name = "DownloadChangedMetadataButton";
             DownloadChangedMetadataButton.Size = new Size(349, 29);
             DownloadChangedMetadataButton.TabIndex = 3;
@@ -586,6 +591,14 @@
             NewTestCasesDataGridView.AllowUserToAddRows = false;
             NewTestCasesDataGridView.AllowUserToDeleteRows = false;
             NewTestCasesDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            NewTestCasesDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             NewTestCasesDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             NewTestCasesDataGridView.Columns.AddRange(new DataGridViewColumn[] { MetadataSelect, MetadataID, MetadataName, Issue });
             NewTestCasesDataGridView.Location = new Point(2, 43);
@@ -673,14 +686,14 @@
             HandleDiffDataGridView.AllowUserToAddRows = false;
             HandleDiffDataGridView.AllowUserToDeleteRows = false;
             HandleDiffDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            HandleDiffDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             HandleDiffDataGridView.ColumnHeadersHeight = 29;
             HandleDiffDataGridView.Columns.AddRange(new DataGridViewColumn[] { dataGridViewCheckBoxColumn1, dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2, dataGridViewTextBoxColumn3 });
             HandleDiffDataGridView.Location = new Point(-1, 0);
@@ -895,7 +908,7 @@
         private StepSelectProject StepSelectProject;
         private StepSelectRepo StepSelectRepo;
         private StepDownloadNewTestCases StepDownloadNewTestCases;
-        private StepHandleDifferences StepHandleDifferences;
+        private StepUploadTestCaseChanges StepHandleDifferences;
         private StepDownloadChangedMetadata StepDownloadChangedMetadata;
         private StepDone StepDone;
 

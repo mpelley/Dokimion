@@ -15,7 +15,7 @@ namespace Updater5
 
         public StepDownloadChangedMetadata(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
-            StepName = "Download changed metadata";
+            StepName = "Download Changed Metadata";
             MetadataFromFiles = new Dictionary<string, string>();
         }
 

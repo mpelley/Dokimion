@@ -14,7 +14,7 @@ namespace Updater5
     {
         public StepDownloadNewTestCases(Panel panel, Data data, Updater form) : base(panel, data, form)
         {
-            StepName = "Download new test cases";
+            StepName = "Download New Test Cases";
         }
 
         public override void Init()
