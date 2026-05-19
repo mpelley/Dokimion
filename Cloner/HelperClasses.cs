@@ -131,7 +131,8 @@ namespace Cloner
 
     public class TestSuite
     {
-        public string name;
+        public string name = "";
+        public string id = "";
         public TestSuiteFilter filter;
     }
 

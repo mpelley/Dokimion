@@ -1,3 +1,4 @@
+
 namespace Updater5
 {
     internal static class Program
@@ -11,7 +12,15 @@ namespace Updater5
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.File("Updater_.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
             Application.Run(new Updater());
+
+            Log.CloseAndFlush();
+
         }
     }
 }

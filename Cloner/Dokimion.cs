@@ -331,6 +331,12 @@ namespace Cloner
             return PostContent(url, json, "Attribute", attr.name);
         }
 
+        public bool DeleteAttribute(Project project, Attribute attr)
+        {
+            string url = BaseDokimionApiUrl() + $"/{project.id}/attribute/{attr.id}";
+            return Delete(url, "Attribute", attr.name);
+        }
+
         public bool CreateTestCase(Project project, TestCaseForUpload tc)
         {
             string url = BaseDokimionApiUrl() + $"/{project.id}/testcase";
@@ -350,6 +356,38 @@ namespace Cloner
             string url = BaseDokimionApiUrl() + $"/{project.id}/testsuite";
             string json = JsonConvert.SerializeObject(suite);
             return PostContent(url, json, "Test Suite", suite.name);
+        }
+
+        public bool DeleteTestSuite(Project project, TestSuite suite)
+        {
+            string url = BaseDokimionApiUrl() + $"/{project.id}/testsuite/{suite.id}";
+            return Delete(url, "TestSuite", suite.name);
+        }
+
+        private bool Delete(string url, string elementType, string elementName)
+        {
+            bool success = true;
+            try
+            {
+                var resp = m_Client.DeleteAsync(url).Result;
+                if (false == resp.IsSuccessStatusCode)
+                {
+                    string problem = resp.Content.ReadAsStringAsync().Result;
+                    Error = $"Server returned {resp.ReasonPhrase} when deleting {elementType} {elementName}.\r\n";
+                    Error += problem;
+                    success = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Error = $"Exception thrown while deleting {elementType} {elementName}\r\n" + ex.Message;
+                if (ex.InnerException != null)
+                {
+                    Error += ex.InnerException.Message;
+                }
+                success = false;
+            }
+            return success;
         }
 
         private bool PostContent(string url, string json, string elementType, string elementName)

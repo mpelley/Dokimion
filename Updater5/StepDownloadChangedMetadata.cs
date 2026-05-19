@@ -1,12 +1,4 @@
-﻿using Dokimion;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Updater5
 {
     public class StepDownloadChangedMetadata : StepCode
@@ -140,10 +132,12 @@ namespace Updater5
                 string json = hmd.PrettyPrint(Data.Project.attributes);
                 try
                 {
+                    Log.Information($"Updating metadata for testcase {id} for project {Data.Project.name} in file {path}.");
                     File.WriteAllText(path, json);
                 }
                 catch (Exception ex)
                 {
+                    Log.Error($"Cannot write {path} because {ex.Message}");
                     Form.FeedbackTextBox.Text += $"\r\nCannot write {path} because {ex.Message}";
                     return;
                 }

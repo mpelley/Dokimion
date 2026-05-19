@@ -1,12 +1,4 @@
-﻿using Dokimion;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Updater5
 {
     public class StepUploadTestCaseChanges : StepCode
@@ -226,6 +218,7 @@ namespace Updater5
                 step.action = action;
                 testCase.steps.Add(step);
                 bool abort = false;
+                Log.Information($"Uploading test case {id} for project {Data.Project.name} to Dokimion.");
                 UploadStatus status = Data.Dokimion.UploadTestCaseObjectToProject(repo, testCase, Data.Project, Data.Project.attributes);
                 switch (status)
                 {
@@ -248,6 +241,7 @@ namespace Updater5
                         }
                         break;
                     case UploadStatus.Error:
+                        Log.Error($"Error uploading test case {id} for project {Data.Project.name} to Dokimion because {Data.Dokimion.Error}");
                         Form.FeedbackTextBox.Text = Data.Dokimion.Error;
                         break;
                     case UploadStatus.NotChanged:

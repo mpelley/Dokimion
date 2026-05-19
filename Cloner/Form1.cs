@@ -5,13 +5,15 @@ namespace Cloner
 {
     public partial class Form1 : Form
     {
-        private Dokimion? SourceDokimion;
-        private Dokimion? DestDokimion;
+        private Dokimion SourceDokimion;
+        private Dokimion DestDokimion;
         private Dictionary<string, Project> ProjectMap;
 
         public Form1()
         {
             InitializeComponent();
+            SourceDokimion = new("", true);
+            DestDokimion = new("", true);
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -59,13 +61,17 @@ namespace Cloner
                 ; // Ignore errors
             }
 
-            SourceDokimion = dlg.Source;
-            DestDokimion = dlg.Destination;
+            Dokimion? sourceDokimion = dlg.Source;
+            if (null != sourceDokimion)
+                SourceDokimion = sourceDokimion;
+            Dokimion? destDokimion = dlg.Destination;
+            if (null != destDokimion)
+                DestDokimion= destDokimion;
 
             ProjectsListBox.Items.Clear();
             ProjectMap.Clear();
 
-            if (SourceDokimion != null && DestDokimion != null)
+            if (sourceDokimion != null && destDokimion != null)
             {
                 List<Project>? projects = SourceDokimion.GetProjects();
                 if (projects == null)
@@ -82,6 +88,11 @@ namespace Cloner
                 }
 
             }
+            else
+            {
+                StatusTextBox.Text = "You must log into both servers for cloning.";
+            }
+
             ApplyFiltersButton.Enabled = false;
         }
 
@@ -258,16 +269,31 @@ namespace Cloner
 
             // Reject the clone if the desired project already exists in the destination server; we won't modify existing projects
             string projectName = NewProjectNameTextBox.Text;
-            if (IsProjectInDest(projectName))
+            destProject.name = projectName;
+            bool overwriting = false;
+            string? destProjectId = GetDestProjectId(projectName);
+            if (destProjectId != null)
             {
-                StatusTextBox.Text = $"Cannot clone; project {projectName} already exists in destination";
-                return;
+                StatusTextBox.Text = $"Overwriting project {projectName}\r\n";
+                destProject.id = destProjectId;
+                overwriting = true ;
+            }
+            else
+            {
+                // Create the new project in the destination
+                if (false == CreateProject(destProject))
+                {
+                    return;
+                }
             }
 
-            // Create the new project in the destination
-            if (false == CreateProject(destProject))
+            if (overwriting)
             {
-                return;
+                if (false == DeleteAttributes(destProject))
+                {
+                    StatusTextBox.Text = "Failed to delete Attributes" + DestDokimion.Error;
+                    return;
+                }
             }
 
             // Copy the project's attributes from the source to destination
@@ -294,6 +320,15 @@ namespace Cloner
                 return;
             }
 
+            if (overwriting)
+            {
+                if (false == DeleteTestSuites(destProject))
+                {
+                    StatusTextBox.Text = "Failed to delete Test Suites" + DestDokimion.Error;
+                    return;
+                }
+            }
+
             // Copy the test suites to the destination server
             foreach (TestSuite testSuite in testSuites)
             {
@@ -302,9 +337,11 @@ namespace Cloner
                     attr.id = attrMap[attr.id];
                 }
 
+                testSuite.id = null;
+
                 if (false == DestDokimion.CreateTestSuite(destProject, testSuite))
                 {
-                    StatusTextBox.Text = SourceDokimion.Error;
+                    StatusTextBox.Text = DestDokimion.Error;
                     return;
                 }
             }
@@ -329,7 +366,7 @@ namespace Cloner
             ProgressBar.Maximum = maxId;
             ProgressBar.Step = 1;
             ProgressBar.Value = 0;
-            StatusTextBox.Text = $"Creating {maxId} empty test cases";
+            StatusTextBox.Text += $"Creating {maxId} empty test cases\r\n";
 
             TestCaseForUpload emptyTc = new();
             emptyTc.name = "dummy";
@@ -337,10 +374,13 @@ namespace Cloner
 
             for (int i=1; i <= maxId; i++)
             {
-                if (false == DestDokimion.CreateTestCase(destProject, emptyTc))
+                if (null == DestDokimion.GetTestCaseForId(destProject, i.ToString()))
                 {
-                    StatusTextBox.Text = DestDokimion.Error;
-                    return;
+                    if (false == DestDokimion.CreateTestCase(destProject, emptyTc))
+                    {
+                        StatusTextBox.Text = DestDokimion.Error;
+                        return;
+                    }
                 }
                 ProgressBar.PerformStep();
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
@@ -359,7 +399,7 @@ namespace Cloner
             // Update the test cases we will be using
             ProgressBar.Maximum = testCaseCount;
             ProgressBar.Value = 0;
-            StatusTextBox.Text = $"Filling in {testCaseCount} test cases";
+            StatusTextBox.Text += $"Filling in {testCaseCount} test cases\r\n";
 
             foreach (DataGridViewRow row in TestcaseDataGridView.Rows)
             {
@@ -374,14 +414,18 @@ namespace Cloner
                 Thread.Sleep(TimeSpan.FromMilliseconds(10));
             }
 
-            StatusTextBox.Text = "Cloning has completed";
+            StatusTextBox.Text += "Cloning has completed\r\n";
         }
 
-        private bool IsProjectInDest(string projectName)
+        private string? GetDestProjectId(string projectName)
         {
             List<Project> destProjects = DestDokimion.GetProjects();
+            if (destProjects == null || destProjects.Count == 0)
+            { 
+                return null; 
+            }
             var matchingProjects = destProjects.Where((p) => p.name == projectName);
-            return matchingProjects.Any();
+            return matchingProjects.First()?.id;
         }
 
         private bool CreateProject(Project destProject)
@@ -402,6 +446,39 @@ namespace Cloner
             return true;
         }
 
+        private bool DeleteAttributes(Project project)
+        {
+            List<Attribute> attrList = DestDokimion.GetAttributesForProject(project.id);
+
+            foreach (var attr in attrList)
+            {
+                if (false == DestDokimion.DeleteAttribute(project, attr))
+                {
+                    StatusTextBox.Text = $"Failed to delete Attribute {attr.name}.\r\n" + DestDokimion.Error;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool DeleteTestSuites(Project project)
+        {
+            TestSuite[]? testSuites = DestDokimion.GetTestSuites(project);
+
+            if (testSuites != null)
+            {
+                foreach (var suite in testSuites)
+                {
+                    if (false == DestDokimion.DeleteTestSuite(project, suite))
+                    {
+                        StatusTextBox.Text = $"Failed to delete Test Suite {suite.name}.\r\n" + DestDokimion.Error;
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private bool CopyAttributes(Project sourceProject, Project destProject)
         {
             foreach (var srcAttr in sourceProject.attributes)
@@ -410,7 +487,7 @@ namespace Cloner
                 destAttr.id = null;
                 if (false == DestDokimion.CreateAttribute(destProject, destAttr))
                 {
-                    StatusTextBox.Text = "Failed to copy Attributes.\r\n" + DestDokimion.Error;
+                    StatusTextBox.Text = $"Failed to copy Attribute {destAttr.name}.\r\n" + DestDokimion.Error;
                     return false;
                 }
             }

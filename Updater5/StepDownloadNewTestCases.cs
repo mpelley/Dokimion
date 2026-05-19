@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Dokimion;
-using Newtonsoft.Json;
+﻿using static System.Net.Mime.MediaTypeNames;
 
 namespace Updater5
 {
@@ -177,16 +169,19 @@ namespace Updater5
                     string path = Path.Combine(repo, id + ".JSON");
                     try
                     {
+                        Log.Information($"Saving metadata for test case {id} for project \"{Data.Project.name}\" to {path}");
                         File.WriteAllText(path, json);
                     }
                     catch (Exception ex)
                     {
-                        Form.FeedbackTextBox.Text += $"\r\nError {ex.Message}";
+                        Log.Error($"Error saving metadata for test case { id } for project \"{Data.Project.name}\" to {path} because {ex.Message}") ;
+                        Form.FeedbackTextBox.Text += $"\r\nError saving metadata for test case {id} {ex.Message}";
                         return;
                     }
 
                     if ((File.Exists(Path.Combine(repo, id + ".txt"))) || (File.Exists(Path.Combine(repo, id + ".html"))))
                     {
+                        Log.Information($"Not saving step data for testcase {id} for project \"{Data.Project.name}\" because it already exists.");
                         Form.FeedbackTextBox.Text = $"\r\nNot saving step data for {id} because it already exists.";
                     }
                     else
@@ -208,6 +203,7 @@ namespace Updater5
                         }
                         catch (Exception ex)
                         {
+                            Log.Error($"Error saving step data for test case {id} for project \"{Data.Project.name}\" to {path} because {ex.Message}");
                             Form.FeedbackTextBox.Text += $"\r\nError writing step data for id {id} {ex.Message}";
                             return;
                         }
